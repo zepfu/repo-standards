@@ -1,0 +1,61 @@
+---
+name: Config Standards Validation
+
+on:
+  workflow_call:
+
+jobs:
+  validate-configs:
+    name: Validate Required Config Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check required config files exist
+        run: |
+          REQUIRED_FILES=(
+            ".gitattributes"
+            ".gitignore"
+            ".editorconfig"
+            ".flake8"
+            ".shellcheckrc"
+            ".pre-commit-config.yaml"
+          )
+          
+          MISSING=()
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING+=("$file")
+            fi
+          done
+          
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "❌ Missing required config files:"
+            printf '  - %s\n' "${MISSING[@]}"
+            echo ""
+            echo "Run: curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
+            exit 1
+          fi
+          
+          echo "✅ All required config files present"
+      
+      - name: Validate .gitattributes content
+        run: |
+          if ! grep -q "text=auto" .gitattributes; then
+            echo "❌ .gitattributes must contain: * text=auto"
+            exit 1
+          fi
+          
+          if ! grep -q "\.sh text eol=lf" .gitattributes; then
+            echo "❌ .gitattributes must enforce LF for .sh files"
+            exit 1
+          fi
+          
+          if ! grep -q "\.py text eol=lf" .gitattributes; then
+            echo "❌ .gitattributes must enforce LF for .py files"
+            exit 1
+          fi
+          
+          echo "✅ .gitattributes is valid"

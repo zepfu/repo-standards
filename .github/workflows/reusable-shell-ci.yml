@@ -1,0 +1,49 @@
+---
+name: Shell Script Standards Enforcement
+
+on:
+  workflow_call:
+    inputs:
+      severity:
+        type: string
+        default: 'error'
+        description: 'ShellCheck severity level (error, warning, info, style)'
+      shellcheck-version:
+        type: string
+        default: 'v0.9.0'
+        description: 'ShellCheck version to use'
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: './scripts'
+          severity: ${{ inputs.severity }}
+          check_together: 'yes'
+          version: ${{ inputs.shellcheck-version }}
+
+  bash-syntax:
+    name: Bash Syntax Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate Bash scripts syntax
+        run: |
+          shopt -s globstar nullglob
+          for file in scripts/**/*.sh; do
+            if [ -f "$file" ]; then
+              echo "Checking $file"
+              bash -n "$file"
+            fi
+          done

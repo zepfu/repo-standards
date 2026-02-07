@@ -1,0 +1,40 @@
+---
+name: Docker Build Standards
+
+on:
+  workflow_call:
+    inputs:
+      platforms:
+        type: string
+        default: 'linux/amd64'
+        description: 'Platforms to build for'
+      push:
+        type: boolean
+        default: false
+        description: 'Push image after build'
+
+jobs:
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ inputs.push }}
+          platforms: ${{ inputs.platforms }}
+          tags: test:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
+      - name: Inspect image
+        if: ${{ !inputs.push }}
+        run: docker images test:latest

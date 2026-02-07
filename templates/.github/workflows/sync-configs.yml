@@ -1,0 +1,48 @@
+---
+name: Sync Config Files from repo-standards
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
+  workflow_dispatch: {}   # Allow manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync Configuration Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run sync script from repo-standards
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: sync config files from repo-standards'
+          title: 'Update config files from repo-standards'
+          body: |
+            🤖 Automated sync of configuration files from [repo-standards](https://github.com/zepfu/repo-standards).
+            
+            ## Updated Files
+            - Config files (`.gitattributes`, `.gitignore`, `.editorconfig`, etc.)
+            - `scripts/sync-configs.sh` (self-update)
+            
+            ## Review Checklist
+            - [ ] Check for repo-specific customizations that may be overwritten
+            - [ ] Verify no breaking changes in linting rules
+            - [ ] Test: `pre-commit run --all-files`
+            
+            See: https://github.com/zepfu/repo-standards/tree/main/templates
+          branch: sync-configs-from-standards
+          delete-branch: true
+          labels: |
+            dependencies
+            chore
