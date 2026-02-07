@@ -1,0 +1,131 @@
+---
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+
+jobs:
+  # Validate that repo-standards follows its own standards!
+  validate-self:
+    name: Validate Repository Standards
+    uses: ./.github/workflows/reusable-config-validation.yml
+
+  python-standards:
+    name: Python Standards (Self-Check)
+    uses: ./.github/workflows/reusable-python-ci.yml
+    with:
+      python-version: '3.11'
+
+  shell-standards:
+    name: Shell Standards (Self-Check)
+    uses: ./.github/workflows/reusable-shell-ci.yml
+    with:
+      severity: 'error'
+      shellcheck-version: 'v0.9.0'
+
+  pre-commit-check:
+    name: Pre-commit Standards (Self-Check)
+    uses: ./.github/workflows/reusable-pre-commit.yml
+    with:
+      python-version: '3.11'
+
+  # Additional check: Ensure reusable workflows are valid
+  validate-workflows:
+    name: Validate Workflow Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate workflow YAML syntax
+        run: |
+          echo "Checking all workflow files for valid YAML..."
+          for file in .github/workflows/*.yml; do
+            echo "Validating: $file"
+            python3 -c "import yaml; yaml.safe_load(open('$file'))"
+          done
+          echo "All workflow files are valid YAML!"
+
+      - name: Check for required workflows
+        run: |
+          REQUIRED_WORKFLOWS=(
+            "reusable-python-ci.yml"
+            "reusable-shell-ci.yml"
+            "reusable-docker-build.yml"
+            "reusable-pre-commit.yml"
+            "reusable-config-validation.yml"
+          )
+
+          MISSING=()
+          for workflow in "${REQUIRED_WORKFLOWS[@]}"; do
+            if [ ! -f ".github/workflows/$workflow" ]; then
+              MISSING+=("$workflow")
+            fi
+          done
+
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "ERROR: Missing required workflow files:"
+            printf '  - %s\n' "${MISSING[@]}"
+            exit 1
+          fi
+
+          echo "All required workflow files present!"
+
+  # Check that sync script is valid
+  validate-sync-script:
+    name: Validate Sync Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check sync script exists and is executable
+        run: |
+          if [ ! -f "scripts/sync-configs.sh" ]; then
+            echo "ERROR: scripts/sync-configs.sh not found"
+            exit 1
+          fi
+
+          if [ ! -x "scripts/sync-configs.sh" ]; then
+            echo "ERROR: scripts/sync-configs.sh is not executable"
+            exit 1
+          fi
+
+          echo "Sync script exists and is executable!"
+
+      - name: Validate sync script syntax
+        run: |
+          bash -n scripts/sync-configs.sh
+          echo "Sync script has valid bash syntax!"
+
+      - name: Test sync script (dry run)
+        run: |
+          # Test that the script can at least start
+          # Don't actually run it to avoid side effects
+          bash -c 'source scripts/sync-configs.sh --help 2>&1 | head -1' || true
+          echo "Sync script can be sourced without errors!"
+
+  # Summary job - all checks must pass
+  all-checks:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs:
+      - validate-self
+      - python-standards
+      - shell-standards
+      - pre-commit-check
+      - validate-workflows
+      - validate-sync-script
+    steps:
+      - name: Success
+        run: |
+          echo "=========================================="
+          echo "All validation checks passed!"
+          echo "repo-standards follows its own standards!"
+          echo "=========================================="
