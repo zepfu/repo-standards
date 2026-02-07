@@ -81,5 +81,15 @@ logs/
 # DON'T ignore templates/ - that's our main content!
 # DON'T ignore .github/workflows/ - those are our reusable workflows!
 
+# =============================================================================
 # Windows Zone Identifiers (WSL)
+# =============================================================================
 *:Zone.Identifier
+
+
+# =============================================================================
+# Sphinx documentation
+# =============================================================================
+docs/_build/
+docs/_static/
+docs/_templates/
