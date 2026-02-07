@@ -19,7 +19,7 @@ jobs:
           REQUIRED="3.11"
           PROVIDED="${{ inputs.python-version }}"
           if [[ "$PROVIDED" < "$REQUIRED" ]]; then
-            echo "❌ Python version must be $REQUIRED+ (organization standard)"
+            echo "ERROR: Python version must be $REQUIRED+ (organization standard)"
             echo "Provided: $PROVIDED"
             echo "See: https://github.com/zepfu/repo-standards#python-standards"
             exit 1
@@ -29,29 +29,29 @@ jobs:
     name: Python Linting
     runs-on: ubuntu-latest
     needs: validate-python-version
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install black isort flake8
-          
+
       - name: Run Black (check only)
         run: |
           black --check --line-length=100 scripts/*.py
-          
+
       - name: Run isort (check only)
         run: |
           isort --check --profile=black --line-length=100 scripts/*.py
-          
+
       - name: Run Flake8
         run: |
           flake8 scripts/*.py \
@@ -63,16 +63,16 @@ jobs:
     name: Python Syntax Validation
     runs-on: ubuntu-latest
     needs: validate-python-version
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
-          
+
       - name: Validate Python files compile
         run: |
           shopt -s nullglob

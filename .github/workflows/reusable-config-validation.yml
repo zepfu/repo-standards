@@ -8,11 +8,11 @@ jobs:
   validate-configs:
     name: Validate Required Config Files
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Check required config files exist
         run: |
           REQUIRED_FILES=(
@@ -23,39 +23,82 @@ jobs:
             ".shellcheckrc"
             ".pre-commit-config.yaml"
           )
-          
-          MISSING=()
+
+          RECOMMENDED_FILES=(
+            ".markdownlint.json"
+            "pyproject.toml"
+          )
+
+          MISSING_REQUIRED=()
           for file in "${REQUIRED_FILES[@]}"; do
             if [ ! -f "$file" ]; then
-              MISSING+=("$file")
+              MISSING_REQUIRED+=("$file")
             fi
           done
-          
-          if [ ${#MISSING[@]} -ne 0 ]; then
-            echo "❌ Missing required config files:"
-            printf '  - %s\n' "${MISSING[@]}"
+
+          if [ ${#MISSING_REQUIRED[@]} -ne 0 ]; then
+            echo "Missing REQUIRED config files:"
+            printf '  - %s\n' "${MISSING_REQUIRED[@]}"
             echo ""
             echo "Run: curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
             exit 1
           fi
-          
-          echo "✅ All required config files present"
-      
+
+          echo "All required config files present"
+          echo ""
+
+          # Check recommended files (warnings only)
+          MISSING_RECOMMENDED=()
+          for file in "${RECOMMENDED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING_RECOMMENDED+=("$file")
+            fi
+          done
+
+          if [ ${#MISSING_RECOMMENDED[@]} -ne 0 ]; then
+            echo "Recommended files missing (not required):"
+            printf '  - %s\n' "${MISSING_RECOMMENDED[@]}"
+            echo ""
+          fi
+
       - name: Validate .gitattributes content
         run: |
           if ! grep -q "text=auto" .gitattributes; then
-            echo "❌ .gitattributes must contain: * text=auto"
+            echo ".gitattributes must contain: * text=auto"
             exit 1
           fi
-          
+
           if ! grep -q "\.sh text eol=lf" .gitattributes; then
-            echo "❌ .gitattributes must enforce LF for .sh files"
+            echo ".gitattributes must enforce LF for .sh files"
             exit 1
           fi
-          
+
           if ! grep -q "\.py text eol=lf" .gitattributes; then
-            echo "❌ .gitattributes must enforce LF for .py files"
+            echo ".gitattributes must enforce LF for .py files"
             exit 1
           fi
-          
-          echo "✅ .gitattributes is valid"
+
+          echo ".gitattributes is valid"
+
+      - name: Validate .gitignore content
+        run: |
+          REQUIRED_PATTERNS=(
+            "__pycache__"
+            "*.pyc"
+            ".venv"
+            ".env"
+          )
+
+          MISSING=()
+          for pattern in "${REQUIRED_PATTERNS[@]}"; do
+            if ! grep -q "$pattern" .gitignore; then
+              MISSING+=("$pattern")
+            fi
+          done
+
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo ".gitignore should include:"
+            printf '  - %s\n' "${MISSING[@]}"
+          else
+            echo ".gitignore has required patterns"
+          fi

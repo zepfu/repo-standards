@@ -4,19 +4,41 @@
 
 This repository provides:
 - **Reusable GitHub Actions workflows** - Python, Shell, Docker, Pre-commit standards
-- **Configuration templates** - `.gitattributes`, `.gitignore`, `.editorconfig`, etc.
+- **Configuration files** - `.gitattributes`, `.gitignore`, `.editorconfig`, etc. (in repo root)
 - **Automated sync** - Keep all repos up to date with latest standards
+
+---
+
+## 🎯 Key Concept
+
+**This repository IS the standard.**
+
+All config files are in the **root** of this repo. Other repos sync directly from here.
+
+```
+repo-standards/              ← Other repos sync from here
+├── .gitattributes          ← The standard
+├── .gitignore              ← The standard
+├── .editorconfig           ← The standard
+├── .flake8                 ← The standard
+├── .shellcheckrc           ← The standard
+├── .pre-commit-config.yaml ← The standard
+├── .markdownlint.json      ← The standard
+├── pyproject.toml          ← The standard
+├── .github/workflows/      ← Reusable workflows
+└── scripts/
+    └── sync-configs.sh     ← Downloads files from root
+```
+
+**No templates/ directory needed** - the repo itself is the template!
+
+---
 
 ## Usage
 
 ### For New Repositories
 
-**Option 1: Use as Template (Recommended)**
-1. Click "Use this template" on GitHub
-2. All config files and workflows are copied automatically
-3. Push and CI enforces standards
-
-**Option 2: Manual Setup**
+**Quick setup:**
 ```bash
 # Run sync script
 curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
@@ -33,12 +55,14 @@ git commit -m "chore: add repo standards"
 curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
 
 # Add CI workflows that reference @main
-# See: templates/.github/workflows/ for examples
+# Create .github/workflows/ci.yml (see examples below)
 
 # Commit
 git add .
 git commit -m "chore: adopt repo standards"
 ```
+
+---
 
 ## Reusable Workflows
 
@@ -51,10 +75,10 @@ jobs:
     uses: zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main
     with:
       python-version: '3.11'
-  
+
   shell-standards:
     uses: zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main
-  
+
   config-validation:
     uses: zepfu/repo-standards/.github/workflows/reusable-config-validation.yml@main
 ```
@@ -66,36 +90,71 @@ jobs:
 - `reusable-pre-commit.yml` - Pre-commit hook enforcement
 - `reusable-config-validation.yml` - Config file validation
 
+---
+
 ## Configuration Files
 
-Templates in `templates/`:
+**What gets synced:**
 - `.gitattributes` - Git line ending rules
 - `.gitignore` - Python/IDE/OS ignore patterns
 - `.editorconfig` - Editor consistency
 - `.flake8` - Python linting config
 - `.shellcheckrc` - Shell linting config
 - `.pre-commit-config.yaml` - Pre-commit hooks
+- `.markdownlint.json` - Markdown linting
 - `pyproject.toml` - Python project config
+
+
+---
 
 ## Automated Sync
 
-Enable automatic updates in your repo:
+### Manual Sync
 
 ```bash
-# Copy the sync workflow
-curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/templates/.github/workflows/sync-configs.yml \
-  -o .github/workflows/sync-configs.yml
-
-# Commit
-git add .github/workflows/sync-configs.yml
-git commit -m "chore: enable automated config sync"
+# Anytime you want to sync
+bash scripts/sync-configs.sh
 ```
 
-**This workflow:**
-- Runs weekly on Sunday
-- Downloads latest configs from repo-standards
-- Creates PR with updates
-- Updates itself automatically
+### Automated Sync (Optional)
+
+Add this workflow to your repo:
+
+```yaml
+# .github/workflows/sync-configs.yml
+name: Sync Config Files
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run sync script
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: sync config files from repo-standards'
+          title: 'Update config files from repo-standards'
+          branch: sync-configs
+          delete-branch: true
+```
+
+This creates weekly PRs to sync config files.
+
+---
 
 ## Standards Enforced
 
@@ -118,14 +177,58 @@ git commit -m "chore: enable automated config sync"
 - Line endings: LF
 - Indentation: 4 spaces (Python), 2 spaces (YAML/Shell)
 
+---
+
 ## Updating Standards
 
 When you update standards in this repo:
-1. All repos using `@main` workflows get updates immediately
-2. Config files sync via weekly PR (or manual trigger)
-3. CI fails if repos don't meet new standards
+
+1. Update config files in root (e.g., edit `.flake8`)
+2. Commit and push to main
+3. All repos using `@main` workflows get updates immediately
+4. Config files sync via weekly PR (or manual trigger)
+5. CI fails if repos don't meet new standards
 
 This forces compliance across all repos.
+
+---
+
+## Example: Full CI Setup
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  # Validate configs match standards
+  config-validation:
+    uses: zepfu/repo-standards/.github/workflows/reusable-config-validation.yml@main
+
+  # Enforce Python standards
+  python-standards:
+    uses: zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main
+    with:
+      python-version: '3.11'
+
+  # Enforce Shell standards
+  shell-standards:
+    uses: zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main
+
+  # Project-specific tests
+  project-tests:
+    runs-on: ubuntu-latest
+    needs: [python-standards, shell-standards]
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/tests/run_tests.sh
+```
+
+---
 
 ## Local Development
 
@@ -143,7 +246,14 @@ pre-commit run --all-files
 bash scripts/sync-configs.sh
 ```
 
-## See Also
+---
 
-- [CODE_STYLE.md](CODE_STYLE.md) - Detailed code standards
-- [CONFIGURATION.md](CONFIGURATION.md) - Config file documentation
+## Why This Approach?
+
+**✅ Single source of truth** - Config files in one place (repo root)
+**✅ Self-validating** - repo-standards follows its own rules
+**✅ Simple** - No templates/ directory, just sync from root
+**✅ Transparent** - Anyone can see the actual configs in use
+**✅ Versioned** - Git history shows how standards evolved
+
+**Other repos simply mirror these files!**

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# sync-configs.sh - Sync all config files from repo-standards/templates
+# sync-configs.sh - Sync all config files from repo-standards (root directory)
 # This script can update itself from the latest version in repo-standards
 
 set -euo pipefail
@@ -26,9 +26,9 @@ echo ""
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-log_info "Cloning repo-standards (templates and scripts only)..."
+log_info "Cloning repo-standards (root configs and scripts only)..."
 
-# Clone with sparse checkout
+# Clone with sparse checkout - just root config files and scripts
 cd "$TEMP_DIR"
 git clone \
   --depth 1 \
@@ -39,7 +39,19 @@ git clone \
   repo-standards 2>&1 | grep -v "Cloning into" || true
 
 cd repo-standards
-git sparse-checkout set templates scripts 2>&1 | grep -v "^$" || true
+
+# Set sparse-checkout to get root config files and scripts directory
+git sparse-checkout set \
+  .gitattributes \
+  .gitignore \
+  .editorconfig \
+  .flake8 \
+  .shellcheckrc \
+  .pre-commit-config.yaml \
+  .markdownlint.json \
+  pyproject.toml \
+  scripts \
+  2>&1 | grep -v "^$" || true
 
 log_info "Sparse checkout complete"
 echo ""
@@ -47,37 +59,46 @@ echo ""
 # Return to original directory
 cd "$OLDPWD"
 
-# Copy config files from templates/
+# Copy config files from root of repo-standards
 log_info "Copying config files..."
 echo ""
 
 SUCCESS_COUNT=0
-SKIP_COUNT=0
 
-for file in "$TEMP_DIR"/repo-standards/templates/*; do
-    filename=$(basename "$file")
-    
-    # Skip subdirectories (like .github/)
-    if [ -d "$file" ]; then
-        log_warn "Skipping directory: $filename"
-        ((SKIP_COUNT++))
+# Config files to sync (from root of repo-standards)
+CONFIG_FILES=(
+  ".gitattributes"
+  ".gitignore"
+  ".editorconfig"
+  ".flake8"
+  ".shellcheckrc"
+  ".pre-commit-config.yaml"
+  ".markdownlint.json"
+  "pyproject.toml"
+)
+
+for file in "${CONFIG_FILES[@]}"; do
+    SOURCE="$TEMP_DIR/repo-standards/$file"
+
+    if [ ! -f "$SOURCE" ]; then
+        log_warn "File not found in repo-standards: $file"
         continue
     fi
-    
+
     # Backup existing file
-    if [ -f "$filename" ]; then
-        cp "$filename" "${filename}.bak"
+    if [ -f "$file" ]; then
+        cp "$file" "${file}.bak"
     fi
-    
+
     # Copy file
-    if cp "$file" "$filename"; then
-        log_info "Synced: $filename"
+    if cp "$SOURCE" "$file"; then
+        log_info "Synced: $file"
         ((SUCCESS_COUNT++))
     else
-        log_error "Failed to copy: $filename"
+        log_error "Failed to copy: $file"
         # Restore backup if copy failed
-        if [ -f "${filename}.bak" ]; then
-            mv "${filename}.bak" "$filename"
+        if [ -f "${file}.bak" ]; then
+            mv "${file}.bak" "$file"
         fi
     fi
 done
@@ -90,15 +111,15 @@ log_info "Checking for script updates..."
 
 if [ -f "$SCRIPT_PATH" ]; then
     LATEST_SCRIPT="$TEMP_DIR/repo-standards/scripts/sync-configs.sh"
-    
+
     if [ -f "$LATEST_SCRIPT" ]; then
         # Check if script has changed
         if ! cmp -s "$SCRIPT_PATH" "$LATEST_SCRIPT"; then
             log_warn "Script has updates available"
-            
+
             # Backup current script
             cp "$SCRIPT_PATH" "${SCRIPT_PATH}.bak"
-            
+
             # Copy latest version
             if cp "$LATEST_SCRIPT" "$SCRIPT_PATH"; then
                 chmod +x "$SCRIPT_PATH"
@@ -116,7 +137,7 @@ elif [ ! -d "scripts" ]; then
     # First time setup - create scripts directory
     log_info "Creating scripts/ directory..."
     mkdir -p scripts
-    
+
     LATEST_SCRIPT="$TEMP_DIR/repo-standards/scripts/sync-configs.sh"
     if cp "$LATEST_SCRIPT" "$SCRIPT_PATH"; then
         chmod +x "$SCRIPT_PATH"
@@ -126,38 +147,22 @@ elif [ ! -d "scripts" ]; then
 fi
 
 echo ""
-
-# Sync the sync-configs.yml workflow if .github/workflows exists
-if [ -d ".github/workflows" ]; then
-    SYNC_WORKFLOW=".github/workflows/sync-configs.yml"
-    LATEST_WORKFLOW="$TEMP_DIR/repo-standards/templates/.github/workflows/sync-configs.yml"
-    
-    if [ -f "$LATEST_WORKFLOW" ]; then
-        if [ -f "$SYNC_WORKFLOW" ]; then
-            if ! cmp -s "$SYNC_WORKFLOW" "$LATEST_WORKFLOW"; then
-                log_info "Updating sync workflow..."
-                cp "$SYNC_WORKFLOW" "${SYNC_WORKFLOW}.bak"
-                if cp "$LATEST_WORKFLOW" "$SYNC_WORKFLOW"; then
-                    log_info "Updated: $SYNC_WORKFLOW"
-                    ((SUCCESS_COUNT++))
-                fi
-            fi
-        else
-            log_info "Installing sync workflow..."
-            if cp "$LATEST_WORKFLOW" "$SYNC_WORKFLOW"; then
-                log_info "Installed: $SYNC_WORKFLOW"
-                ((SUCCESS_COUNT++))
-            fi
-        fi
-    fi
-fi
-
-echo ""
 echo "=========================================="
 echo "Sync complete!"
 echo "  Synced:  $SUCCESS_COUNT files"
-echo "  Skipped: $SKIP_COUNT directories"
 echo "=========================================="
+echo ""
+echo "Files synced:"
+for file in "${CONFIG_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        echo "  ✓ $file"
+    else
+        echo "  ✗ $file (missing)"
+    fi
+done
+echo ""
+echo "Note: .gitmodules is NOT synced (each repo manages its own submodules)"
+echo "Note: .env.example is NOT synced (each repo documents its own environment)"
 echo ""
 echo "Next steps:"
 echo "  1. Review changes: git diff"

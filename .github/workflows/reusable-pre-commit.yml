@@ -13,24 +13,24 @@ jobs:
   pre-commit:
     name: Pre-commit Checks
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Verify pre-commit config exists
         run: |
           if [ ! -f .pre-commit-config.yaml ]; then
-            echo "❌ .pre-commit-config.yaml is required (organization standard)"
+            echo "ERROR: .pre-commit-config.yaml is required (organization standard)"
             echo "Run: curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
             exit 1
           fi
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
-      
+
       - name: Cache pre-commit hooks
         uses: actions/cache@v3
         with:
@@ -38,9 +38,9 @@ jobs:
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             pre-commit-${{ runner.os }}-
-      
+
       - name: Install pre-commit
         run: pip install pre-commit
-      
+
       - name: Run pre-commit
         run: pre-commit run --all-files --show-diff-on-failure

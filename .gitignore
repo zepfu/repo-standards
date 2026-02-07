@@ -1,73 +1,82 @@
 # =============================================================================
-# Git Attributes - Line Ending Configuration
+# Python
 # =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
 
-# Auto-detect text files and normalize line endings
-* text=auto
-
-# =============================================================================
-# Scripts - Force LF (Unix line endings)
-# =============================================================================
-*.sh text eol=lf
-*.bash text eol=lf
-
-# =============================================================================
-# Source Code - Force LF
-# =============================================================================
-*.py text eol=lf
-*.js text eol=lf
-*.ts text eol=lf
-*.jsx text eol=lf
-*.tsx text eol=lf
-*.java text eol=lf
-*.go text eol=lf
-*.rs text eol=lf
-
-# =============================================================================
-# Configuration Files - Force LF
-# =============================================================================
-*.yml text eol=lf
-*.yaml text eol=lf
-*.json text eol=lf
-*.toml text eol=lf
-*.ini text eol=lf
-*.cfg text eol=lf
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+*.cover
+.hypothesis/
 
 # =============================================================================
-# Documentation - Force LF
+# IDE
 # =============================================================================
-*.md text eol=lf
-*.txt text eol=lf
-*.rst text eol=lf
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+.vscode-test/
 
 # =============================================================================
-# Docker - Force LF
+# OS
 # =============================================================================
-Dockerfile text eol=lf
-*.dockerfile text eol=lf
-.dockerignore text eol=lf
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
 # =============================================================================
-# Git Files - Force LF
+# Pre-commit
 # =============================================================================
-.gitignore text eol=lf
-.gitattributes text eol=lf
-.gitmodules text eol=lf
+.pre-commit-cache/
 
 # =============================================================================
-# Binary Files - No normalization
+# Logs
 # =============================================================================
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.pdf binary
-*.zip binary
-*.tar binary
-*.gz binary
-*.gguf binary
-*.bin binary
-*.so binary
-*.dylib binary
-*.dll binary
+*.log
+logs/
+*.log.*
+
+# =============================================================================
+# Environment
+# =============================================================================
+.env
+.env.local
+.env.*.local
+*.env
+
+# =============================================================================
+# Backup files
+# =============================================================================
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+
+# =============================================================================
+# repo-standards specific
+# =============================================================================
+# DON'T ignore templates/ - that's our main content!
+# DON'T ignore .github/workflows/ - those are our reusable workflows!
