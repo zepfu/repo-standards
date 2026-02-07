@@ -63,6 +63,10 @@ IGNORE_PATTERNS = {
     "*.so",
     "*.dylib",
     "*.dll",
+    # Sphinx documentation build artifacts
+    "_build",
+    "_static",
+    "_templates",
 }
 
 
