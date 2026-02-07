@@ -1,5 +1,7 @@
 # repo-standards
 
+[![Code Quality](https://github.com/zepfu/llama-gguf-inference/workflows/Code%20Quality/badge.svg)](https://github.com/zepfu/llama-gguf-inference/actions)
+
 **Organization-wide code quality standards and configuration templates.**
 
 This repository provides:
