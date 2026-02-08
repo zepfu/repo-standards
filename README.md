@@ -1,5 +1,9 @@
 # Documentation System Implementation for repo-standards
 
+[![Documentation Status](https://readthedocs.org/projects/repo-standards/badge/?version=latest)](https://repo-standards.readthedocs.io/en/latest/?badge=latest)
+[![Code Quality](https://github.com/zepfu/repo-standards/workflows/Code%20Quality/badge.svg)](https://github.com/zepfu/repo-standards/actions)
+
+
 Complete Sphinx documentation setup with automated generation.
 
 ## 📦 What's Included

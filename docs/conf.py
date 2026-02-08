@@ -65,6 +65,9 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+# Configure MyST to recognize mermaid code blocks as directives
+myst_fence_as_directive = ["mermaid"]
+
 # Mermaid configuration
 mermaid_version = "latest"  # Use latest Mermaid.js
 mermaid_init_js = """
@@ -75,3 +78,9 @@ mermaid.initialize({
     flowchart: { useMaxWidth: true }
 });
 """
+
+# Suppress warnings for missing cross-references in auto-generated docs
+# These are internal document anchors that may not exist yet
+suppress_warnings = [
+    "myst.xref_missing",  # Missing cross-references in MyST documents
+]
