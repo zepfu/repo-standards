@@ -1,0 +1,98 @@
+---
+name: Build Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/build-docs.yml'
+  workflow_run:
+    workflows: ["Update Documentation"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Sphinx Docs
+    runs-on: ubuntu-latest
+    # Only run if workflow_run succeeded or was manually triggered
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for git history in changelog
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Sphinx dependencies
+        run: |
+          python3 -m pip install -r docs/requirements.txt
+
+      - name: Install PyYAML for architecture generation
+        run: |
+          python3 -m pip install pyyaml
+
+      - name: Generate auto-docs if missing
+        run: |
+          mkdir -p docs/auto
+
+          # Generate if files don't exist
+          if [[ ! -f docs/auto/CHANGELOG.md ]]; then
+            echo "Generating CHANGELOG.md..."
+            python3 scripts/changelog.py --output docs/auto/CHANGELOG.md || echo "Failed to generate changelog"
+          fi
+
+          if [[ ! -f docs/auto/REPO_MAP.md ]]; then
+            echo "Generating REPO_MAP.md..."
+            python3 scripts/repo_map.py --output docs/auto/REPO_MAP.md || echo "Failed to generate repo map"
+          fi
+
+          if [[ ! -f docs/auto/ARCHITECTURE_AUTO.md ]]; then
+            echo "Generating ARCHITECTURE_AUTO.md..."
+            python3 scripts/generate_architecture.py \
+              --output docs/auto/ARCHITECTURE_AUTO.md \
+              --all-diagrams || echo "Failed to generate architecture"
+          fi
+
+      - name: Build documentation
+        run: |
+          cd docs
+          sphinx-build -b html . _build/html -W --keep-going
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'docs: deploy documentation'
+
+      - name: Summary
+        run: |
+          echo "## Documentation Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "✅ Built and deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 View at: https://zepfu.github.io/repo-standards/" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Built successfully (not deployed - not on main branch)" >> $GITHUB_STEP_SUMMARY
+          fi
