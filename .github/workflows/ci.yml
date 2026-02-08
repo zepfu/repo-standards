@@ -35,7 +35,6 @@ jobs:
     with:
       python-version: '3.11'
 
-  # Additional check: Ensure reusable workflows are valid
   validate-workflows:
     name: Validate Workflow Files
     runs-on: ubuntu-latest
@@ -77,7 +76,6 @@ jobs:
 
           echo "All required workflow files present!"
 
-  # Check that sync script is valid
   validate-sync-script:
     name: Validate Sync Script
     runs-on: ubuntu-latest
@@ -106,12 +104,9 @@ jobs:
 
       - name: Test sync script (dry run)
         run: |
-          # Test that the script can at least start
-          # Don't actually run it to avoid side effects
           bash -c 'source scripts/sync-configs.sh --help 2>&1 | head -1' || true
           echo "Sync script can be sourced without errors!"
 
-  # Summary job - all checks must pass
   all-checks:
     name: All Checks Passed
     runs-on: ubuntu-latest

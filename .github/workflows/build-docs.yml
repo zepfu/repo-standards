@@ -1,119 +1,91 @@
 ---
 name: Build Documentation
 
+# Only run after CI workflow completes successfully
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - '.github/workflows/build-docs.yml'
   workflow_run:
-    workflows: ["Update Documentation"]
-    types: [completed]
-    branches: [main]
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
   workflow_dispatch: {}
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Sphinx Docs
+  # Only proceed if CI succeeded
+  check-ci-status:
+    name: Check CI Success
     runs-on: ubuntu-latest
-    # Only run if workflow_run succeeded or was manually triggered
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      github.event.workflow_run.conclusion == 'success'
+    # Skip if workflow_dispatch (manual trigger)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      ci_passed: ${{ steps.check.outputs.passed }}
+    steps:
+      - name: Check CI result
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual trigger - skipping CI check"
+            echo "passed=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "CI passed - proceeding with docs build"
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "CI failed - skipping docs build"
+            echo "passed=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  build-docs:
+    name: Build Sphinx Documentation
+    runs-on: ubuntu-latest
+    needs: check-ci-status
+    if: needs.check-ci-status.outputs.ci_passed == 'true'
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Needed for git history in changelog
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Sphinx dependencies
+      - name: Install documentation dependencies
         run: |
-          python3 -m pip install -r docs/requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements.txt
 
-      - name: Install PyYAML for architecture generation
-        run: |
-          python3 -m pip install pyyaml
-
-      - name: Generate auto-docs if missing
-        run: |
-          mkdir -p docs/auto
-
-          # Generate if files don't exist
-          if [[ ! -f docs/auto/CHANGELOG.md ]]; then
-            echo "Generating CHANGELOG.md..."
-            python3 scripts/changelog.py --output docs/auto/CHANGELOG.md || {
-              echo "Failed to generate changelog, creating placeholder"
-              echo "# Changelog" > docs/auto/CHANGELOG.md
-              echo "" >> docs/auto/CHANGELOG.md
-              echo "No changelog entries yet." >> docs/auto/CHANGELOG.md
-            }
-          fi
-
-          if [[ ! -f docs/auto/REPO_MAP.md ]]; then
-            echo "Generating REPO_MAP.md..."
-            python3 scripts/repo_map.py --output docs/auto/REPO_MAP.md || {
-              echo "Failed to generate repo map, creating placeholder"
-              echo "# Repository Map" > docs/auto/REPO_MAP.md
-              echo "" >> docs/auto/REPO_MAP.md
-              echo "Repository structure documentation will be generated automatically." >> docs/auto/REPO_MAP.md
-            }
-          fi
-
-          if [[ ! -f docs/auto/ARCHITECTURE_AUTO.md ]]; then
-            echo "Generating ARCHITECTURE_AUTO.md..."
-            python3 scripts/generate_architecture.py \
-              --output docs/auto/ARCHITECTURE_AUTO.md \
-              --all-diagrams || {
-              echo "Failed to generate architecture, creating placeholder"
-              echo "# Architecture" > docs/auto/ARCHITECTURE_AUTO.md
-              echo "" >> docs/auto/ARCHITECTURE_AUTO.md
-              echo "Architecture diagrams will be generated automatically." >> docs/auto/ARCHITECTURE_AUTO.md
-            }
-          fi
-
-          # Always ensure files exist (even if empty)
-          touch docs/auto/.gitkeep
-
-          echo "Auto-generated docs status:"
-          ls -lh docs/auto/
-
-      - name: Build documentation
+      - name: Build HTML documentation
         run: |
           cd docs
-          sphinx-build -b html . _build/html -W --keep-going
+          make html
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+      - name: Upload documentation artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/_build/html
-          publish_branch: gh-pages
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'docs: deploy documentation'
+          path: 'docs/_build/html'
 
-      - name: Summary
-        run: |
-          echo "## Documentation Build" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-docs
+    # Only deploy on pushes to main/master (not PRs)
+    if: github.event_name != 'pull_request'
 
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "✅ Built and deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "🔗 View at: https://zepfu.github.io/repo-standards/" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "✅ Built successfully (not deployed - not on main branch)" >> $GITHUB_STEP_SUMMARY
-          fi
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
