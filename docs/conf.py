@@ -35,6 +35,11 @@ html_static_path = ["_static"]
 html_title = "repo-standards Documentation"
 html_short_title = "repo-standards"
 
+# Custom CSS (optional - can be customized by users)
+html_css_files = [
+    "custom.css",
+]
+
 # Theme options
 html_theme_options = {
     "display_version": True,
