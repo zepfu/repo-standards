@@ -52,20 +52,41 @@ jobs:
           # Generate if files don't exist
           if [[ ! -f docs/auto/CHANGELOG.md ]]; then
             echo "Generating CHANGELOG.md..."
-            python3 scripts/changelog.py --output docs/auto/CHANGELOG.md || echo "Failed to generate changelog"
+            python3 scripts/changelog.py --output docs/auto/CHANGELOG.md || {
+              echo "Failed to generate changelog, creating placeholder"
+              echo "# Changelog" > docs/auto/CHANGELOG.md
+              echo "" >> docs/auto/CHANGELOG.md
+              echo "No changelog entries yet." >> docs/auto/CHANGELOG.md
+            }
           fi
 
           if [[ ! -f docs/auto/REPO_MAP.md ]]; then
             echo "Generating REPO_MAP.md..."
-            python3 scripts/repo_map.py --output docs/auto/REPO_MAP.md || echo "Failed to generate repo map"
+            python3 scripts/repo_map.py --output docs/auto/REPO_MAP.md || {
+              echo "Failed to generate repo map, creating placeholder"
+              echo "# Repository Map" > docs/auto/REPO_MAP.md
+              echo "" >> docs/auto/REPO_MAP.md
+              echo "Repository structure documentation will be generated automatically." >> docs/auto/REPO_MAP.md
+            }
           fi
 
           if [[ ! -f docs/auto/ARCHITECTURE_AUTO.md ]]; then
             echo "Generating ARCHITECTURE_AUTO.md..."
             python3 scripts/generate_architecture.py \
               --output docs/auto/ARCHITECTURE_AUTO.md \
-              --all-diagrams || echo "Failed to generate architecture"
+              --all-diagrams || {
+              echo "Failed to generate architecture, creating placeholder"
+              echo "# Architecture" > docs/auto/ARCHITECTURE_AUTO.md
+              echo "" >> docs/auto/ARCHITECTURE_AUTO.md
+              echo "Architecture diagrams will be generated automatically." >> docs/auto/ARCHITECTURE_AUTO.md
+            }
           fi
+
+          # Always ensure files exist (even if empty)
+          touch docs/auto/.gitkeep
+
+          echo "Auto-generated docs status:"
+          ls -lh docs/auto/
 
       - name: Build documentation
         run: |
