@@ -1,10 +1,42 @@
 # Changelog
 
-*This document is automatically generated from git commit history.*
+All notable changes to this project will be documented in this file.
 
-No changelog entries yet. This file will be automatically populated when you:
-1. Push changes to the repository
-2. The `update-docs` workflow runs
-3. Changes are merged
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-See the [update-docs workflow](../../.github/workflows/update-docs.yml) for details.
+## [Unreleased]
+
+### Added
+
+- Additional documentation support
+- Additional documentation support
+- Additional documentation support
+- Additional documentation support
+- Additional documentation support
+- Additional documentation support
+- Architecture documentation automation
+- additional workflow
+- additional standards
+- ci added
+
+### Changed
+
+- workflow updates
+- workflow updates
+- workflow updates
+- more ignores
+- more ignores
+- ci updates
+- ci updates
+- refined
+- initial
+
+### Fixed
+
+- repo map fix
+
+---
+
+*This file is auto-generated from git history.*
+*Manual edits may be overwritten.*
