@@ -17,6 +17,7 @@ repo-standards/
 ├── ⭐ Makefile
 ├── Makefile:Zone.Identifier
 ├── ⭐ README.md
+├── README.md.bak
 ├── README.md:Zone.Identifier
 ├── pyproject.toml
 ├── docs/
@@ -83,11 +84,11 @@ repo-standards/
 - **`README.md`**
   - Documentation System Implementation for repo-standards
 - **`ARCHITECTURE_AUTO.md`**
-  - Architecture
+  - Architecture (Auto-Generated)
 - **`CHANGELOG.md`**
   - Changelog
 - **`REPO_MAP.md`**
-  - Repository Map
+  - Repository Structure
 
 ## Scripts
 

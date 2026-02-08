@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Additional documentation support
 - Additional documentation support
 - Additional documentation support
+- Additional documentation support
 - Architecture documentation automation
 - additional workflow
 - additional standards
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- doc fixes
 - repo map fix
 
 ---

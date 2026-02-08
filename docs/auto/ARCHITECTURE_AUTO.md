@@ -1,6 +1,6 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-08 09:55:37
+**Generated:** 2026-02-08 10:17:16
 **Project:** /home/zepfu/projects/repo-standards
 
 ## Overview

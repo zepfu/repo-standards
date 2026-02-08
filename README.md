@@ -1,7 +1,11 @@
 # Documentation System Implementation for repo-standards
 
-[![Documentation Status](https://readthedocs.org/projects/repo-standards/badge/?version=latest)](https://repo-standards.readthedocs.io/en/latest/?badge=latest)
-[![Code Quality](https://github.com/zepfu/repo-standards/workflows/Code%20Quality/badge.svg)](https://github.com/zepfu/repo-standards/actions)
+[![CI](https://github.com/zepfu/repo-standards/actions/workflows/ci.yml/badge.svg)](https://github.com/zepfu/repo-standards/actions/workflows/ci.yml)
+[![Documentation](https://github.com/zepfu/repo-standards/actions/workflows/build-docs.yml/badge.svg)](https://github.com/zepfu/repo-standards/actions/workflows/build-docs.yml)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://zepfu.github.io/repo-standards/)
+[![ReadTheDocs](https://readthedocs.org/projects/repo-standards/badge/?version=latest)](https://repo-standards.readthedocs.io/en/latest/)
+
+**Organization-wide code quality standards and configuration templates.**
 
 
 Complete Sphinx documentation setup with automated generation.
