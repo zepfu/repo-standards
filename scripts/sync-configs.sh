@@ -183,7 +183,7 @@ for file in "${CONFIG_FILES[@]}"; do
     # Copy file
     if cp "$SOURCE" "$file"; then
         log_info "Synced: $file"
-        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+        ((SUCCESS_COUNT++))
     else
         log_error "Failed to copy: $file"
         # Restore backup if copy failed
@@ -208,21 +208,6 @@ for file in "${CONFIG_FILES[@]}"; do
     fi
 done
 echo ""
-echo "Note: .gitmodules is NOT synced (each repo manages its own submodules)"
-echo "Note: .env.example is NOT synced (each repo documents its own environment)"
-echo "Note: Makefile is NOT synced (project-specific build commands)"
-echo "Note: README.md is NOT synced (each repo has its own)"
-echo ""
-echo "Changes from previous version:"
-echo "  - Removed .markdownlint.json (migrated to Python-based mdformat)"
-echo "  - Added .readthedocs.yml (Sphinx documentation config)"
-echo "  - Updated pyproject.toml with mdformat, vulture, autoflake configs"
-echo "  - Updated .pre-commit-config.yaml with new tools"
-echo ""
-echo "Next steps:"
-echo "  1. Review changes: git diff"
-echo "  2. Test pre-commit: pre-commit run --all-files"
-echo "  3. Commit changes: git add . && git commit -m 'chore: sync config files'"
 
 # Exit successfully
 exit 0
