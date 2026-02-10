@@ -1,11 +1,11 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-09 22:10:46 **Project:** /home/zepfu/projects/repo-standards
+**Generated:** 2026-02-10 04:09:58
+**Project:** /home/runner/work/repo-standards/repo-standards
 
 ## Overview
 
 Analyzed **4** Python modules containing:
-
 - **2** classes
 - **46** functions
 - **0** async functions
@@ -27,8 +27,11 @@ Analyzed **4** Python modules containing:
 ```mermaid
 flowchart TD
     Start([Start]) --> Init[Initialize]
-    Init --> End([End])
+    Init --> rungitcommand[run_git_command]
+    Init --> main[main]
+    main --> End([End])
 ```
+
 
 ## State Diagram
 
@@ -39,27 +42,31 @@ stateDiagram-v2
     GenerateStateDiagram --> [*]
 ```
 
+
 ## Sequence Diagram
 
 *Sequence diagram not applicable for this codebase.*
+
 
 ## Architecture Diagram
 
 ```mermaid
 architecture-beta
+    group scripts(cloud)[Scripts]
+        service scripts_changelog(server)[changelog] in scripts
+        service scripts_generate_architecture(server)[generate_architecture] in scripts
+        service scripts_repo_map(server)[repo_map] in scripts
+    end
     group docs(cloud)[Docs]
         service docs_conf(server)[conf] in docs
     end
-    group scripts(cloud)[Scripts]
-        service scripts_repo_map(server)[repo_map] in scripts
-        service scripts_changelog(server)[changelog] in scripts
-        service scripts_generate_architecture(server)[generate_architecture] in scripts
-    end
 ```
+
 
 ## Er Diagram
 
 *Er diagram not applicable for this codebase.*
+
 
 ## Class Diagram
 
@@ -81,9 +88,11 @@ classDiagram
     }
 ```
 
+
 ## Journey Diagram
 
 *Journey diagram not applicable for this codebase.*
+
 
 ## Mindmap Diagram
 
@@ -93,10 +102,11 @@ mindmap
     docs
       conf
     scripts
-      repo_map
       changelog
       generate_architecture
+      repo_map
 ```
+
 
 ## Workflow Pipeline Diagram
 
@@ -105,25 +115,27 @@ flowchart TD
 
     Push -->|Doc Changes| Docs[Build Docs]
     Docs --> update_docs[Update Documentation]
-    Docs --> build_docs[Build Documentation]
+    Docs --> reusable_docker_build[Docker Build Standards]
 ```
+
 
 ## Workflow Triggers Diagram
 
 ```mermaid
 graph TD
-    reusable_pre_commit[Pre-commit Standards Enforcement]
-    update_docs[Update Documentation]
     reusable_config_validation[Config Standards Validation]
-    reusable_shell_ci[Shell Script Standards Enforcement]
     ci[CI]
+    update_docs[Update Documentation]
+    reusable_docker_build[Docker Build Standards]
+    reusable_python_ci[Python Standards Enforcement]
+    reusable_update_architecture[Update Architecture Documentation]
+    reusable_shell_ci[Shell Script Standards Enforcement]
+    reusable_pre_commit[Pre-commit Standards Enforcement]
     build_docs[Build Documentation]
     reusable_update_docs[Update Documentation (Reusable)]
     reusable_quality_checks[Advanced Quality Checks]
-    reusable_update_architecture[Update Architecture Documentation]
-    reusable_python_ci[Python Standards Enforcement]
-    reusable_docker_build[Docker Build Standards]
 ```
+
 
 ## Workflow Jobs Diagram
 
@@ -138,23 +150,24 @@ flowchart LR
     end
 ```
 
+
 ## Development Workflows
 
 ### GitHub Workflows Summary
 
-| Workflow                           | Triggers | Jobs                                                        |
-| ---------------------------------- | -------- | ----------------------------------------------------------- |
-| Build Documentation                |          | check-ci-status, build-and-deploy                           |
-| CI                                 |          | validate-self, python-standards, shell-standards...         |
-| Config Standards Validation        |          | validate-configs                                            |
-| Docker Build Standards             |          | docker-build                                                |
-| Pre-commit Standards Enforcement   |          | pre-commit                                                  |
-| Python Standards Enforcement       |          | validate-python-version, python-lint, python-syntax         |
-| Advanced Quality Checks            |          | detect-unused-python, detect-unused-shell, markdown-lint... |
-| Shell Script Standards Enforcement |          | shellcheck, bash-syntax                                     |
-| Update Architecture Documentation  |          | generate-architecture                                       |
-| Update Documentation (Reusable)    |          | update-docs                                                 |
-| Update Documentation               |          | generate-docs                                               |
+| Workflow | Triggers | Jobs |
+|----------|----------|------|
+| Build Documentation |  | check-ci-status, build-and-deploy |
+| CI |  | validate-self, python-standards, shell-standards... |
+| Config Standards Validation |  | validate-configs |
+| Docker Build Standards |  | docker-build |
+| Pre-commit Standards Enforcement |  | pre-commit |
+| Python Standards Enforcement |  | validate-python-version, python-lint, python-syntax |
+| Advanced Quality Checks |  | detect-unused-python, detect-unused-shell, markdown-lint... |
+| Shell Script Standards Enforcement |  | shellcheck, bash-syntax |
+| Update Architecture Documentation |  | generate-architecture |
+| Update Documentation (Reusable) |  | update-docs |
+| Update Documentation |  | generate-docs |
 
 ## Module Summary
 
@@ -168,10 +181,11 @@ flowchart LR
 
 changelog.py - Generate changelog from git history
 
-Automatically generates and maintains a CHANGELOG.md file following the Keep a Changelog format using conventional
-commits.
+Automatically generates and maintains a CHANGELOG.md file following the
+Keep a Changelog format using conventional commits.
 
-Usage: python3 chan...
+Usage:
+    python3 chan...
 
 - **Classes:** 0
 - **Functions:** 8
@@ -182,28 +196,24 @@ Usage: python3 chan...
 generate_architecture.py - Comprehensive Architecture Diagram Generator
 
 Generates multiple Mermaid diagram types based on codebase analysis:
-
 - flowchart: Control flow and process flows
-
 - stateDiagram...
 
 - **Classes:** 2
-
 - **Functions:** 26
-
 - **Async Functions:** 0
 
 ### `scripts.repo_map`
 
 repo_map.py - Generate repository structure documentation
 
-Automatically generates comprehensive repository structure documentation including directory trees, file descriptions,
-and categorized overvi...
+Automatically generates comprehensive repository structure documentation
+including directory trees, file descriptions, and categorized overvi...
 
 - **Classes:** 0
 - **Functions:** 12
 - **Async Functions:** 0
 
-______________________________________________________________________
+---
 
 *Generated by: `generate_architecture.py` from repo-standards*
