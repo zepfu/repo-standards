@@ -146,7 +146,7 @@ git sparse-checkout set \
 log_info "Sparse checkout complete"
 echo ""
 
-# Return to original directory
+# Return to original directory (the git repository root)
 cd "$GIT_ROOT"
 
 # Copy config files from root of repo-standards
@@ -223,3 +223,6 @@ echo "Next steps:"
 echo "  1. Review changes: git diff"
 echo "  2. Test pre-commit: pre-commit run --all-files"
 echo "  3. Commit changes: git add . && git commit -m 'chore: sync config files'"
+
+# Exit successfully
+exit 0
