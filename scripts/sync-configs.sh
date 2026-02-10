@@ -1,11 +1,45 @@
 #!/usr/bin/env bash
 # sync-configs.sh - Sync all config files from repo-standards (root directory)
 # This script can update itself from the latest version in repo-standards
+#
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash -s -- --yes
 
 set -euo pipefail
 
 REPO_URL="https://github.com/zepfu/repo-standards.git"
 BRANCH="main"
+SKIP_PROMPTS=false
+
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        --yes|-y)
+            SKIP_PROMPTS=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: sync-configs.sh [options]"
+            echo ""
+            echo "Sync configuration files from repo-standards to current repository."
+            echo ""
+            echo "Options:"
+            echo "  --yes, -y    Skip all confirmation prompts (for CI/automation)"
+            echo "  --help, -h   Show this help message"
+            echo ""
+            echo "Files synced:"
+            echo "  .gitattributes, .gitignore, .editorconfig, .flake8,"
+            echo "  .shellcheckrc, .pre-commit-config.yaml, .readthedocs.yml,"
+            echo "  pyproject.toml"
+            echo ""
+            echo "Example:"
+            echo "  curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
+            echo "  curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash -s -- --yes"
+            exit 0
+            ;;
+    esac
+done
 
 # Colors
 GREEN='\033[0;32m'
@@ -20,6 +54,62 @@ log_error() { echo -e "${RED}✗${NC} $*"; }
 echo "=========================================="
 echo "Syncing config files from repo-standards"
 echo "=========================================="
+echo ""
+
+# Safety check: Are we in a git repository?
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    log_error "Not in a git repository!"
+    echo ""
+    echo "This script must be run from the root of a git repository."
+    echo "Current directory: $(pwd)"
+    echo ""
+    echo "Usage:"
+    echo "  cd /path/to/your/project"
+    echo "  curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
+    exit 1
+fi
+
+# Safety check: Are we at the repository root?
+GIT_ROOT=$(git rev-parse --show-toplevel)
+CURRENT_DIR=$(pwd)
+
+if [ "$GIT_ROOT" != "$CURRENT_DIR" ]; then
+    log_warn "Not at repository root!"
+    echo ""
+    echo "Current directory: $CURRENT_DIR"
+    echo "Repository root:   $GIT_ROOT"
+    echo ""
+
+    if [ "$SKIP_PROMPTS" = true ]; then
+        cd "$GIT_ROOT"
+        log_info "Changed to repository root: $GIT_ROOT"
+    else
+        read -p "Change to repository root and continue? (y/N) " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            cd "$GIT_ROOT"
+            log_info "Changed to repository root: $GIT_ROOT"
+        else
+            log_error "Aborted by user"
+            exit 1
+        fi
+    fi
+fi
+
+# Safety check: Confirm before overwriting files
+if [ -f ".pre-commit-config.yaml" ] || [ -f "pyproject.toml" ]; then
+    if [ "$SKIP_PROMPTS" = false ]; then
+        log_warn "Existing config files will be overwritten (backups will be created)"
+        echo ""
+        read -p "Continue? (y/N) " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_error "Aborted by user"
+            exit 1
+        fi
+    fi
+fi
+
 echo ""
 
 # Create temporary directory
@@ -48,7 +138,7 @@ git sparse-checkout set \
   .flake8 \
   .shellcheckrc \
   .pre-commit-config.yaml \
-  .markdownlint.json \
+  .readthedocs.yml \
   pyproject.toml \
   scripts \
   2>&1 | grep -v "^$" || true
@@ -73,7 +163,7 @@ CONFIG_FILES=(
   ".flake8"
   ".shellcheckrc"
   ".pre-commit-config.yaml"
-  ".markdownlint.json"
+  ".readthedocs.yml"
   "pyproject.toml"
 )
 
@@ -104,49 +194,6 @@ for file in "${CONFIG_FILES[@]}"; do
 done
 
 echo ""
-
-# Self-update: Copy the latest version of this script
-SCRIPT_PATH="scripts/sync-configs.sh"
-log_info "Checking for script updates..."
-
-if [ -f "$SCRIPT_PATH" ]; then
-    LATEST_SCRIPT="$TEMP_DIR/repo-standards/scripts/sync-configs.sh"
-
-    if [ -f "$LATEST_SCRIPT" ]; then
-        # Check if script has changed
-        if ! cmp -s "$SCRIPT_PATH" "$LATEST_SCRIPT"; then
-            log_warn "Script has updates available"
-
-            # Backup current script
-            cp "$SCRIPT_PATH" "${SCRIPT_PATH}.bak"
-
-            # Copy latest version
-            if cp "$LATEST_SCRIPT" "$SCRIPT_PATH"; then
-                chmod +x "$SCRIPT_PATH"
-                log_info "Updated: $SCRIPT_PATH"
-                ((SUCCESS_COUNT++))
-            else
-                log_error "Failed to update script"
-                mv "${SCRIPT_PATH}.bak" "$SCRIPT_PATH"
-            fi
-        else
-            log_info "Script is up to date"
-        fi
-    fi
-elif [ ! -d "scripts" ]; then
-    # First time setup - create scripts directory
-    log_info "Creating scripts/ directory..."
-    mkdir -p scripts
-
-    LATEST_SCRIPT="$TEMP_DIR/repo-standards/scripts/sync-configs.sh"
-    if cp "$LATEST_SCRIPT" "$SCRIPT_PATH"; then
-        chmod +x "$SCRIPT_PATH"
-        log_info "Installed: $SCRIPT_PATH"
-        ((SUCCESS_COUNT++))
-    fi
-fi
-
-echo ""
 echo "=========================================="
 echo "Sync complete!"
 echo "  Synced:  $SUCCESS_COUNT files"
@@ -163,6 +210,14 @@ done
 echo ""
 echo "Note: .gitmodules is NOT synced (each repo manages its own submodules)"
 echo "Note: .env.example is NOT synced (each repo documents its own environment)"
+echo "Note: Makefile is NOT synced (project-specific build commands)"
+echo "Note: README.md is NOT synced (each repo has its own)"
+echo ""
+echo "Changes from previous version:"
+echo "  - Removed .markdownlint.json (migrated to Python-based mdformat)"
+echo "  - Added .readthedocs.yml (Sphinx documentation config)"
+echo "  - Updated pyproject.toml with mdformat, vulture, autoflake configs"
+echo "  - Updated .pre-commit-config.yaml with new tools"
 echo ""
 echo "Next steps:"
 echo "  1. Review changes: git diff"

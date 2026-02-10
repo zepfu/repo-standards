@@ -57,9 +57,40 @@ repos:
           '--max-complexity=20'
         ]
 
+  # Python: Remove unused imports and variables
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.2.1
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --remove-unused-variables
+          - --remove-duplicate-keys
+          - --ignore-init-module-imports
+
+  # Python: Detect commented-out code
+  - repo: https://github.com/myint/eradicate
+    rev: 3.0.1
+    hooks:
+      - id: eradicate
+        args: ['--in-place']
+
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
       - id: yamllint
         args: ['-d', '{extends: relaxed, rules: {line-length: {max: 150}}}']
+
+  # Markdown formatting (Python-based, no Node.js required)
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm          # GitHub Flavored Markdown
+          - mdformat-tables       # Table formatting
+          - mdformat-frontmatter  # YAML frontmatter
+        args:
+          - --wrap=120            # Line length

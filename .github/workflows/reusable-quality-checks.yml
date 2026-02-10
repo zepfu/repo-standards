@@ -1,0 +1,252 @@
+---
+name: Advanced Quality Checks
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: '3.11'
+        description: 'Python version to use'
+      fail-on-unused:
+        type: boolean
+        default: false
+        description: 'Fail build if unused code is detected'
+
+jobs:
+  detect-unused-python:
+    name: Detect Unused Python Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install analysis tools
+        run: |
+          pip install vulture autoflake eradicate pylint
+
+      - name: Check for dead code (Vulture)
+        id: vulture
+        run: |
+          echo "## 🔍 Dead Code Analysis (Vulture)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          vulture scripts/ --min-confidence 80 | tee vulture.txt || true
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          if [ -s vulture.txt ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Potentially unused code detected**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "✅ No dead code detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check for unused imports (Autoflake)
+        id: autoflake
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Unused Imports (Autoflake)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if compgen -G "scripts/*.py" > /dev/null; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            autoflake --check --remove-all-unused-imports --recursive scripts/ 2>&1 | tee autoflake.txt || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+            if grep -q "would be reformatted" autoflake.txt; then
+              echo "found=true" >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Unused imports detected**" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "found=false" >> $GITHUB_OUTPUT
+              echo "✅ No unused imports" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No Python files found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check for commented code (Eradicate)
+        id: eradicate
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 💬 Commented-Out Code (Eradicate)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if compgen -G "scripts/*.py" > /dev/null; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            eradicate --check scripts/ 2>&1 | tee eradicate.txt || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+            if [ -s eradicate.txt ]; then
+              echo "found=true" >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Commented-out code detected**" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "found=false" >> $GITHUB_OUTPUT
+              echo "✅ No commented-out code" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No Python files found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check for unreachable code (PyLint)
+        id: pylint
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚫 Unreachable Code (PyLint)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if compgen -G "scripts/*.py" > /dev/null; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            pylint --disable=all \
+                   --enable=unreachable,pointless-statement,expression-not-assigned \
+                   scripts/*.py 2>&1 | tee pylint.txt || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+            if grep -E "unreachable|pointless" pylint.txt; then
+              echo "found=true" >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Unreachable code detected**" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "found=false" >> $GITHUB_OUTPUT
+              echo "✅ No unreachable code" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No Python files found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if requested and issues found
+        if: |
+          inputs.fail-on-unused == true &&
+          (steps.vulture.outputs.found == 'true' ||
+           steps.autoflake.outputs.found == 'true' ||
+           steps.eradicate.outputs.found == 'true' ||
+           steps.pylint.outputs.found == 'true')
+        run: |
+          echo "❌ Unused code detected and fail-on-unused is enabled"
+          exit 1
+
+  detect-unused-shell:
+    name: Detect Unused Shell Functions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find unused shell functions
+        run: |
+          echo "## 🐚 Unused Shell Functions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ! compgen -G "scripts/*.sh" > /dev/null; then
+            echo "No shell scripts found" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          found_unused=false
+
+          for script in scripts/*.sh; do
+            echo "Analyzing: $script"
+
+            # Extract function definitions
+            grep -E "^[a-z_]+\(\)|^function [a-z_]+" "$script" | \
+              sed 's/function //;s/().*$//' | \
+              while read -r func; do
+
+              # Skip common utility functions
+              if [[ "$func" =~ ^(main|usage|help|log|die|error|warn|info)$ ]]; then
+                continue
+              fi
+
+              # Check if function is called in any script
+              if ! grep -q "\b$func\b" scripts/*.sh --exclude="$(basename "$script")"; then
+                # Check if called within same script
+                if ! grep -A 9999 "^$func()" "$script" | grep -q "\b$func\b"; then
+                  echo "⚠️ Potentially unused: \`$func\` in \`$(basename "$script")\`" >> $GITHUB_STEP_SUMMARY
+                  found_unused=true
+                fi
+              fi
+            done
+          done
+
+          if [ "$found_unused" = false ]; then
+            echo "✅ No obviously unused shell functions detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  markdown-lint:
+    name: Markdown Formatting (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install mdformat
+        run: |
+          pip install mdformat mdformat-gfm mdformat-tables mdformat-frontmatter
+
+      - name: Check for markdown files
+        id: check_md
+        run: |
+          if compgen -G "*.md" > /dev/null || compgen -G "docs/**/*.md" > /dev/null; then
+            echo "has_markdown=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_markdown=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run mdformat check
+        if: steps.check_md.outputs.has_markdown == 'true'
+        run: |
+          echo "## 📝 Markdown Formatting (mdformat)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if mdformat --check --wrap 120 . 2>&1 | tee markdown.txt; then
+            echo "✅ All markdown files are properly formatted" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat markdown.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Markdown formatting issues found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**To fix:** Run \`mdformat --wrap 120 .\` locally" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: No markdown files
+        if: steps.check_md.outputs.has_markdown == 'false'
+        run: |
+          echo "## 📝 Markdown Formatting" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No markdown files found" >> $GITHUB_STEP_SUMMARY
+
+  summary:
+    name: Code Quality Summary
+    runs-on: ubuntu-latest
+    needs: [detect-unused-python, detect-unused-shell, markdown-lint]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🎯 Code Quality Check Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All code quality checks have been executed." >> $GITHUB_STEP_SUMMARY
+          echo "Review the individual job outputs above for details." >> $GITHUB_STEP_SUMMARY
