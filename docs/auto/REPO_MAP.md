@@ -15,52 +15,38 @@
 ```
 repo-standards/
 ├── ⭐ Makefile
-├── Makefile:Zone.Identifier
 ├── ⭐ README.md
-├── README.md.bak
-├── README.md:Zone.Identifier
 ├── pyproject.toml
+├── pyproject.toml:Zone.Identifier
 ├── docs/
 │   ├── conf.py
 │   ├── conf.py.bak
-│   ├── conf.py:Zone.Identifier
 │   ├── index.rst
-│   ├── index.rst:Zone.Identifier
 │   ├── requirements.txt
-│   ├── requirements.txt:Zone.Identifier
 │   ├── auto/
 │   │   ├── ARCHITECTURE_AUTO.md
-│   │   ├── ARCHITECTURE_AUTO.md:Zone.Identifier
 │   │   ├── CHANGELOG.md
-│   │   ├── CHANGELOG.md:Zone.Identifier
-│   │   ├── REPO_MAP.md
-│   │   └── REPO_MAP.md:Zone.Identifier
+│   │   └── REPO_MAP.md
 │   ├── guides/
 │   │   ├── docker-standards.rst
-│   │   ├── docker-standards.rst:Zone.Identifier
 │   │   ├── getting-started.rst
-│   │   ├── getting-started.rst:Zone.Identifier
 │   │   ├── python-standards.rst
-│   │   ├── python-standards.rst:Zone.Identifier
 │   │   ├── quick-setup.rst
-│   │   ├── quick-setup.rst:Zone.Identifier
 │   │   ├── shell-standards.rst
-│   │   ├── shell-standards.rst:Zone.Identifier
-│   │   ├── workflow-standards.rst
-│   │   └── workflow-standards.rst:Zone.Identifier
+│   │   └── workflow-standards.rst
 │   └── reference/
 │       ├── configs.rst
-│       ├── configs.rst:Zone.Identifier
 │       ├── scripts.rst
-│       ├── scripts.rst:Zone.Identifier
-│       ├── workflows.rst
-│       └── workflows.rst:Zone.Identifier
+│       └── workflows.rst
 └── scripts/
+    ├── archive.sh
     ├── changelog.py
     ├── generate_architecture.py
     ├── generate_architecture.py:Zone.Identifier
     ├── repo_map.py
-    └── sync-configs.sh
+    ├── sync-configs.sh
+    ├── sync-configs.sh.bak
+    └── sync-configs.sh:Zone.Identifier
 ```
 
 ## Key Files
@@ -70,13 +56,14 @@ repo-standards/
 **`Makefile`**
 
 **`README.md`**
-  - Documentation System Implementation for repo-standards
+
+- Documentation System Implementation for repo-standards
 
 ## Configuration Files
 
-| File | Description |
-|------|-------------|
-| `Makefile` | *No description* |
+| File             | Description      |
+| ---------------- | ---------------- |
+| `Makefile`       | *No description* |
 | `pyproject.toml` | *No description* |
 
 ## Documentation
@@ -92,14 +79,15 @@ repo-standards/
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `changelog.py` | *No description* |
+| Script                     | Description      |
+| -------------------------- | ---------------- |
+| `archive.sh`               | *No description* |
+| `changelog.py`             | *No description* |
 | `generate_architecture.py` | *No description* |
-| `repo_map.py` | *No description* |
-| `sync-configs.sh` | *No description* |
+| `repo_map.py`              | *No description* |
+| `sync-configs.sh`          | *No description* |
 
----
+______________________________________________________________________
 
 *This file is auto-generated. Do not edit manually.*
 
