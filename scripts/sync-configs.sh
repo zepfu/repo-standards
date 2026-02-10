@@ -147,7 +147,7 @@ log_info "Sparse checkout complete"
 echo ""
 
 # Return to original directory
-cd "$OLDPWD"
+cd "$GIT_ROOT"
 
 # Copy config files from root of repo-standards
 log_info "Copying config files..."
