@@ -1,6 +1,6 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-11 05:53:43 **Project:** /home/runner/work/repo-standards/repo-standards
+**Generated:** 2026-02-11 23:09:39 **Project:** /home/runner/work/repo-standards/repo-standards
 
 ## Overview
 

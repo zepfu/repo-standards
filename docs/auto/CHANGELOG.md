@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- Auto-update documentation \[skip ci\]
+  ([100bf30](https://github.com/zepfu/repo-standards/commit/100bf30ae9ced4130a4d7cfde41568344b26f53e))
 - mermaid image generation
   ([b9878b4](https://github.com/zepfu/repo-standards/commit/b9878b4433a1fbf9ba526b9db3641e7c34ca970f))
 - workflow updates ([2bf2899](https://github.com/zepfu/repo-standards/commit/2bf2899958711edc5236e221946993ca504c928a))
@@ -56,6 +58,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- fix make for sync config
+  ([3fc233d](https://github.com/zepfu/repo-standards/commit/3fc233d73f4e75783a259dde91bdf10e340f90fd))
+- fix make for sync config
+  ([7a823b4](https://github.com/zepfu/repo-standards/commit/7a823b46cd9efdc4097df10f801b81d0a7a8d628))
+- fix make for sync config
+  ([abfe979](https://github.com/zepfu/repo-standards/commit/abfe979c6c0c06ecf3178c3b14a8c20406a697e9))
+- fix make for sync config
+  ([6305836](https://github.com/zepfu/repo-standards/commit/6305836a28d7798d2f73914f11e9d46176c2c97f))
+- auto docs ci fix ([19485a6](https://github.com/zepfu/repo-standards/commit/19485a6a6eccc3f274d262c5d164dfaaf5d58e8b))
+- auto docs ci fix ([c040ee2](https://github.com/zepfu/repo-standards/commit/c040ee26ab8884f1fd7a5275c3b2c0eead25acaf))
+- makefile ci fix ([3baa7b2](https://github.com/zepfu/repo-standards/commit/3baa7b2be67aba51705c03f27fb98b654d4e736e))
 - mermaid image generation fix
   ([d405ca2](https://github.com/zepfu/repo-standards/commit/d405ca2b19aeb0df3494f63b2f34b42a13bf2945))
 - workflow fix ([637289e](https://github.com/zepfu/repo-standards/commit/637289e9fdf7639709228766811766a973a5154a))
