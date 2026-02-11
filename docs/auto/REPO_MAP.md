@@ -15,9 +15,10 @@
 ```
 repo-standards/
 ├── ⭐ Makefile
+├── Makefile.bak
 ├── ⭐ README.md
 ├── pyproject.toml
-├── pyproject.toml:Zone.Identifier
+├── repo.mk.example
 ├── docs/
 │   ├── conf.py
 │   ├── conf.py.bak
@@ -27,6 +28,7 @@ repo-standards/
 │   │   ├── ARCHITECTURE_AUTO.md
 │   │   ├── CHANGELOG.md
 │   │   └── REPO_MAP.md
+│   ├── diagrams/
 │   ├── guides/
 │   │   ├── docker-standards.rst
 │   │   ├── getting-started.rst
@@ -43,6 +45,9 @@ repo-standards/
     ├── changelog.py
     ├── generate_architecture.py
     ├── generate_architecture.py:Zone.Identifier
+    ├── render-mermaid.sh
+    ├── render-mermaid.sh.bak
+    ├── render-mermaid.sh:Zone.Identifier
     ├── repo_map.py
     ├── sync-configs.sh
     ├── sync-configs.sh.bak
@@ -84,6 +89,7 @@ repo-standards/
 | `archive.sh`               | *No description* |
 | `changelog.py`             | *No description* |
 | `generate_architecture.py` | *No description* |
+| `render-mermaid.sh`        | *No description* |
 | `repo_map.py`              | *No description* |
 | `sync-configs.sh`          | *No description* |
 

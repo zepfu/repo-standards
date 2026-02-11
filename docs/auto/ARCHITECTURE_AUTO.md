@@ -1,6 +1,6 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-09 22:10:46 **Project:** /home/zepfu/projects/repo-standards
+**Generated:** 2026-02-11 00:24:49 **Project:** /home/zepfu/projects/repo-standards
 
 ## Overview
 
@@ -104,8 +104,8 @@ mindmap
 flowchart TD
 
     Push -->|Doc Changes| Docs[Build Docs]
-    Docs --> update_docs[Update Documentation]
-    Docs --> build_docs[Build Documentation]
+    Docs --> reusable_update_docs[Update Documentation (Reusable]
+    Docs --> reusable_update_architecture[Update Architecture Documentat]
 ```
 
 ## Workflow Triggers Diagram
@@ -113,14 +113,13 @@ flowchart TD
 ```mermaid
 graph TD
     reusable_pre_commit[Pre-commit Standards Enforcement]
-    update_docs[Update Documentation]
     reusable_config_validation[Config Standards Validation]
     reusable_shell_ci[Shell Script Standards Enforcement]
-    ci[CI]
-    build_docs[Build Documentation]
+    reusable_yaml_ci[YAML Standards Enforcement]
     reusable_update_docs[Update Documentation (Reusable)]
     reusable_quality_checks[Advanced Quality Checks]
     reusable_update_architecture[Update Architecture Documentation]
+    reusable_makefile_ci[Makefile Standards Enforcement]
     reusable_python_ci[Python Standards Enforcement]
     reusable_docker_build[Docker Build Standards]
 ```
@@ -144,17 +143,16 @@ flowchart LR
 
 | Workflow                           | Triggers | Jobs                                                        |
 | ---------------------------------- | -------- | ----------------------------------------------------------- |
-| Build Documentation                |          | check-ci-status, build-and-deploy                           |
-| CI                                 |          | validate-self, python-standards, shell-standards...         |
 | Config Standards Validation        |          | validate-configs                                            |
 | Docker Build Standards             |          | docker-build                                                |
+| Makefile Standards Enforcement     |          | validate-makefile                                           |
 | Pre-commit Standards Enforcement   |          | pre-commit                                                  |
 | Python Standards Enforcement       |          | validate-python-version, python-lint, python-syntax         |
 | Advanced Quality Checks            |          | detect-unused-python, detect-unused-shell, markdown-lint... |
 | Shell Script Standards Enforcement |          | shellcheck, bash-syntax                                     |
 | Update Architecture Documentation  |          | generate-architecture                                       |
-| Update Documentation (Reusable)    |          | update-docs                                                 |
-| Update Documentation               |          | generate-docs                                               |
+| Update Documentation (Reusable)    |          | update-and-build-docs                                       |
+| YAML Standards Enforcement         |          | validate-yaml                                               |
 
 ## Module Summary
 

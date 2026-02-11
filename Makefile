@@ -1,6 +1,8 @@
 .DEFAULT_GOAL := help
-.PHONY: help sphinx archive clean sync-configs
+.PHONY: help sphinx archive clean sync-configs mermaid mermaid-pnf mermaid-pdf docs
 # Configuration
+SHELL := /bin/bash
+PYTHON := python3
 REPO_STANDARDS_URL := https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts
 
 ##@ Help
@@ -23,15 +25,32 @@ sphinx: ## Build and serve Sphinx documentation locally
 	@echo "Press Ctrl+C to stop"
 	@cd docs/_build/html && python3 -m http.server 8000
 
+docs: ## Auto generated documents
+	@curl -fsSL $(REPO_STANDARDS_URL)/repo_map.py | $(PYTHON) - --output docs/auto/REPO_MAP.md
+	@curl -fsSL $(REPO_STANDARDS_URL)/changelog.py | $(PYTHON) - --from-git --with-commits --output docs/auto/CHANGELOG.md
+	@curl -fsSL $(REPO_STANDARDS_URL)/generate_architecture.py | $(PYTHON) - --output docs/auto/ARCHITECTURE_AUTO.md
+
 
 mermaid: ## Render all Mermaid diagrams to SVG images
-	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format svg
+	@echo "Downloading render-mermaid.sh..."
+	@curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh -o /tmp/render-mermaid.sh
+	@chmod +x /tmp/render-mermaid.sh
+	@bash /tmp/render-mermaid.sh --format svg
+	@rm /tmp/render-mermaid.sh
 
 mermaid-png: ## Render all Mermaid diagrams to PNG images
-	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format png
+	@echo "Downloading render-mermaid.sh..."
+	@curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh -o /tmp/render-mermaid.sh
+	@chmod +x /tmp/render-mermaid.sh
+	@bash /tmp/render-mermaid.sh --format png
+	@rm /tmp/render-mermaid.sh
 
 mermaid-pdf: ## Render all Mermaid diagrams to PDF files
-	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format pdf
+	@echo "Downloading render-mermaid.sh..."
+	@curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh -o /tmp/render-mermaid.sh
+	@chmod +x /tmp/render-mermaid.sh
+	@bash /tmp/render-mermaid.sh --format pdf
+	@rm /tmp/render-mermaid.sh
 
 mermaid-check: ## Validate Mermaid diagrams (check if mmdc is installed)
 	@if command -v mmdc &> /dev/null; then \
