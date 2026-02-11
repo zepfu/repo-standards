@@ -186,7 +186,7 @@ for file in "${CONFIG_FILES[@]}"; do
     # Copy file
     if cp "$SOURCE" "$file"; then
         log_info "Synced: $file"
-        ((SUCCESS_COUNT++))
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
     else
         log_error "Failed to copy: $file"
         # Restore backup if copy failed
