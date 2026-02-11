@@ -4,10 +4,6 @@ name: Makefile Standards Enforcement
 on:
   workflow_call:
     inputs:
-      checkmake-version:
-        type: string
-        default: '0.2.2'
-        description: 'checkmake version to use'
       fail-on-warnings:
         type: boolean
         default: false
@@ -68,30 +64,25 @@ jobs:
             exit 1
           fi
 
-      - name: Install checkmake
+      - name: Setup checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          # Set default version if input is empty (push/PR triggers)
-          CHECKMAKE_VERSION="${{ inputs.checkmake-version }}"
-          [ -z "$CHECKMAKE_VERSION" ] && CHECKMAKE_VERSION="0.2.2"
+          echo "Setting up checkmake (latest version via Docker)..."
 
-          echo "Installing checkmake $CHECKMAKE_VERSION..."
+          # Pull latest Docker image
+          docker pull quay.io/checkmake/checkmake:latest
 
-          # checkmake uses 'v' prefix in release tags but not in filenames
-          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/v${CHECKMAKE_VERSION}/checkmake-${CHECKMAKE_VERSION}.linux.amd64"
+          # Create wrapper script
+          cat > /tmp/checkmake << 'EOFMARKER'
+          #!/bin/bash
+          docker run --rm -v "$(pwd)":/data -w /data quay.io/checkmake/checkmake:latest "$@"
+          EOFMARKER
 
-          echo "Downloading from: $CHECKMAKE_URL"
+          chmod +x /tmp/checkmake
+          sudo mv /tmp/checkmake /usr/local/bin/checkmake
 
-          if wget -q "$CHECKMAKE_URL" -O checkmake; then
-            chmod +x checkmake
-            sudo mv checkmake /usr/local/bin/checkmake
-            echo "✓ checkmake installed"
-            checkmake --version
-          else
-            echo "✗ Failed to download checkmake"
-            echo "URL: $CHECKMAKE_URL"
-            exit 1
-          fi
+          echo "✓ checkmake installed (Docker-based)"
+          checkmake --version
 
       - name: Lint Makefile with checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
@@ -117,26 +108,36 @@ jobs:
             fi
           fi
 
-          # Also check repo.mk if it exists
-          if [ -f "repo.mk" ]; then
+          # Find and check all .mk files
+          echo ""
+          echo "Searching for .mk files..."
+
+          MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
+
+          if [ -n "$MK_FILES" ]; then
+            MK_COUNT=$(echo "$MK_FILES" | wc -l)
+            echo "Found $MK_COUNT .mk file(s)"
             echo ""
-            echo "Running checkmake on repo.mk..."
 
-            if checkmake repo.mk; then
-              echo "✓ repo.mk: No issues found"
-            else
-              EXIT_CODE=$?
+            while IFS= read -r mk_file; do
+              echo "Running checkmake on $mk_file..."
 
-              if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-                echo "✗ repo.mk: checkmake found issues"
-                FAILED=true
+              if checkmake "$mk_file"; then
+                echo "✓ $mk_file: No issues found"
               else
-                echo "⚠️ repo.mk: checkmake found issues (non-blocking)"
+                EXIT_CODE=$?
+
+                if [ "$FAIL_ON_WARNINGS" = "true" ]; then
+                  echo "✗ $mk_file: checkmake found issues"
+                  FAILED=true
+                else
+                  echo "⚠️ $mk_file: checkmake found issues (non-blocking)"
+                fi
               fi
-            fi
+              echo ""
+            done <<< "$MK_FILES"
           else
-            echo ""
-            echo "ℹ️ No repo.mk found (optional file)"
+            echo "ℹ️ No .mk files found"
           fi
 
           if [ "$FAILED" = "true" ]; then
@@ -160,17 +161,21 @@ jobs:
             echo "Consider adding .PHONY declarations for non-file targets"
           fi
 
-          # Also check repo.mk if it exists
-          if [ -f "repo.mk" ]; then
-            echo ""
-            if grep -q "^\.PHONY:" repo.mk; then
-              echo "✓ repo.mk: .PHONY declarations found"
+          # Check all .mk files
+          MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
+
+          if [ -n "$MK_FILES" ]; then
+            while IFS= read -r mk_file; do
               echo ""
-              echo "Phony targets in repo.mk:"
-              grep "^\.PHONY:" repo.mk | sed 's/^\.PHONY: /  - /'
-            else
-              echo "⚠️ repo.mk: No .PHONY declarations found"
-            fi
+              if grep -q "^\.PHONY:" "$mk_file"; then
+                echo "✓ $mk_file: .PHONY declarations found"
+                echo ""
+                echo "Phony targets in $mk_file:"
+                grep "^\.PHONY:" "$mk_file" | sed 's/^\.PHONY: /  - /'
+              else
+                echo "⚠️ $mk_file: No .PHONY declarations found"
+              fi
+            done <<< "$MK_FILES"
           fi
 
       - name: Check for tabs (not spaces)
@@ -189,16 +194,20 @@ jobs:
             echo "✓ Makefile: Recipe indentation looks correct"
           fi
 
-          # Also check repo.mk if it exists
-          if [ -f "repo.mk" ]; then
-            echo ""
-            if grep -n '^        [a-zA-Z@-]' repo.mk >/dev/null 2>&1; then
-              echo "✗ repo.mk: Found potential recipes using spaces instead of tabs:"
-              grep -n '^        [a-zA-Z@-]' repo.mk
-              FAILED=true
-            else
-              echo "✓ repo.mk: Recipe indentation looks correct"
-            fi
+          # Check all .mk files
+          MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
+
+          if [ -n "$MK_FILES" ]; then
+            while IFS= read -r mk_file; do
+              echo ""
+              if grep -n '^        [a-zA-Z@-]' "$mk_file" >/dev/null 2>&1; then
+                echo "✗ $mk_file: Found potential recipes using spaces instead of tabs:"
+                grep -n '^        [a-zA-Z@-]' "$mk_file"
+                FAILED=true
+              else
+                echo "✓ $mk_file: Recipe indentation looks correct"
+              fi
+            done <<< "$MK_FILES"
           fi
 
           if [ "$FAILED" = "true" ]; then

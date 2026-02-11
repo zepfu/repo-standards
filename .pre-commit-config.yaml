@@ -10,7 +10,7 @@ default_stages: [pre-commit]
 repos:
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
@@ -26,14 +26,14 @@ repos:
 
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.6
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         args: ['-x', '--severity=error']
 
   # Python formatting (Black)
   - repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 26.1.0
     hooks:
       - id: black
         language_version: python3
@@ -41,14 +41,14 @@ repos:
 
   # Python import sorting
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
       - id: isort
         args: ['--profile=black', '--line-length=100']
 
   # Python linting (Flake8)
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         args: [
@@ -59,7 +59,7 @@ repos:
 
   # Python: Remove unused imports and variables
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.1
+    rev: v2.3.1
     hooks:
       - id: autoflake
         args:
@@ -78,14 +78,14 @@ repos:
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: ['-d', '{extends: relaxed, rules: {line-length: {max: 150}}}']
 
   # Markdown formatting (Python-based, no Node.js required)
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.22
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -94,3 +94,11 @@ repos:
           - mdformat-frontmatter  # YAML frontmatter
         args:
           - --wrap=120            # Line length
+
+  # Makefile linting
+  - repo: https://github.com/checkmake/checkmake.git
+    rev: v0.3.2
+    hooks:
+      - id: checkmake
+        # This builds checkmake from source using Go
+        # Alternative: use checkmake-system if checkmake is pre-installed
