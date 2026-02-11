@@ -158,6 +158,10 @@ jobs:
               --diagrams "$ARCH_DIAGRAMS"
           fi
 
+      - name: Run pre-commit on auto-generated files
+        run: |
+          pip install pre-commit
+          pre-commit run --files ${{ steps.set_defaults.outputs.auto_docs_dir }}/* || true
 
       - name: Ensure auto-docs directory is tracked
         run: |
