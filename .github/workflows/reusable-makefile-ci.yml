@@ -71,10 +71,14 @@ jobs:
       - name: Install checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Installing checkmake ${{ inputs.checkmake-version }}..."
+          # Set default version if input is empty (push/PR triggers)
+          CHECKMAKE_VERSION="${{ inputs.checkmake-version }}"
+          [ -z "$CHECKMAKE_VERSION" ] && CHECKMAKE_VERSION="0.2.2"
+
+          echo "Installing checkmake $CHECKMAKE_VERSION..."
 
           # checkmake uses 'v' prefix in release tags but not in filenames
-          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/v${{ inputs.checkmake-version }}/checkmake-${{ inputs.checkmake-version }}.linux.amd64"
+          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/v${CHECKMAKE_VERSION}/checkmake-${CHECKMAKE_VERSION}.linux.amd64"
 
           echo "Downloading from: $CHECKMAKE_URL"
 
@@ -94,6 +98,10 @@ jobs:
         run: |
           echo "Running checkmake on Makefile..."
 
+          # Set default if input is empty
+          FAIL_ON_WARNINGS="${{ inputs.fail-on-warnings }}"
+          [ -z "$FAIL_ON_WARNINGS" ] && FAIL_ON_WARNINGS="false"
+
           FAILED=false
 
           if checkmake Makefile; then
@@ -101,7 +109,7 @@ jobs:
           else
             EXIT_CODE=$?
 
-            if [ "${{ inputs.fail-on-warnings }}" = "true" ]; then
+            if [ "$FAIL_ON_WARNINGS" = "true" ]; then
               echo "✗ Makefile: checkmake found issues"
               FAILED=true
             else
@@ -119,7 +127,7 @@ jobs:
             else
               EXIT_CODE=$?
 
-              if [ "${{ inputs.fail-on-warnings }}" = "true" ]; then
+              if [ "$FAIL_ON_WARNINGS" = "true" ]; then
                 echo "✗ repo.mk: checkmake found issues"
                 FAILED=true
               else
