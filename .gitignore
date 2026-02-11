@@ -101,6 +101,7 @@ docs/_templates/*.generated.*
 # But keep the directories themselves tracked with .gitkeep files
 !docs/_static/.gitkeep
 !docs/_templates/.gitkeep
+!docs/diagrams/.gitkeep
 
 # =============================================================================
 # Repo tooling folders

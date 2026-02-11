@@ -23,6 +23,30 @@ sphinx: ## Build and serve Sphinx documentation locally
 	@echo "Press Ctrl+C to stop"
 	@cd docs/_build/html && python3 -m http.server 8000
 
+
+mermaid: ## Render all Mermaid diagrams to SVG images
+	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format svg
+
+mermaid-png: ## Render all Mermaid diagrams to PNG images
+	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format png
+
+mermaid-pdf: ## Render all Mermaid diagrams to PDF files
+	curl -fsSL $(REPO_STANDARDS_URL)/render-mermaid.sh | bash -s -- --format pdf
+
+mermaid-check: ## Validate Mermaid diagrams (check if mmdc is installed)
+	@if command -v mmdc &> /dev/null; then \
+		echo "✓ mermaid-cli is installed: $$(mmdc --version 2>&1 | head -1)"; \
+	else \
+		echo "✗ mermaid-cli (mmdc) not found"; \
+		echo ""; \
+		echo "Install with:"; \
+		echo "  npm install -g @mermaid-js/mermaid-cli"; \
+		echo ""; \
+		echo "Or use npx without installing:"; \
+		echo "  npx -p @mermaid-js/mermaid-cli mmdc --help"; \
+		exit 1; \
+	fi
+
 ##@ Maintenance
 
 sync-configs:  ## Sync config files from repo-standards
