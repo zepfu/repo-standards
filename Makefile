@@ -69,8 +69,11 @@ mermaid-check: ## Validate Mermaid diagrams (check if mmdc is installed)
 ##@ Maintenance
 
 sync-configs:  ## Sync config files from repo-standards
-	@echo "Creating repository archive..."
-	@curl -fsSL $(REPO_STANDARDS_URL)/sync-configs.sh | bash -s -- --yes
+	@echo "Syncing config files from repo-standards..."
+	@curl -fsSL $(REPO_STANDARDS_URL)/sync-configs.sh -o /tmp/sync-configs.sh
+	@chmod +x /tmp/sync-configs.sh
+	@bash /tmp/sync-configs.sh
+	@rm /tmp/sync-configs.sh
 
 archive:  ## Create tar.gz archive for AI context
 	@curl -fsSL $(REPO_STANDARDS_URL)/archive.sh | sh
