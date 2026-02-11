@@ -25,6 +25,21 @@ on:
         type: boolean
         default: true
 
+  push:
+    branches: [main, master]
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '.github/workflows/**'
+      - 'scripts/generate_architecture.py'
+
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '.github/workflows/**'
+      - 'scripts/generate_architecture.py'
+
 permissions:
   contents: write
   pull-requests: write

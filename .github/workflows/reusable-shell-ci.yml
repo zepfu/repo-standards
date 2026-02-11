@@ -12,6 +12,15 @@ on:
         type: string
         default: 'v0.9.0'
         description: 'ShellCheck version to use'
+  push:
+    branches: [main, master]
+    paths:
+      - '**.sh'
+      - '.shellcheckrc'
+  pull_request:
+    paths:
+      - '**.sh'
+      - '.shellcheckrc'
 
 jobs:
   shellcheck:

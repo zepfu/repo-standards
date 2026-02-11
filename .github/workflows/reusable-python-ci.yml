@@ -8,6 +8,17 @@ on:
         type: string
         default: '3.11'
         description: 'Python version (must be 3.11+)'
+  push:
+    branches: [main, master]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - '.flake8'
+  pull_request:
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - '.flake8'
 
 jobs:
   validate-python-version:

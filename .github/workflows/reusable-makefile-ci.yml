@@ -1,0 +1,203 @@
+---
+name: Makefile Standards Enforcement
+
+on:
+  workflow_call:
+    inputs:
+      checkmake-version:
+        type: string
+        default: '0.2.2'
+        description: 'checkmake version to use'
+      fail-on-warnings:
+        type: boolean
+        default: false
+        description: 'Fail build on checkmake warnings'
+
+  push:
+    branches: [main, master]
+    paths: ['Makefile', '*.mk', '**/*.mk']
+  pull_request:
+    paths: ['Makefile', '*.mk', '**/*.mk']
+
+jobs:
+  validate-makefile:
+    name: Validate Makefile
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if Makefile exists
+        id: check_makefile
+        run: |
+          if [ -f "Makefile" ]; then
+            echo "has_makefile=true" >> $GITHUB_OUTPUT
+            echo "✓ Makefile found"
+          else
+            echo "has_makefile=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Makefile found, skipping validation"
+          fi
+
+      - name: Validate Makefile syntax
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "Checking Makefile syntax with 'make -n'..."
+
+          # Get list of targets from help (or use 'all' as fallback)
+          TARGETS=$(make -qp 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u | head -1)
+
+          if [ -z "$TARGETS" ]; then
+            TARGETS="help"
+          fi
+
+          echo "Testing target: $TARGETS"
+
+          if make -n $TARGETS >/dev/null 2>&1; then
+            echo "✓ Makefile syntax is valid"
+          else
+            echo "✗ Makefile has syntax errors:"
+            make -n $TARGETS
+            exit 1
+          fi
+
+      - name: Install checkmake
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "Installing checkmake ${{ inputs.checkmake-version }}..."
+
+          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/${{ inputs.checkmake-version }}/checkmake-${{ inputs.checkmake-version }}.linux.amd64"
+
+          wget -q "$CHECKMAKE_URL" -O checkmake
+          chmod +x checkmake
+          sudo mv checkmake /usr/local/bin/checkmake
+
+          echo "✓ checkmake installed"
+          checkmake --version
+
+      - name: Lint Makefile with checkmake
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "Running checkmake on Makefile..."
+
+          FAILED=false
+
+          if checkmake Makefile; then
+            echo "✓ Makefile: No issues found"
+          else
+            EXIT_CODE=$?
+
+            if [ "${{ inputs.fail-on-warnings }}" = "true" ]; then
+              echo "✗ Makefile: checkmake found issues"
+              FAILED=true
+            else
+              echo "⚠️ Makefile: checkmake found issues (non-blocking)"
+            fi
+          fi
+
+          # Also check repo.mk if it exists
+          if [ -f "repo.mk" ]; then
+            echo ""
+            echo "Running checkmake on repo.mk..."
+
+            if checkmake repo.mk; then
+              echo "✓ repo.mk: No issues found"
+            else
+              EXIT_CODE=$?
+
+              if [ "${{ inputs.fail-on-warnings }}" = "true" ]; then
+                echo "✗ repo.mk: checkmake found issues"
+                FAILED=true
+              else
+                echo "⚠️ repo.mk: checkmake found issues (non-blocking)"
+              fi
+            fi
+          else
+            echo ""
+            echo "ℹ️ No repo.mk found (optional file)"
+          fi
+
+          if [ "$FAILED" = "true" ]; then
+            exit 1
+          fi
+
+      - name: Check for .PHONY declarations
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "Checking for .PHONY declarations..."
+
+          if grep -q "^\.PHONY:" Makefile; then
+            echo "✓ Makefile: .PHONY declarations found"
+
+            # Show what's declared as phony
+            echo ""
+            echo "Phony targets in Makefile:"
+            grep "^\.PHONY:" Makefile | sed 's/^\.PHONY: /  - /'
+          else
+            echo "⚠️ Makefile: No .PHONY declarations found"
+            echo "Consider adding .PHONY declarations for non-file targets"
+          fi
+
+          # Also check repo.mk if it exists
+          if [ -f "repo.mk" ]; then
+            echo ""
+            if grep -q "^\.PHONY:" repo.mk; then
+              echo "✓ repo.mk: .PHONY declarations found"
+              echo ""
+              echo "Phony targets in repo.mk:"
+              grep "^\.PHONY:" repo.mk | sed 's/^\.PHONY: /  - /'
+            else
+              echo "⚠️ repo.mk: No .PHONY declarations found"
+            fi
+          fi
+
+      - name: Check for tabs (not spaces)
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "Checking that recipes use tabs (not spaces)..."
+
+          FAILED=false
+
+          # Check Makefile
+          if grep -n '^        [a-zA-Z@-]' Makefile >/dev/null 2>&1; then
+            echo "✗ Makefile: Found potential recipes using spaces instead of tabs:"
+            grep -n '^        [a-zA-Z@-]' Makefile
+            FAILED=true
+          else
+            echo "✓ Makefile: Recipe indentation looks correct"
+          fi
+
+          # Also check repo.mk if it exists
+          if [ -f "repo.mk" ]; then
+            echo ""
+            if grep -n '^        [a-zA-Z@-]' repo.mk >/dev/null 2>&1; then
+              echo "✗ repo.mk: Found potential recipes using spaces instead of tabs:"
+              grep -n '^        [a-zA-Z@-]' repo.mk
+              FAILED=true
+            else
+              echo "✓ repo.mk: Recipe indentation looks correct"
+            fi
+          fi
+
+          if [ "$FAILED" = "true" ]; then
+            echo ""
+            echo "Makefiles require tabs for recipe indentation, not spaces!"
+            exit 1
+          fi
+
+      - name: Summary
+        if: steps.check_makefile.outputs.has_makefile == 'true'
+        run: |
+          echo "## Makefile Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Makefile syntax validation passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ checkmake linting completed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ .PHONY declarations checked" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Tab indentation verified" >> $GITHUB_STEP_SUMMARY
+
+      - name: No Makefile summary
+        if: steps.check_makefile.outputs.has_makefile == 'false'
+        run: |
+          echo "## Makefile Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ No Makefile found - skipping validation" >> $GITHUB_STEP_SUMMARY

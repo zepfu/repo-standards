@@ -12,6 +12,20 @@ on:
         type: boolean
         default: false
         description: 'Fail build if unused code is detected'
+  push:
+    branches: [main, master]
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '**.md'
+      - 'scripts/**'
+
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '**.md'
+      - 'scripts/**'
 
 jobs:
   detect-unused-python:

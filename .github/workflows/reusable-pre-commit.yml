@@ -8,6 +8,21 @@ on:
         type: string
         default: '3.11'
         description: 'Python version for pre-commit'
+  push:
+    branches: [main, master]
+    paths:
+      - '.pre-commit-config.yaml'
+      - '**.py'
+      - '**.sh'
+      - '**.yml'
+      - '**.yaml'
+  pull_request:
+    paths:
+      - '.pre-commit-config.yaml'
+      - '**.py'
+      - '**.sh'
+      - '**.yml'
+      - '**.yaml'
 
 jobs:
   pre-commit:

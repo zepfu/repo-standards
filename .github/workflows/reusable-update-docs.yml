@@ -3,88 +3,205 @@ name: Update Documentation (Reusable)
 
 on:
   workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: '3.11'
+      docs-directory:
+        description: 'Documentation directory path'
+        required: false
+        type: string
+        default: 'docs'
+      auto-docs-directory:
+        description: 'Auto-generated docs directory path'
+        required: false
+        type: string
+        default: 'docs/auto'
+      generate-architecture:
+        description: 'Generate architecture diagrams'
+        required: false
+        type: boolean
+        default: true
+      architecture-diagrams:
+        description: 'Comma-separated list of diagram types or "all"'
+        required: false
+        type: string
+        default: 'all'
+
+  push:
+    branches: [main, master]
+    paths:
+      - '**.py'
+      - '**.sh'
+
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.sh'
+
+
+  workflow_dispatch: {}
 
 permissions:
   contents: write
-  pull-requests: write
+  pages: write
+  id-token: write
 
 jobs:
-  update-docs:
-    name: Update Repository Documentation
+  update-and-build-docs:
+    name: Update and Build Documentation
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Needed for git history in changelog
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ inputs.python-version }}
 
-      - name: Generate repository map
+      - name: Install Sphinx dependencies
         run: |
-          echo "Generating REPO_MAP.md..."
-          REPO_MAP_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/repo_map.py"
-          curl -fsSL "$REPO_MAP_URL" | python3 - --output REPO_MAP.md
+          if [ -f "${{ inputs.docs-directory }}/requirements.txt" ]; then
+            echo "Installing Sphinx dependencies from ${{ inputs.docs-directory }}/requirements.txt"
+            python3 -m pip install -r "${{ inputs.docs-directory }}/requirements.txt"
+          else
+            echo "WARNING: No requirements.txt found at ${{ inputs.docs-directory }}/requirements.txt"
+            echo "Installing minimal Sphinx dependencies"
+            python3 -m pip install sphinx sphinx-rtd-theme myst-parser
+          fi
 
-      - name: Generate changelog
+      - name: Install PyYAML for architecture generation
+        if: inputs.generate-architecture == true
+        run: |
+          python3 -m pip install pyyaml
+
+      - name: Create auto-docs directory
+        run: |
+          mkdir -p "${{ inputs.auto-docs-directory }}"
+
+      - name: Generate CHANGELOG.md
         run: |
           echo "Generating CHANGELOG.md..."
           CHANGELOG_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/changelog.py"
-          curl -fsSL "$CHANGELOG_URL" | python3 - --from-git --with-commits --output CHANGELOG.md
+          curl -fsSL "$CHANGELOG_URL" | python3 - \
+            --output "${{ inputs.auto-docs-directory }}/CHANGELOG.md" \
+            --from-git \
+            --with-commits
 
-      - name: Check for changes
-        id: check_changes
+      - name: Generate REPO_MAP.md
         run: |
-          if git diff --quiet REPO_MAP.md CHANGELOG.md; then
-            echo "No documentation changes"
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          echo "Generating REPO_MAP.md..."
+          REPO_MAP_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/repo_map.py"
+          curl -fsSL "$REPO_MAP_URL" | python3 - \
+            --output "${{ inputs.auto-docs-directory }}/REPO_MAP.md"
+
+      - name: Generate ARCHITECTURE_AUTO.md
+        if: inputs.generate-architecture == true
+        run: |
+          echo "Generating ARCHITECTURE_AUTO.md..."
+          ARCH_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/generate_architecture.py"
+          curl -fsSL "$ARCH_URL" -o /tmp/generate_architecture.py
+          chmod +x /tmp/generate_architecture.py
+
+          if [ "${{ inputs.architecture-diagrams }}" = "all" ]; then
+            python3 /tmp/generate_architecture.py \
+              --output "${{ inputs.auto-docs-directory }}/ARCHITECTURE_AUTO.md" \
+              --all-diagrams
           else
-            echo "Documentation has changes"
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            python3 /tmp/generate_architecture.py \
+              --output "${{ inputs.auto-docs-directory }}/ARCHITECTURE_AUTO.md" \
+              --diagrams "${{ inputs.architecture-diagrams }}"
           fi
 
-      - name: Create Pull Request
-        if: steps.check_changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'docs: update repository map and changelog [automated]'
-          title: '📚 Update Documentation'
-          body: |
-            ## Automated Documentation Update
-
-            This PR updates the repository documentation:
-
-            - ✅ `REPO_MAP.md` - Repository structure
-            - ✅ `CHANGELOG.md` - Git history
-
-            ### Generated by
-            - Workflow: `update-docs.yml`
-            - Trigger: ${{ github.event_name }}
-            - Run: ${{ github.run_id }}
-
-            ### Review Checklist
-            - [ ] Verify REPO_MAP.md structure is correct
-            - [ ] Check CHANGELOG.md entries are accurate
-            - [ ] Ensure no sensitive information exposed
-
-            ---
-            *This PR was automatically generated. Review and merge if changes look correct.*
-          branch: docs/auto-update
-          delete-branch: true
-          labels: |
-            documentation
-            automated
-          assignees: ${{ github.actor }}
-
-      - name: Enable auto-merge
-        if: steps.check_changes.outputs.has_changes == 'true'
+      - name: Ensure auto-docs directory is tracked
         run: |
-          sleep 5
-          gh pr merge --auto --squash docs/auto-update || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Ensure .gitkeep exists to track the directory
+          touch "${{ inputs.auto-docs-directory }}/.gitkeep"
+
+          echo "Auto-generated docs status:"
+          ls -lh "${{ inputs.auto-docs-directory }}/"
+
+      - name: Check for documentation changes
+        id: check_changes
+        run: |
+          git add "${{ inputs.auto-docs-directory }}/"
+
+          if git diff --cached --quiet; then
+            echo "No auto-documentation changes"
+            echo "has_auto_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Auto-documentation has changes"
+            echo "has_auto_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit auto-documentation changes
+        if: steps.check_changes.outputs.has_auto_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git commit -m "docs: auto-update documentation [skip ci]"
+          git push
+
+      - name: Build Sphinx documentation
+        run: |
+          cd "${{ inputs.docs-directory }}"
+
+          # Build with warnings as errors, but keep going to see all issues
+          sphinx-build -b html . _build/html -W --keep-going
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./${{ inputs.docs-directory }}/_build/html
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'docs: deploy documentation [skip ci]'
+
+      - name: Summary
+        run: |
+          echo "## Documentation Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check_changes.outputs.has_auto_changes }}" = "true" ]; then
+            echo "✅ Auto-documentation updated and committed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ No auto-documentation changes" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "✅ Sphinx documentation built and deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Extract repo owner and name from GITHUB_REPOSITORY
+            REPO="${GITHUB_REPOSITORY}"
+            OWNER="${REPO%/*}"
+            REPO_NAME="${REPO#*/}"
+
+            echo "🔗 View documentation at: https://${OWNER}.github.io/${REPO_NAME}/" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Sphinx documentation built successfully (not deployed - not on main branch)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ CHANGELOG.md - Git history" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ REPO_MAP.md - Repository structure" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.generate-architecture }}" = "true" ]; then
+            echo "- ✅ ARCHITECTURE_AUTO.md - Architecture diagrams" >> $GITHUB_STEP_SUMMARY
+          fi

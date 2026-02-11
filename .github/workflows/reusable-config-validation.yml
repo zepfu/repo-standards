@@ -3,6 +3,27 @@ name: Config Standards Validation
 
 on:
   workflow_call:
+  push:
+    branches: [main, master]
+    paths:
+      - '.gitattributes'
+      - '.gitignore'
+      - '.editorconfig'
+      - '.flake8'
+      - '.shellcheckrc'
+      - '.pre-commit-config.yaml'
+      - '.markdownlint.json'
+      - 'pyproject.toml'
+  pull_request:
+    paths:
+      - '.gitattributes'
+      - '.gitignore'
+      - '.editorconfig'
+      - '.flake8'
+      - '.shellcheckrc'
+      - '.pre-commit-config.yaml'
+      - '.markdownlint.json'
+      - 'pyproject.toml'
 
 jobs:
   validate-configs:

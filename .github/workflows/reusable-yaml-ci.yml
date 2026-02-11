@@ -1,0 +1,252 @@
+---
+name: YAML Standards Enforcement
+
+on:
+  workflow_call:
+    inputs:
+      yamllint-version:
+        type: string
+        default: 'v1.35.1'
+        description: 'yamllint version to use'
+      config:
+        type: string
+        default: '{extends: relaxed, rules: {line-length: {max: 150}}}'
+        description: 'yamllint configuration'
+      strict:
+        type: boolean
+        default: false
+        description: 'Fail on warnings (default: errors only)'
+
+  push:
+    branches: [main, master]
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '.yamllint'
+      - '.yamllint.yml'
+
+  pull_request:
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '.yamllint'
+      - '.yamllint.yml'
+
+  workflow_dispatch: {}
+
+jobs:
+  validate-yaml:
+    name: Validate YAML Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for YAML files
+        id: check_yaml
+        run: |
+          if compgen -G "*.yml" > /dev/null || compgen -G "*.yaml" > /dev/null || \
+             compgen -G "**/*.yml" > /dev/null || compgen -G "**/*.yaml" > /dev/null; then
+            echo "has_yaml=true" >> $GITHUB_OUTPUT
+            echo "✓ YAML files found"
+          else
+            echo "has_yaml=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No YAML files found, skipping validation"
+          fi
+
+      - name: Set up Python
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install yamllint
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          pip install yamllint==${{ inputs.yamllint-version }}
+          echo "✓ yamllint installed"
+          yamllint --version
+
+      - name: Check for yamllint config
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        id: check_config
+        run: |
+          if [ -f ".yamllint" ] || [ -f ".yamllint.yml" ]; then
+            echo "has_config=true" >> $GITHUB_OUTPUT
+            echo "✓ Found custom yamllint config"
+          else
+            echo "has_config=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No custom yamllint config, using workflow defaults"
+          fi
+
+      - name: Run yamllint with custom config
+        if: steps.check_yaml.outputs.has_yaml == 'true' && steps.check_config.outputs.has_config == 'true'
+        run: |
+          echo "## 📋 YAML Linting (yamllint)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Using custom configuration file" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if yamllint . 2>&1 | tee yamllint.txt; then
+            echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat yamllint.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ YAML linting issues found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Run yamllint with workflow config
+        if: steps.check_yaml.outputs.has_yaml == 'true' && steps.check_config.outputs.has_config == 'false'
+        run: |
+          echo "## 📋 YAML Linting (yamllint)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Using workflow configuration:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`yaml" >> $GITHUB_STEP_SUMMARY
+          echo "${{ inputs.config }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if yamllint -d '${{ inputs.config }}' . 2>&1 | tee yamllint.txt; then
+            echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat yamllint.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ YAML linting issues found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Validate YAML syntax (Python)
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## ✓ YAML Syntax Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          FAILED=false
+
+          shopt -s globstar nullglob
+          for file in **/*.yml **/*.yaml *.yml *.yaml; do
+            if [ -f "$file" ]; then
+              echo "Checking: $file"
+              if python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
+                echo "  ✓ Valid"
+              else
+                echo "  ✗ Invalid YAML syntax in: $file" >> $GITHUB_STEP_SUMMARY
+                FAILED=true
+              fi
+            fi
+          done
+
+          if [ "$FAILED" = "false" ]; then
+            echo "✅ All YAML files have valid syntax" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Some YAML files have syntax errors" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Validate GitHub workflow files
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## ⚙️ GitHub Workflow Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ ! -d ".github/workflows" ]; then
+            echo "ℹ️ No .github/workflows directory found" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          WORKFLOW_COUNT=0
+          FAILED=false
+
+          for file in .github/workflows/*.yml .github/workflows/*.yaml; do
+            if [ -f "$file" ]; then
+              ((WORKFLOW_COUNT++))
+              echo "Validating workflow: $file"
+
+              # Check syntax
+              if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
+                echo "  ✗ Syntax error in: $file" >> $GITHUB_STEP_SUMMARY
+                FAILED=true
+                continue
+              fi
+
+              # Check for required fields
+              if ! grep -q "^name:" "$file"; then
+                echo "  ⚠️ Warning: No 'name' field in: $file" >> $GITHUB_STEP_SUMMARY
+              fi
+
+              if ! grep -q "^on:" "$file" && ! grep -q "^'on':" "$file"; then
+                echo "  ✗ Error: No 'on' trigger field in: $file" >> $GITHUB_STEP_SUMMARY
+                FAILED=true
+              fi
+
+              if ! grep -q "^jobs:" "$file"; then
+                echo "  ✗ Error: No 'jobs' field in: $file" >> $GITHUB_STEP_SUMMARY
+                FAILED=true
+              fi
+            fi
+          done
+
+          if [ $WORKFLOW_COUNT -eq 0 ]; then
+            echo "ℹ️ No workflow files found in .github/workflows/" >> $GITHUB_STEP_SUMMARY
+          elif [ "$FAILED" = "false" ]; then
+            echo "✅ All $WORKFLOW_COUNT workflow files are valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Some workflow files have validation errors" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Check for common YAML issues
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Common Issues Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          ISSUES_FOUND=false
+
+          # Check for tabs (YAML requires spaces)
+          if grep -r $'\t' --include="*.yml" --include="*.yaml" . 2>/dev/null; then
+            echo "⚠️ Warning: Found tabs in YAML files (should use spaces)" >> $GITHUB_STEP_SUMMARY
+            ISSUES_FOUND=true
+          fi
+
+          # Check for inconsistent indentation (common issue)
+          shopt -s globstar nullglob
+          for file in **/*.yml **/*.yaml *.yml *.yaml; do
+            if [ -f "$file" ]; then
+              # Check if file mixes 2-space and 4-space indentation
+              if grep -q "^  [^ ]" "$file" && grep -q "^    [^ ]" "$file"; then
+                echo "⚠️ Warning: Inconsistent indentation in: $file" >> $GITHUB_STEP_SUMMARY
+                ISSUES_FOUND=true
+              fi
+            fi
+          done
+
+          if [ "$ISSUES_FOUND" = "false" ]; then
+            echo "✅ No common issues detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: No YAML files summary
+        if: steps.check_yaml.outputs.has_yaml == 'false'
+        run: |
+          echo "## YAML Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ No YAML files found - skipping validation" >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**YAML validation complete** ✅" >> $GITHUB_STEP_SUMMARY
