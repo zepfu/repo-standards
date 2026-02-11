@@ -15,13 +15,11 @@
 ```
 repo-standards/
 ├── ⭐ Makefile
-├── Makefile.bak
 ├── ⭐ README.md
 ├── pyproject.toml
 ├── repo.mk.example
 ├── docs/
 │   ├── conf.py
-│   ├── conf.py.bak
 │   ├── index.rst
 │   ├── requirements.txt
 │   ├── auto/
@@ -44,14 +42,9 @@ repo-standards/
     ├── archive.sh
     ├── changelog.py
     ├── generate_architecture.py
-    ├── generate_architecture.py:Zone.Identifier
     ├── render-mermaid.sh
-    ├── render-mermaid.sh.bak
-    ├── render-mermaid.sh:Zone.Identifier
     ├── repo_map.py
-    ├── sync-configs.sh
-    ├── sync-configs.sh.bak
-    └── sync-configs.sh:Zone.Identifier
+    └── sync-configs.sh
 ```
 
 ## Key Files
@@ -61,14 +54,13 @@ repo-standards/
 **`Makefile`**
 
 **`README.md`**
-
-- Documentation System Implementation for repo-standards
+  - Documentation System Implementation for repo-standards
 
 ## Configuration Files
 
-| File             | Description      |
-| ---------------- | ---------------- |
-| `Makefile`       | *No description* |
+| File | Description |
+|------|-------------|
+| `Makefile` | *No description* |
 | `pyproject.toml` | *No description* |
 
 ## Documentation
@@ -84,17 +76,17 @@ repo-standards/
 
 ## Scripts
 
-| Script                     | Description      |
-| -------------------------- | ---------------- |
-| `archive.sh`               | *No description* |
-| `changelog.py`             | *No description* |
+| Script | Description |
+|--------|-------------|
+| `archive.sh` | *No description* |
+| `changelog.py` | *No description* |
 | `generate_architecture.py` | *No description* |
-| `render-mermaid.sh`        | *No description* |
-| `repo_map.py`              | *No description* |
-| `sync-configs.sh`          | *No description* |
+| `render-mermaid.sh` | *No description* |
+| `repo_map.py` | *No description* |
+| `sync-configs.sh` | *No description* |
 
-______________________________________________________________________
+---
 
 *This file is auto-generated. Do not edit manually.*
 
-*Last updated: /home/zepfu/projects/repo-standards*
+*Last updated: /home/runner/work/repo-standards/repo-standards*
