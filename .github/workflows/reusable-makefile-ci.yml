@@ -15,9 +15,16 @@ on:
 
   push:
     branches: [main, master]
-    paths: ['Makefile', '*.mk', '**/*.mk']
+    paths:
+      - 'Makefile'
+      - '*.mk'
+      - '**/*.mk'
+
   pull_request:
-    paths: ['Makefile', '*.mk', '**/*.mk']
+    paths:
+      - 'Makefile'
+      - '*.mk'
+      - '**/*.mk'
 
 jobs:
   validate-makefile:
@@ -66,14 +73,21 @@ jobs:
         run: |
           echo "Installing checkmake ${{ inputs.checkmake-version }}..."
 
-          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/${{ inputs.checkmake-version }}/checkmake-${{ inputs.checkmake-version }}.linux.amd64"
+          # checkmake uses 'v' prefix in release tags but not in filenames
+          CHECKMAKE_URL="https://github.com/mrtazz/checkmake/releases/download/v${{ inputs.checkmake-version }}/checkmake-${{ inputs.checkmake-version }}.linux.amd64"
 
-          wget -q "$CHECKMAKE_URL" -O checkmake
-          chmod +x checkmake
-          sudo mv checkmake /usr/local/bin/checkmake
+          echo "Downloading from: $CHECKMAKE_URL"
 
-          echo "✓ checkmake installed"
-          checkmake --version
+          if wget -q "$CHECKMAKE_URL" -O checkmake; then
+            chmod +x checkmake
+            sudo mv checkmake /usr/local/bin/checkmake
+            echo "✓ checkmake installed"
+            checkmake --version
+          else
+            echo "✗ Failed to download checkmake"
+            echo "URL: $CHECKMAKE_URL"
+            exit 1
+          fi
 
       - name: Lint Makefile with checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'

@@ -12,15 +12,23 @@ on:
         type: string
         default: 'v0.9.0'
         description: 'ShellCheck version to use'
+
   push:
     branches: [main, master]
     paths:
       - '**.sh'
+      - '**.bash'
       - '.shellcheckrc'
+      - 'scripts/**'
+
   pull_request:
     paths:
       - '**.sh'
+      - '**.bash'
       - '.shellcheckrc'
+      - 'scripts/**'
+
+  workflow_dispatch: {}
 
 jobs:
   shellcheck:
@@ -31,13 +39,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check for shell scripts
+        id: check_scripts
+        run: |
+          if compgen -G "scripts/*.sh" > /dev/null || compgen -G "**/*.sh" > /dev/null; then
+            echo "has_scripts=true" >> $GITHUB_OUTPUT
+            echo "✓ Shell scripts found"
+          else
+            echo "has_scripts=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No shell scripts found, skipping validation"
+          fi
+
       - name: Run ShellCheck
+        if: steps.check_scripts.outputs.has_scripts == 'true'
         uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: './scripts'
-          severity: ${{ inputs.severity }}
+          severity: ${{ inputs.severity || 'error' }}
           check_together: 'yes'
-          version: ${{ inputs.shellcheck-version }}
+          version: ${{ inputs.shellcheck-version || 'v0.9.0' }}
 
   bash-syntax:
     name: Bash Syntax Validation
@@ -47,12 +67,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate Bash scripts syntax
+      - name: Check for shell scripts
+        id: check_scripts
         run: |
+          if compgen -G "scripts/*.sh" > /dev/null || compgen -G "**/*.sh" > /dev/null; then
+            echo "has_scripts=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_scripts=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No shell scripts found"
+          fi
+
+      - name: Validate Bash scripts syntax
+        if: steps.check_scripts.outputs.has_scripts == 'true'
+        run: |
+          echo "Validating Bash syntax..."
+
+          FAILED=false
+
           shopt -s globstar nullglob
-          for file in scripts/**/*.sh; do
+          for file in scripts/**/*.sh **/*.sh; do
             if [ -f "$file" ]; then
-              echo "Checking $file"
-              bash -n "$file"
+              echo "Checking: $file"
+              if bash -n "$file" 2>&1; then
+                echo "  ✓ Valid syntax"
+              else
+                echo "  ✗ Syntax error"
+                FAILED=true
+              fi
             fi
           done
+
+          if [ "$FAILED" = "true" ]; then
+            echo ""
+            echo "✗ Some scripts have syntax errors"
+            exit 1
+          else
+            echo ""
+            echo "✓ All scripts have valid syntax"
+          fi
+
+      - name: No scripts summary
+        if: steps.check_scripts.outputs.has_scripts == 'false'
+        run: |
+          echo "## Shell Script Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ No shell scripts found - skipping validation" >> $GITHUB_STEP_SUMMARY

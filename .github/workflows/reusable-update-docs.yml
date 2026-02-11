@@ -61,77 +61,118 @@ jobs:
           fetch-depth: 0  # Needed for git history in changelog
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set defaults for inputs
+        id: set_defaults
+        run: |
+          # Set defaults when inputs are empty (push/PR triggers)
+          PYTHON_VERSION="${{ inputs.python-version }}"
+          DOCS_DIR="${{ inputs.docs-directory }}"
+          AUTO_DOCS_DIR="${{ inputs.auto-docs-directory }}"
+          GEN_ARCH="${{ inputs.generate-architecture }}"
+          ARCH_DIAGRAMS="${{ inputs.architecture-diagrams }}"
+
+          [ -z "$PYTHON_VERSION" ] && PYTHON_VERSION="3.11"
+          [ -z "$DOCS_DIR" ] && DOCS_DIR="docs"
+          [ -z "$AUTO_DOCS_DIR" ] && AUTO_DOCS_DIR="docs/auto"
+          [ -z "$GEN_ARCH" ] && GEN_ARCH="true"
+          [ -z "$ARCH_DIAGRAMS" ] && ARCH_DIAGRAMS="all"
+
+          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+          echo "docs_dir=$DOCS_DIR" >> $GITHUB_OUTPUT
+          echo "auto_docs_dir=$AUTO_DOCS_DIR" >> $GITHUB_OUTPUT
+          echo "generate_arch=$GEN_ARCH" >> $GITHUB_OUTPUT
+          echo "arch_diagrams=$ARCH_DIAGRAMS" >> $GITHUB_OUTPUT
+
+          echo "Using configuration:"
+          echo "  Python version: $PYTHON_VERSION"
+          echo "  Docs directory: $DOCS_DIR"
+          echo "  Auto-docs directory: $AUTO_DOCS_DIR"
+          echo "  Generate architecture: $GEN_ARCH"
+          echo "  Architecture diagrams: $ARCH_DIAGRAMS"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ steps.set_defaults.outputs.python_version }}
 
       - name: Install Sphinx dependencies
         run: |
-          if [ -f "${{ inputs.docs-directory }}/requirements.txt" ]; then
-            echo "Installing Sphinx dependencies from ${{ inputs.docs-directory }}/requirements.txt"
-            python3 -m pip install -r "${{ inputs.docs-directory }}/requirements.txt"
+          DOCS_DIR="${{ steps.set_defaults.outputs.docs_dir }}"
+
+          if [ -f "$DOCS_DIR/requirements.txt" ]; then
+            echo "Installing Sphinx dependencies from $DOCS_DIR/requirements.txt"
+            python3 -m pip install -r "$DOCS_DIR/requirements.txt"
           else
-            echo "WARNING: No requirements.txt found at ${{ inputs.docs-directory }}/requirements.txt"
+            echo "WARNING: No requirements.txt found at $DOCS_DIR/requirements.txt"
             echo "Installing minimal Sphinx dependencies"
             python3 -m pip install sphinx sphinx-rtd-theme myst-parser
           fi
 
       - name: Install PyYAML for architecture generation
-        if: inputs.generate-architecture == true
+        if: steps.set_defaults.outputs.generate_arch == 'true'
         run: |
           python3 -m pip install pyyaml
 
       - name: Create auto-docs directory
         run: |
-          mkdir -p "${{ inputs.auto-docs-directory }}"
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
+          echo "Creating directory: $AUTO_DOCS_DIR"
+          mkdir -p "$AUTO_DOCS_DIR"
 
       - name: Generate CHANGELOG.md
         run: |
           echo "Generating CHANGELOG.md..."
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
           CHANGELOG_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/changelog.py"
           curl -fsSL "$CHANGELOG_URL" | python3 - \
-            --output "${{ inputs.auto-docs-directory }}/CHANGELOG.md" \
+            --output "$AUTO_DOCS_DIR/CHANGELOG.md" \
             --from-git \
             --with-commits
 
       - name: Generate REPO_MAP.md
         run: |
           echo "Generating REPO_MAP.md..."
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
           REPO_MAP_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/repo_map.py"
           curl -fsSL "$REPO_MAP_URL" | python3 - \
-            --output "${{ inputs.auto-docs-directory }}/REPO_MAP.md"
+            --output "$AUTO_DOCS_DIR/REPO_MAP.md"
 
       - name: Generate ARCHITECTURE_AUTO.md
-        if: inputs.generate-architecture == true
+        if: steps.set_defaults.outputs.generate_arch == 'true'
         run: |
           echo "Generating ARCHITECTURE_AUTO.md..."
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
+          ARCH_DIAGRAMS="${{ steps.set_defaults.outputs.arch_diagrams }}"
+
           ARCH_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/generate_architecture.py"
           curl -fsSL "$ARCH_URL" -o /tmp/generate_architecture.py
           chmod +x /tmp/generate_architecture.py
 
-          if [ "${{ inputs.architecture-diagrams }}" = "all" ]; then
+          if [ "$ARCH_DIAGRAMS" = "all" ]; then
             python3 /tmp/generate_architecture.py \
-              --output "${{ inputs.auto-docs-directory }}/ARCHITECTURE_AUTO.md" \
+              --output "$AUTO_DOCS_DIR/ARCHITECTURE_AUTO.md" \
               --all-diagrams
           else
             python3 /tmp/generate_architecture.py \
-              --output "${{ inputs.auto-docs-directory }}/ARCHITECTURE_AUTO.md" \
-              --diagrams "${{ inputs.architecture-diagrams }}"
+              --output "$AUTO_DOCS_DIR/ARCHITECTURE_AUTO.md" \
+              --diagrams "$ARCH_DIAGRAMS"
           fi
 
       - name: Ensure auto-docs directory is tracked
         run: |
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
+
           # Ensure .gitkeep exists to track the directory
-          touch "${{ inputs.auto-docs-directory }}/.gitkeep"
+          touch "$AUTO_DOCS_DIR/.gitkeep"
 
           echo "Auto-generated docs status:"
-          ls -lh "${{ inputs.auto-docs-directory }}/"
+          ls -lh "$AUTO_DOCS_DIR/"
 
       - name: Check for documentation changes
         id: check_changes
         run: |
-          git add "${{ inputs.auto-docs-directory }}/"
+          AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"
+          git add "$AUTO_DOCS_DIR/"
 
           if git diff --cached --quiet; then
             echo "No auto-documentation changes"
@@ -152,7 +193,8 @@ jobs:
 
       - name: Build Sphinx documentation
         run: |
-          cd "${{ inputs.docs-directory }}"
+          DOCS_DIR="${{ steps.set_defaults.outputs.docs_dir }}"
+          cd "$DOCS_DIR"
 
           # Build with warnings as errors, but keep going to see all issues
           sphinx-build -b html . _build/html -W --keep-going
@@ -162,7 +204,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./${{ inputs.docs-directory }}/_build/html
+          publish_dir: ./${{ steps.set_defaults.outputs.docs_dir }}/_build/html
           publish_branch: gh-pages
           force_orphan: true
           user_name: 'github-actions[bot]'
@@ -171,6 +213,8 @@ jobs:
 
       - name: Summary
         run: |
+          GEN_ARCH="${{ steps.set_defaults.outputs.generate_arch }}"
+
           echo "## Documentation Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
@@ -202,6 +246,6 @@ jobs:
           echo "- ✅ CHANGELOG.md - Git history" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ REPO_MAP.md - Repository structure" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ inputs.generate-architecture }}" = "true" ]; then
+          if [ "$GEN_ARCH" = "true" ]; then
             echo "- ✅ ARCHITECTURE_AUTO.md - Architecture diagrams" >> $GITHUB_STEP_SUMMARY
           fi
