@@ -158,6 +158,7 @@ jobs:
               --diagrams "$ARCH_DIAGRAMS"
           fi
 
+
       - name: Ensure auto-docs directory is tracked
         run: |
           AUTO_DOCS_DIR="${{ steps.set_defaults.outputs.auto_docs_dir }}"

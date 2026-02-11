@@ -2,31 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## \[Unreleased\]
 
 ### Added
 
-- additional standardization ([f3bbeef](https://github.com/zepfu/repo-standards/commit/f3bbeefd478be06f2a54f0b78b6f95bca48e48f6))
-- additional standardization ([117321a](https://github.com/zepfu/repo-standards/commit/117321ac6450bae0e7ec6fa20a17ca11886404c6))
-- additional standardization ([97a26bf](https://github.com/zepfu/repo-standards/commit/97a26bfdb3b48e04a405824142e789953834b06f))
-- Additional documentation support ([ce72716](https://github.com/zepfu/repo-standards/commit/ce727163be64216c2269da23387626e2a01f4fad))
-- Additional documentation support ([b0fea5a](https://github.com/zepfu/repo-standards/commit/b0fea5a72842bdb38f8c5181c5a57abd3fc852f5))
-- Additional documentation support ([72580b2](https://github.com/zepfu/repo-standards/commit/72580b28478839dcfef9af6853cef99a4041cd09))
-- Additional documentation support ([dd35cf2](https://github.com/zepfu/repo-standards/commit/dd35cf2718e429d3b3228c020478a4652e891fb5))
-- Additional documentation support ([98745ef](https://github.com/zepfu/repo-standards/commit/98745ef65270a555869dddc8fba7940dc2885e3e))
-- Additional documentation support ([96dd4fc](https://github.com/zepfu/repo-standards/commit/96dd4fcf7ad666bb15e15e5dbb2f79520d7aadbd))
-- Additional documentation support ([39647a3](https://github.com/zepfu/repo-standards/commit/39647a326508afacf3eec7764ba7f638e139a26d))
-- Architecture documentation automation ([ba484be](https://github.com/zepfu/repo-standards/commit/ba484bec2c733cbbb7b422557e03cfd920f5e763))
-- additional workflow ([6126bcf](https://github.com/zepfu/repo-standards/commit/6126bcfb5811320adfa14a8e6fc876760b913cad))
-- additional standards ([f61d714](https://github.com/zepfu/repo-standards/commit/f61d714261145afbd39a66ec41053db759b46345))
+- additional standardization
+  ([f3bbeef](https://github.com/zepfu/repo-standards/commit/f3bbeefd478be06f2a54f0b78b6f95bca48e48f6))
+- additional standardization
+  ([117321a](https://github.com/zepfu/repo-standards/commit/117321ac6450bae0e7ec6fa20a17ca11886404c6))
+- additional standardization
+  ([97a26bf](https://github.com/zepfu/repo-standards/commit/97a26bfdb3b48e04a405824142e789953834b06f))
+- Additional documentation support
+  ([ce72716](https://github.com/zepfu/repo-standards/commit/ce727163be64216c2269da23387626e2a01f4fad))
+- Additional documentation support
+  ([b0fea5a](https://github.com/zepfu/repo-standards/commit/b0fea5a72842bdb38f8c5181c5a57abd3fc852f5))
+- Additional documentation support
+  ([72580b2](https://github.com/zepfu/repo-standards/commit/72580b28478839dcfef9af6853cef99a4041cd09))
+- Additional documentation support
+  ([dd35cf2](https://github.com/zepfu/repo-standards/commit/dd35cf2718e429d3b3228c020478a4652e891fb5))
+- Additional documentation support
+  ([98745ef](https://github.com/zepfu/repo-standards/commit/98745ef65270a555869dddc8fba7940dc2885e3e))
+- Additional documentation support
+  ([96dd4fc](https://github.com/zepfu/repo-standards/commit/96dd4fcf7ad666bb15e15e5dbb2f79520d7aadbd))
+- Additional documentation support
+  ([39647a3](https://github.com/zepfu/repo-standards/commit/39647a326508afacf3eec7764ba7f638e139a26d))
+- Architecture documentation automation
+  ([ba484be](https://github.com/zepfu/repo-standards/commit/ba484bec2c733cbbb7b422557e03cfd920f5e763))
+- additional workflow
+  ([6126bcf](https://github.com/zepfu/repo-standards/commit/6126bcfb5811320adfa14a8e6fc876760b913cad))
+- additional standards
+  ([f61d714](https://github.com/zepfu/repo-standards/commit/f61d714261145afbd39a66ec41053db759b46345))
 - ci added ([5159586](https://github.com/zepfu/repo-standards/commit/5159586fcd91f0fb15045f2c95604b9d14ef5799))
 
 ### Changed
 
-- mermaid image generation ([b9878b4](https://github.com/zepfu/repo-standards/commit/b9878b4433a1fbf9ba526b9db3641e7c34ca970f))
+- mermaid image generation
+  ([b9878b4](https://github.com/zepfu/repo-standards/commit/b9878b4433a1fbf9ba526b9db3641e7c34ca970f))
 - workflow updates ([2bf2899](https://github.com/zepfu/repo-standards/commit/2bf2899958711edc5236e221946993ca504c928a))
 - git ignore update ([af37c79](https://github.com/zepfu/repo-standards/commit/af37c79ef54237232053c9d8d7d07389ed48bcc4))
 - doc updates ([d640423](https://github.com/zepfu/repo-standards/commit/d640423b5a818dbbfe5644b65fe1ef5343636024))
@@ -42,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- mermaid image generation fix ([d405ca2](https://github.com/zepfu/repo-standards/commit/d405ca2b19aeb0df3494f63b2f34b42a13bf2945))
+- mermaid image generation fix
+  ([d405ca2](https://github.com/zepfu/repo-standards/commit/d405ca2b19aeb0df3494f63b2f34b42a13bf2945))
 - workflow fix ([637289e](https://github.com/zepfu/repo-standards/commit/637289e9fdf7639709228766811766a973a5154a))
 - config sync fix ([2d4bff6](https://github.com/zepfu/repo-standards/commit/2d4bff68083f5d00249bd5bb79ffd0691e1664d9))
 - config sync fix ([f116273](https://github.com/zepfu/repo-standards/commit/f1162732f2bacc243a4e2d924278e98a5642f92d))
@@ -51,7 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - doc fixes ([7d22ff8](https://github.com/zepfu/repo-standards/commit/7d22ff84fe73ba1d48de9b621c042275723f1039))
 - repo map fix ([db55de3](https://github.com/zepfu/repo-standards/commit/db55de379b08ab714593ae11992a9571d1152272))
 
----
+______________________________________________________________________
 
-*This file is auto-generated from git history.*
-*Manual edits may be overwritten.*
+*This file is auto-generated from git history.* *Manual edits may be overwritten.*

@@ -54,13 +54,14 @@ repo-standards/
 **`Makefile`**
 
 **`README.md`**
-  - Documentation System Implementation for repo-standards
+
+- Documentation System Implementation for repo-standards
 
 ## Configuration Files
 
-| File | Description |
-|------|-------------|
-| `Makefile` | *No description* |
+| File             | Description      |
+| ---------------- | ---------------- |
+| `Makefile`       | *No description* |
 | `pyproject.toml` | *No description* |
 
 ## Documentation
@@ -76,16 +77,16 @@ repo-standards/
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `archive.sh` | *No description* |
-| `changelog.py` | *No description* |
+| Script                     | Description      |
+| -------------------------- | ---------------- |
+| `archive.sh`               | *No description* |
+| `changelog.py`             | *No description* |
 | `generate_architecture.py` | *No description* |
-| `render-mermaid.sh` | *No description* |
-| `repo_map.py` | *No description* |
-| `sync-configs.sh` | *No description* |
+| `render-mermaid.sh`        | *No description* |
+| `repo_map.py`              | *No description* |
+| `sync-configs.sh`          | *No description* |
 
----
+______________________________________________________________________
 
 *This file is auto-generated. Do not edit manually.*
 
