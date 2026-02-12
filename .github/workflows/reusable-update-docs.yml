@@ -199,7 +199,17 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "docs: auto-update documentation [skip ci]"
-          git push
+
+          # Retry push with rebase in case remote advanced since checkout
+          MAX_RETRIES=3
+          for i in $(seq 1 "$MAX_RETRIES"); do
+            if git push; then
+              echo "Push succeeded"
+              break
+            fi
+            echo "Push failed (attempt $i/$MAX_RETRIES), rebasing..."
+            git pull --rebase
+          done
 
       - name: Build Sphinx documentation
         run: |
