@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search &mdash; repo-standards Documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7ad5552a" />
+
+  
+    
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="#" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            repo-standards
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/getting-started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/getting-started.html#quick-setup">Quick Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/getting-started.html#what-gets-enforced">What Gets Enforced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/getting-started.html#python-code">Python Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/getting-started.html#shell-scripts">Shell Scripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/getting-started.html#yaml-files">YAML Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/getting-started.html#general">General</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/getting-started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/quick-setup.html">Quick Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#one-command-setup">One-Command Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#python-project">Python Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#shell-project">Shell Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#docker-project">Docker Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/quick-setup.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/python-standards.html">Python Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#formatting-with-black">Formatting with Black</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#import-sorting-with-isort">Import Sorting with isort</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#id1">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#id2">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#linting-with-flake8">Linting with Flake8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#id3">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#id4">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#type-hints">Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#line-length">Line Length</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#project-structure">Project Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/python-standards.html#virtual-environments">Virtual Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/python-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/shell-standards.html">Shell Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#shellcheck">ShellCheck</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#script-template">Script Template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#standard-template">Standard Template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#quoting">Quoting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#conditionals">Conditionals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#check-if-command-exists">Check if command exists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#read-file-line-by-line">Read file line by line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#iterate-over-files">Iterate over files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#portability">Portability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#security">Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/shell-standards.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/shell-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/workflow-standards.html">Workflow Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#reusable-workflows">Reusable Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#python-ci">Python CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#shell-ci">Shell CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#docker-build">Docker Build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#config-validation">Config Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#architecture-update">Architecture Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#complete-example">Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#versioning">Versioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#permissions">Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#triggers">Triggers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/workflow-standards.html#monorepo">Monorepo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/workflow-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/docker-standards.html">Docker Standards</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scripts &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/scripts.html">Scripts Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/scripts.html#changelog-py">changelog.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/scripts.html#repo-map-py">repo_map.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/scripts.html#generate-architecture-py">generate_architecture.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/scripts.html#sync-configs-sh">sync-configs.sh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/workflows.html">Workflows Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/workflows.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-python-ci-yml">reusable-python-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-shell-ci-yml">reusable-shell-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-docker-build-yml">reusable-docker-build.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-pre-commit-yml">reusable-pre-commit.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-config-validation-yml">reusable-config-validation.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/workflows.html#reusable-update-architecture-yml">reusable-update-architecture.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/configs.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#gitattributes">.gitattributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#gitignore">.gitignore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#editorconfig">.editorconfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#flake8">.flake8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#shellcheckrc">.shellcheckrc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#pre-commit-config-yaml">.pre-commit-config.yaml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configs.html#pyproject-toml">pyproject.toml</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Auto-Generated Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto/CHANGELOG.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto/CHANGELOG.html#unreleased">[Unreleased]</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto/CHANGELOG.html#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto/CHANGELOG.html#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto/CHANGELOG.html#fixed">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="auto/REPO_MAP.html">Repository Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#directory-tree">Directory Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#key-files">Key Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto/REPO_MAP.html#important-files">Important Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#configuration-files">Configuration Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/REPO_MAP.html#scripts">Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html">Architecture (Auto-Generated)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#detected-patterns">Detected Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#flowchart-diagram">Flowchart Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#state-diagram">State Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#sequence-diagram">Sequence Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#architecture-diagram">Architecture Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#er-diagram">Er Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#class-diagram">Class Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#journey-diagram">Journey Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#mindmap-diagram">Mindmap Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#workflow-pipeline-diagram">Workflow Pipeline Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#workflow-triggers-diagram">Workflow Triggers Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#workflow-jobs-diagram">Workflow Jobs Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#development-workflows">Development Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#github-workflows-summary">GitHub Workflows Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#module-summary">Module Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#docs-conf"><code class="docutils literal notranslate"><span class="pre">docs.conf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#scripts-changelog"><code class="docutils literal notranslate"><span class="pre">scripts.changelog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#scripts-generate-architecture"><code class="docutils literal notranslate"><span class="pre">scripts.generate_architecture</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto/ARCHITECTURE_AUTO.html#scripts-repo-map"><code class="docutils literal notranslate"><span class="pre">scripts.repo_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">repo-standards</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Search</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <noscript>
+  <div id="fallback" class="admonition warning">
+    <p class="last">
+      Please activate JavaScript to enable the search functionality.
+    </p>
+  </div>
+  </noscript>
+
+  
+  <div id="search-results">
+  
+  </div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zepfu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+  <script>
+    jQuery(function() { Search.loadIndex("searchindex.js"); });
+  </script>
+  
+  <script id="searchindexloader"></script>
+   
+
+
+</body>
+</html>

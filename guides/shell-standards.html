@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shell Standards &mdash; repo-standards Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7ad5552a" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Workflow Standards" href="workflow-standards.html" />
+    <link rel="prev" title="Python Standards" href="python-standards.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            repo-standards
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#quick-setup">Quick Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#what-gets-enforced">What Gets Enforced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#python-code">Python Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#shell-scripts">Shell Scripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#yaml-files">YAML Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#general">General</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quick-setup.html">Quick Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#one-command-setup">One-Command Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#python-project">Python Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#shell-project">Shell Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#docker-project">Docker Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standards</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="python-standards.html">Python Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#formatting-with-black">Formatting with Black</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#import-sorting-with-isort">Import Sorting with isort</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id1">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id2">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#linting-with-flake8">Linting with Flake8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id3">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id4">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#type-hints">Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#line-length">Line Length</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#project-structure">Project Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#virtual-environments">Virtual Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Shell Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#shellcheck">ShellCheck</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#script-template">Script Template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#standard-template">Standard Template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#quoting">Quoting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conditionals">Conditionals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#check-if-command-exists">Check if command exists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#read-file-line-by-line">Read file line by line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iterate-over-files">Iterate over files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#portability">Portability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security">Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="workflow-standards.html">Workflow Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#reusable-workflows">Reusable Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#python-ci">Python CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#shell-ci">Shell CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#docker-build">Docker Build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#config-validation">Config Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#architecture-update">Architecture Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#complete-example">Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#versioning">Versioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#permissions">Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#triggers">Triggers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#monorepo">Monorepo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker-standards.html">Docker Standards</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scripts &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/scripts.html">Scripts Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#changelog-py">changelog.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#repo-map-py">repo_map.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#generate-architecture-py">generate_architecture.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#sync-configs-sh">sync-configs.sh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/workflows.html">Workflows Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/workflows.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-python-ci-yml">reusable-python-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-shell-ci-yml">reusable-shell-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-docker-build-yml">reusable-docker-build.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-pre-commit-yml">reusable-pre-commit.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-config-validation-yml">reusable-config-validation.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-update-architecture-yml">reusable-update-architecture.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/configs.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitattributes">.gitattributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitignore">.gitignore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#editorconfig">.editorconfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#flake8">.flake8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#shellcheckrc">.shellcheckrc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pre-commit-config-yaml">.pre-commit-config.yaml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pyproject-toml">pyproject.toml</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Auto-Generated Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto/CHANGELOG.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/CHANGELOG.html#unreleased">[Unreleased]</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#fixed">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/REPO_MAP.html">Repository Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#directory-tree">Directory Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#key-files">Key Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/REPO_MAP.html#important-files">Important Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#configuration-files">Configuration Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#scripts">Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html">Architecture (Auto-Generated)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#detected-patterns">Detected Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#flowchart-diagram">Flowchart Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#state-diagram">State Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#sequence-diagram">Sequence Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#architecture-diagram">Architecture Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#er-diagram">Er Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#class-diagram">Class Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#journey-diagram">Journey Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#mindmap-diagram">Mindmap Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-pipeline-diagram">Workflow Pipeline Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-triggers-diagram">Workflow Triggers Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-jobs-diagram">Workflow Jobs Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#development-workflows">Development Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#github-workflows-summary">GitHub Workflows Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#module-summary">Module Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#docs-conf"><code class="docutils literal notranslate"><span class="pre">docs.conf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-changelog"><code class="docutils literal notranslate"><span class="pre">scripts.changelog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-generate-architecture"><code class="docutils literal notranslate"><span class="pre">scripts.generate_architecture</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-repo-map"><code class="docutils literal notranslate"><span class="pre">scripts.repo_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">repo-standards</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Shell Standards</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/shell-standards.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="shell-standards">
+<h1>Shell Standards<a class="headerlink" href="#shell-standards" title="Link to this heading"></a></h1>
+<p>Code quality standards for shell scripts.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>All shell scripts must:</p>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">#!/usr/bin/env</span> <span class="pre">bash</span></code> shebang</p></li>
+<li><p>Pass ShellCheck (error level)</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">-euo</span> <span class="pre">pipefail</span></code></p></li>
+<li><p>Have proper quoting</p></li>
+</ul>
+</section>
+<section id="shellcheck">
+<h2>ShellCheck<a class="headerlink" href="#shellcheck" title="Link to this heading"></a></h2>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">.shellcheckrc</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ShellCheck configuration</span>
+<span class="nv">disable</span><span class="o">=</span>SC2250<span class="w">  </span><span class="c1"># Prefer ${var} over $var (style preference)</span>
+<span class="nv">enable</span><span class="o">=</span>quote-safe-variables
+<span class="nv">shell</span><span class="o">=</span>bash
+external-sources<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check script</span>
+shellcheck<span class="w"> </span>scripts/automation.sh
+
+<span class="c1"># Check all scripts</span>
+find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.sh&quot;</span><span class="w"> </span>-exec<span class="w"> </span>shellcheck<span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
+</pre></div>
+</div>
+</section>
+<section id="common-rules">
+<h3>Common Rules<a class="headerlink" href="#common-rules" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>SC2086</strong>: Quote variables to prevent word splitting</p></li>
+<li><p><strong>SC2046</strong>: Quote command substitutions</p></li>
+<li><p><strong>SC2004</strong>: Don’t use $ on arithmetic variables</p></li>
+<li><p><strong>SC2250</strong>: Prefer ${var} over $var (can be disabled)</p></li>
+</ul>
+</section>
+</section>
+<section id="script-template">
+<h2>Script Template<a class="headerlink" href="#script-template" title="Link to this heading"></a></h2>
+<section id="standard-template">
+<h3>Standard Template<a class="headerlink" href="#standard-template" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="c1"># script-name.sh - Brief description</span>
+<span class="c1">#</span>
+<span class="c1"># Longer description if needed.</span>
+<span class="c1">#</span>
+<span class="c1"># Usage:</span>
+<span class="c1">#   bash script-name.sh [options]</span>
+<span class="c1">#</span>
+<span class="c1"># Options:</span>
+<span class="c1">#   -h, --help     Show this help message</span>
+<span class="c1">#   -v, --verbose  Enable verbose output</span>
+
+<span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+
+<span class="c1"># Script directory</span>
+<span class="nv">SCRIPT_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>dirname<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">pwd</span><span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Constants</span>
+<span class="nb">readonly</span><span class="w"> </span><span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>basename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+<span class="nb">readonly</span><span class="w"> </span><span class="nv">DEFAULT_CONFIG</span><span class="o">=</span><span class="s2">&quot;config.yml&quot;</span>
+
+<span class="c1"># Functions</span>
+log<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;[</span><span class="k">$(</span>date<span class="w"> </span>+<span class="s1">&#39;%Y-%m-%d %H:%M:%S&#39;</span><span class="k">)</span><span class="s2">] </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="o">}</span>
+
+die<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>log<span class="w"> </span><span class="s2">&quot;ERROR: </span><span class="nv">$*</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="o">}</span>
+
+usage<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>cat<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">Usage: $SCRIPT_NAME [options]</span>
+
+<span class="s">Description of script.</span>
+
+<span class="s">Options:</span>
+<span class="s">    -h, --help      Show this help</span>
+<span class="s">    -v, --verbose   Verbose output</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+<span class="c1"># Main function</span>
+main<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">verbose</span><span class="o">=</span><span class="nb">false</span>
+
+<span class="w">    </span><span class="c1"># Parse arguments</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$1</span><span class="w"> </span><span class="k">in</span>
+<span class="w">            </span>-h<span class="p">|</span>--help<span class="o">)</span>
+<span class="w">                </span>usage
+<span class="w">                </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">                </span><span class="p">;;</span>
+<span class="w">            </span>-v<span class="p">|</span>--verbose<span class="o">)</span>
+<span class="w">                </span><span class="nv">verbose</span><span class="o">=</span><span class="nb">true</span>
+<span class="w">                </span><span class="nb">shift</span>
+<span class="w">                </span><span class="p">;;</span>
+<span class="w">            </span>*<span class="o">)</span>
+<span class="w">                </span>die<span class="w"> </span><span class="s2">&quot;Unknown option: </span><span class="nv">$1</span><span class="s2">&quot;</span>
+<span class="w">                </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">    </span><span class="k">done</span>
+
+<span class="w">    </span><span class="c1"># Script logic here</span>
+<span class="w">    </span>log<span class="w"> </span><span class="s2">&quot;Starting...&quot;</span>
+<span class="o">}</span>
+
+<span class="c1"># Run main</span>
+main<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="style-guidelines">
+<h2>Style Guidelines<a class="headerlink" href="#style-guidelines" title="Link to this heading"></a></h2>
+<section id="quoting">
+<h3>Quoting<a class="headerlink" href="#quoting" title="Link to this heading"></a></h3>
+<p>Always quote variables:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Good</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$variable</span><span class="s2">&quot;</span>
+cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$source</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$destination</span><span class="s2">&quot;</span>
+
+<span class="c1"># Bad - word splitting</span>
+<span class="nb">echo</span><span class="w"> </span><span class="nv">$variable</span>
+cp<span class="w"> </span><span class="nv">$source</span><span class="w"> </span><span class="nv">$destination</span>
+</pre></div>
+</div>
+</section>
+<section id="arrays">
+<h3>Arrays<a class="headerlink" href="#arrays" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define array</span>
+<span class="nv">files</span><span class="o">=(</span><span class="s2">&quot;file1.txt&quot;</span><span class="w"> </span><span class="s2">&quot;file2.txt&quot;</span><span class="w"> </span><span class="s2">&quot;file3.txt&quot;</span><span class="o">)</span>
+
+<span class="c1"># Iterate</span>
+<span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">files</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span>
+<span class="k">done</span>
+
+<span class="c1"># Check length</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="si">${#</span><span class="nv">files</span><span class="p">[@]</span><span class="si">}</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Has files&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+</section>
+<section id="conditionals">
+<h3>Conditionals<a class="headerlink" href="#conditionals" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">[[</span> <span class="pre">]]</span></code> for tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Good</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;File exists&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$var</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Match&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Bad - use [[ ]] instead</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="nv">$file</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;File exists&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define function</span>
+process_file<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">input_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">output_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$input_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Input file not found&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Process file</span>
+<span class="w">    </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$input_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$output_file</span><span class="s2">&quot;</span>
+<span class="o">}</span>
+
+<span class="c1"># Call function</span>
+process_file<span class="w"> </span><span class="s2">&quot;input.txt&quot;</span><span class="w"> </span><span class="s2">&quot;output.txt&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="error-handling">
+<h3>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exit on error</span>
+<span class="nb">set</span><span class="w"> </span>-e
+
+<span class="c1"># Exit on undefined variable</span>
+<span class="nb">set</span><span class="w"> </span>-u
+
+<span class="c1"># Exit on pipe failure</span>
+<span class="nb">set</span><span class="w"> </span>-o<span class="w"> </span>pipefail
+
+<span class="c1"># Combined</span>
+<span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+
+<span class="c1"># Trap errors</span>
+<span class="nb">trap</span><span class="w"> </span><span class="s1">&#39;echo &quot;Error on line $LINENO&quot;&#39;</span><span class="w"> </span>ERR
+</pre></div>
+</div>
+</section>
+</section>
+<section id="common-patterns">
+<h2>Common Patterns<a class="headerlink" href="#common-patterns" title="Link to this heading"></a></h2>
+<section id="check-if-command-exists">
+<h3>Check if command exists<a class="headerlink" href="#check-if-command-exists" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>python3<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Python 3 found&quot;</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Python 3 not found&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+</section>
+<section id="read-file-line-by-line">
+<h3>Read file line by line<a class="headerlink" href="#read-file-line-by-line" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">while</span><span class="w"> </span><span class="nv">IFS</span><span class="o">=</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>line<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Line: </span><span class="nv">$line</span><span class="s2">&quot;</span>
+<span class="k">done</span><span class="w"> </span>&lt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="iterate-over-files">
+<h3>Iterate over files<a class="headerlink" href="#iterate-over-files" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using find</span>
+find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.txt&quot;</span><span class="w"> </span>-print0<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nv">IFS</span><span class="o">=</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span>file<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing: </span><span class="nv">$file</span><span class="s2">&quot;</span>
+<span class="k">done</span>
+
+<span class="c1"># Using glob</span>
+<span class="nb">shopt</span><span class="w"> </span>-s<span class="w"> </span>nullglob
+<span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span>*.txt<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing: </span><span class="nv">$file</span><span class="s2">&quot;</span>
+<span class="k">done</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="enforcement">
+<h2>Enforcement<a class="headerlink" href="#enforcement" title="Link to this heading"></a></h2>
+<section id="pre-commit">
+<h3>Pre-commit<a class="headerlink" href="#pre-commit" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .pre-commit-config.yaml</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/shellcheck-py/shellcheck-py</span>
+<span class="w">  </span><span class="nt">hooks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shellcheck</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;-x&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;--severity=error&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="github-actions">
+<h3>GitHub Actions<a class="headerlink" href="#github-actions" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .github/workflows/ci.yml</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">shell-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="portability">
+<h3>Portability<a class="headerlink" href="#portability" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">#!/usr/bin/env</span> <span class="pre">bash</span></code> not <code class="docutils literal notranslate"><span class="pre">#!/bin/bash</span></code></p></li>
+<li><p>Avoid bashisms if targeting sh</p></li>
+<li><p>Test on multiple systems</p></li>
+</ul>
+</section>
+<section id="security">
+<h3>Security<a class="headerlink" href="#security" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Quote all variables</p></li>
+<li><p>Validate input</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">readonly</span></code> for constants</p></li>
+<li><p>Avoid eval</p></li>
+</ul>
+</section>
+<section id="performance">
+<h3>Performance<a class="headerlink" href="#performance" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use built-ins over external commands</p></li>
+<li><p>Avoid subshells when possible</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">[[</span></code> over <code class="docutils literal notranslate"><span class="pre">[</span></code></p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add header with description</p></li>
+<li><p>Document all functions</p></li>
+<li><p>Show usage examples</p></li>
+<li><p>List dependencies</p></li>
+</ul>
+</section>
+</section>
+<section id="common-issues">
+<h2>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading"></a></h2>
+<p><strong>Word splitting</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrong</span>
+<span class="nv">files</span><span class="o">=</span><span class="k">$(</span><span class="w"> </span>ls<span class="w"> </span>*.txt<span class="w"> </span><span class="k">)</span>
+rm<span class="w"> </span><span class="nv">$files</span><span class="w">  </span><span class="c1"># Word splitting!</span>
+
+<span class="c1"># Right</span>
+<span class="nv">files</span><span class="o">=(</span><span class="w"> </span>*.txt<span class="w"> </span><span class="o">)</span>
+rm<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">files</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><strong>Useless use of cat</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrong</span>
+cat<span class="w"> </span>file.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>pattern
+
+<span class="c1"># Right</span>
+grep<span class="w"> </span>pattern<span class="w"> </span>file.txt
+</pre></div>
+</div>
+<p><strong>Command substitution</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prefer $() over backticks</span>
+<span class="nv">result</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span><span class="k">)</span><span class="w">  </span><span class="c1"># Good</span>
+<span class="nv">result</span><span class="o">=</span><span class="sb">`</span><span class="nb">command</span><span class="sb">`</span><span class="w">   </span><span class="c1"># Old style</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.shellcheck.net/wiki/">ShellCheck Wiki</a></p></li>
+<li><p><a class="reference internal" href="../reference/configs.html"><span class="doc">Configuration Files</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="python-standards.html" class="btn btn-neutral float-left" title="Python Standards" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workflow-standards.html" class="btn btn-neutral float-right" title="Workflow Standards" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zepfu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

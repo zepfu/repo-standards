@@ -1,0 +1,602 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Standards &mdash; repo-standards Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7ad5552a" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Shell Standards" href="shell-standards.html" />
+    <link rel="prev" title="Quick Setup" href="quick-setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            repo-standards
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#quick-setup">Quick Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#what-gets-enforced">What Gets Enforced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#python-code">Python Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#shell-scripts">Shell Scripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#yaml-files">YAML Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#general">General</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quick-setup.html">Quick Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#one-command-setup">One-Command Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#python-project">Python Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#shell-project">Shell Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#docker-project">Docker Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standards</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#formatting-with-black">Formatting with Black</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#import-sorting-with-isort">Import Sorting with isort</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#linting-with-flake8">Linting with Flake8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-hints">Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#line-length">Line Length</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#project-structure">Project Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-environments">Virtual Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shell-standards.html">Shell Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#shellcheck">ShellCheck</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#script-template">Script Template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#standard-template">Standard Template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#quoting">Quoting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#conditionals">Conditionals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#check-if-command-exists">Check if command exists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#read-file-line-by-line">Read file line by line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#iterate-over-files">Iterate over files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#portability">Portability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#security">Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="workflow-standards.html">Workflow Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#reusable-workflows">Reusable Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#python-ci">Python CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#shell-ci">Shell CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#docker-build">Docker Build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#config-validation">Config Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#architecture-update">Architecture Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#complete-example">Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#versioning">Versioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#permissions">Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#triggers">Triggers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow-standards.html#monorepo">Monorepo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker-standards.html">Docker Standards</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scripts &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/scripts.html">Scripts Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#changelog-py">changelog.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#repo-map-py">repo_map.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#generate-architecture-py">generate_architecture.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#sync-configs-sh">sync-configs.sh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/workflows.html">Workflows Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/workflows.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-python-ci-yml">reusable-python-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-shell-ci-yml">reusable-shell-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-docker-build-yml">reusable-docker-build.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-pre-commit-yml">reusable-pre-commit.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-config-validation-yml">reusable-config-validation.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-update-architecture-yml">reusable-update-architecture.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/configs.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitattributes">.gitattributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitignore">.gitignore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#editorconfig">.editorconfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#flake8">.flake8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#shellcheckrc">.shellcheckrc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pre-commit-config-yaml">.pre-commit-config.yaml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pyproject-toml">pyproject.toml</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Auto-Generated Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto/CHANGELOG.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/CHANGELOG.html#unreleased">[Unreleased]</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#fixed">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/REPO_MAP.html">Repository Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#directory-tree">Directory Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#key-files">Key Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/REPO_MAP.html#important-files">Important Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#configuration-files">Configuration Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#scripts">Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html">Architecture (Auto-Generated)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#detected-patterns">Detected Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#flowchart-diagram">Flowchart Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#state-diagram">State Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#sequence-diagram">Sequence Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#architecture-diagram">Architecture Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#er-diagram">Er Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#class-diagram">Class Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#journey-diagram">Journey Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#mindmap-diagram">Mindmap Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-pipeline-diagram">Workflow Pipeline Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-triggers-diagram">Workflow Triggers Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-jobs-diagram">Workflow Jobs Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#development-workflows">Development Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#github-workflows-summary">GitHub Workflows Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#module-summary">Module Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#docs-conf"><code class="docutils literal notranslate"><span class="pre">docs.conf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-changelog"><code class="docutils literal notranslate"><span class="pre">scripts.changelog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-generate-architecture"><code class="docutils literal notranslate"><span class="pre">scripts.generate_architecture</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-repo-map"><code class="docutils literal notranslate"><span class="pre">scripts.repo_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">repo-standards</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python Standards</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/python-standards.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="python-standards">
+<h1>Python Standards<a class="headerlink" href="#python-standards" title="Link to this heading"></a></h1>
+<p>Code quality standards for Python projects.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>All Python code must follow these standards:</p>
+<ul class="simple">
+<li><p>Python 3.11+ required (organization standard)</p></li>
+<li><p>Black formatting (100 char lines)</p></li>
+<li><p>isort import sorting (Black-compatible)</p></li>
+<li><p>Flake8 linting (max complexity 20)</p></li>
+</ul>
+</section>
+<section id="formatting-with-black">
+<h2>Formatting with Black<a class="headerlink" href="#formatting-with-black" title="Link to this heading"></a></h2>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">.pyproject.toml</span></code>:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.black]</span>
+<span class="n">line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span>
+<span class="n">target-version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;py311&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Format files</span>
+black<span class="w"> </span>scripts/*.py
+
+<span class="c1"># Check only</span>
+black<span class="w"> </span>--check<span class="w"> </span>scripts/*.py
+</pre></div>
+</div>
+</section>
+</section>
+<section id="import-sorting-with-isort">
+<h2>Import Sorting with isort<a class="headerlink" href="#import-sorting-with-isort" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Configuration<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.isort]</span>
+<span class="n">profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;black&quot;</span>
+<span class="n">line_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>Usage<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sort imports</span>
+isort<span class="w"> </span>scripts/*.py
+
+<span class="c1"># Check only</span>
+isort<span class="w"> </span>--check<span class="w"> </span>scripts/*.py
+</pre></div>
+</div>
+</section>
+</section>
+<section id="linting-with-flake8">
+<h2>Linting with Flake8<a class="headerlink" href="#linting-with-flake8" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>Configuration<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">.flake8</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[flake8]</span>
+<span class="na">max-line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">120</span>
+<span class="na">extend-ignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">E203, W503</span>
+<span class="na">max-complexity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">20</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>Usage<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lint files</span>
+flake8<span class="w"> </span>scripts/*.py
+</pre></div>
+</div>
+</section>
+<section id="common-rules">
+<h3>Common Rules<a class="headerlink" href="#common-rules" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>E203</strong>: Whitespace before ‘:’ (Black compatibility)</p></li>
+<li><p><strong>W503</strong>: Line break before binary operator (Black compatibility)</p></li>
+<li><p><strong>Complexity</strong>: Functions should be under 20 complexity</p></li>
+</ul>
+</section>
+</section>
+<section id="style-guidelines">
+<h2>Style Guidelines<a class="headerlink" href="#style-guidelines" title="Link to this heading"></a></h2>
+<section id="docstrings">
+<h3>Docstrings<a class="headerlink" href="#docstrings" title="Link to this heading"></a></h3>
+<p>Use triple quotes for all docstrings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process data from input file and write to output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_path: Path to input file</span>
+<span class="sd">        output_path: Path to output file</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If input file doesn&#39;t exist</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="type-hints">
+<h3>Type Hints<a class="headerlink" href="#type-hints" title="Link to this heading"></a></h3>
+<p>Use type hints for function signatures:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">read_files</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read content from multiple files.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="imports">
+<h3>Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h3>
+<p>Order imports by:</p>
+<ol class="arabic simple">
+<li><p>Standard library</p></li>
+<li><p>Third-party packages</p></li>
+<li><p>Local modules</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standard library</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Third-party</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+<span class="c1"># Local</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">helper_function</span>
+</pre></div>
+</div>
+</section>
+<section id="line-length">
+<h3>Line Length<a class="headerlink" href="#line-length" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Maximum 100 characters (Black default)</p></li>
+<li><p>Break long lines naturally</p></li>
+<li><p>Use parentheses for grouping</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Good</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">some_function</span><span class="p">(</span>
+    <span class="n">first_argument</span><span class="p">,</span>
+    <span class="n">second_argument</span><span class="p">,</span>
+    <span class="n">third_argument</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Bad - too long</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">some_function</span><span class="p">(</span><span class="n">first_argument</span><span class="p">,</span> <span class="n">second_argument</span><span class="p">,</span> <span class="n">third_argument</span><span class="p">,</span> <span class="n">fourth_argument</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="enforcement">
+<h2>Enforcement<a class="headerlink" href="#enforcement" title="Link to this heading"></a></h2>
+<section id="pre-commit-hooks">
+<h3>Pre-commit Hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading"></a></h3>
+<p>Standards are enforced via pre-commit:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .pre-commit-config.yaml</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/psf/black</span>
+<span class="w">  </span><span class="nt">rev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24.1.1</span>
+<span class="w">  </span><span class="nt">hooks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">black</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;--line-length=100&#39;</span><span class="p p-Indicator">]</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/pycqa/isort</span>
+<span class="w">  </span><span class="nt">rev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.13.2</span>
+<span class="w">  </span><span class="nt">hooks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">isort</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;--profile=black&#39;</span><span class="p p-Indicator">]</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/pycqa/flake8</span>
+<span class="w">  </span><span class="nt">rev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7.0.0</span>
+<span class="w">  </span><span class="nt">hooks</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flake8</span>
+</pre></div>
+</div>
+</section>
+<section id="github-actions">
+<h3>GitHub Actions<a class="headerlink" href="#github-actions" title="Link to this heading"></a></h3>
+<p>CI enforces standards on every push:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .github/workflows/ci.yml</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">python-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.11&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="project-structure">
+<h3>Project Structure<a class="headerlink" href="#project-structure" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project/
+├── src/
+│   └── package/
+│       ├── __init__.py
+│       ├── module.py
+│       └── utils.py
+├── scripts/
+│   └── automation.py
+├── tests/
+│   └── test_module.py
+├── pyproject.toml
+└── README.md
+</pre></div>
+</div>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h3>
+<p>Use pytest for testing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># tests/test_module.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">package.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_data</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_process_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test data processing.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="s2">&quot;input.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;output.txt&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="virtual-environments">
+<h3>Virtual Environments<a class="headerlink" href="#virtual-environments" title="Link to this heading"></a></h3>
+<p>Always use virtual environments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+
+<span class="c1"># Activate</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># Linux/Mac</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class="w">     </span><span class="c1"># Windows</span>
+
+<span class="c1"># Install</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</section>
+</section>
+<section id="common-issues">
+<h2>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading"></a></h2>
+<p><strong>Black and Flake8 conflict</strong></p>
+<p>Add to <code class="docutils literal notranslate"><span class="pre">.flake8</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">extend-ignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">E203, W503</span>
+</pre></div>
+</div>
+<p><strong>Import order wrong</strong></p>
+<p>Run isort:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isort<span class="w"> </span>--profile<span class="o">=</span>black<span class="w"> </span>.
+</pre></div>
+</div>
+<p><strong>Line too long</strong></p>
+<p>Black will auto-format, but for strings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use implicit string concatenation</span>
+<span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;This is a very long message that &quot;</span>
+    <span class="s2">&quot;needs to be split across multiple lines&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/configs.html"><span class="doc">Configuration Files</span></a> - Configuration file reference</p></li>
+<li><p><a class="reference internal" href="quick-setup.html"><span class="doc">Quick Setup</span></a> - Quick project setup</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quick-setup.html" class="btn btn-neutral float-left" title="Quick Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="shell-standards.html" class="btn btn-neutral float-right" title="Shell Standards" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zepfu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

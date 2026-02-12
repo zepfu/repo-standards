@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workflow Standards &mdash; repo-standards Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=7ad5552a" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Docker Standards" href="docker-standards.html" />
+    <link rel="prev" title="Shell Standards" href="shell-standards.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            repo-standards
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#quick-setup">Quick Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#what-gets-enforced">What Gets Enforced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#python-code">Python Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#shell-scripts">Shell Scripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#yaml-files">YAML Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#general">General</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quick-setup.html">Quick Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#one-command-setup">One-Command Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#python-project">Python Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#shell-project">Shell Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#docker-project">Docker Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-setup.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Standards</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="python-standards.html">Python Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#formatting-with-black">Formatting with Black</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#import-sorting-with-isort">Import Sorting with isort</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id1">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id2">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#linting-with-flake8">Linting with Flake8</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id3">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#id4">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#type-hints">Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#line-length">Line Length</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#project-structure">Project Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python-standards.html#virtual-environments">Virtual Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shell-standards.html">Shell Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#shellcheck">ShellCheck</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#common-rules">Common Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#script-template">Script Template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#standard-template">Standard Template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#style-guidelines">Style Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#quoting">Quoting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#conditionals">Conditionals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#check-if-command-exists">Check if command exists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#read-file-line-by-line">Read file line by line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#iterate-over-files">Iterate over files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#enforcement">Enforcement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#portability">Portability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#security">Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shell-standards.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell-standards.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Workflow Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reusable-workflows">Reusable Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#python-ci">Python CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shell-ci">Shell CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker-build">Docker Build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pre-commit">Pre-commit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#config-validation">Config Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture-update">Architecture Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-example">Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#versioning">Versioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#permissions">Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#triggers">Triggers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-patterns">Common Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multi-language-project">Multi-Language Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#monorepo">Monorepo</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker-standards.html">Docker Standards</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scripts &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/scripts.html">Scripts Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#changelog-py">changelog.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#repo-map-py">repo_map.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#generate-architecture-py">generate_architecture.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/scripts.html#sync-configs-sh">sync-configs.sh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/workflows.html">Workflows Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/workflows.html#available-workflows">Available Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-python-ci-yml">reusable-python-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-shell-ci-yml">reusable-shell-ci.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-docker-build-yml">reusable-docker-build.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-pre-commit-yml">reusable-pre-commit.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-config-validation-yml">reusable-config-validation.yml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/workflows.html#reusable-update-architecture-yml">reusable-update-architecture.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/configs.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitattributes">.gitattributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#gitignore">.gitignore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#editorconfig">.editorconfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#flake8">.flake8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#shellcheckrc">.shellcheckrc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pre-commit-config-yaml">.pre-commit-config.yaml</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configs.html#pyproject-toml">pyproject.toml</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Auto-Generated Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto/CHANGELOG.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/CHANGELOG.html#unreleased">[Unreleased]</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/CHANGELOG.html#fixed">Fixed</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/REPO_MAP.html">Repository Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#directory-tree">Directory Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#key-files">Key Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/REPO_MAP.html#important-files">Important Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#configuration-files">Configuration Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/REPO_MAP.html#scripts">Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html">Architecture (Auto-Generated)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#detected-patterns">Detected Patterns</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#flowchart-diagram">Flowchart Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#state-diagram">State Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#sequence-diagram">Sequence Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#architecture-diagram">Architecture Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#er-diagram">Er Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#class-diagram">Class Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#journey-diagram">Journey Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#mindmap-diagram">Mindmap Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-pipeline-diagram">Workflow Pipeline Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-triggers-diagram">Workflow Triggers Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#workflow-jobs-diagram">Workflow Jobs Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#development-workflows">Development Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#github-workflows-summary">GitHub Workflows Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#module-summary">Module Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#docs-conf"><code class="docutils literal notranslate"><span class="pre">docs.conf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-changelog"><code class="docutils literal notranslate"><span class="pre">scripts.changelog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-generate-architecture"><code class="docutils literal notranslate"><span class="pre">scripts.generate_architecture</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto/ARCHITECTURE_AUTO.html#scripts-repo-map"><code class="docutils literal notranslate"><span class="pre">scripts.repo_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">repo-standards</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Workflow Standards</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/workflow-standards.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="workflow-standards">
+<h1>Workflow Standards<a class="headerlink" href="#workflow-standards" title="Link to this heading"></a></h1>
+<p>Standards for GitHub Actions workflows.</p>
+<section id="reusable-workflows">
+<h2>Reusable Workflows<a class="headerlink" href="#reusable-workflows" title="Link to this heading"></a></h2>
+<p>All projects should use centralized reusable workflows from <code class="docutils literal notranslate"><span class="pre">repo-standards</span></code>.</p>
+<p><strong>Benefits:</strong>
+- Update once, everyone benefits
+- Consistent behavior
+- Zero duplication
+- Easy maintenance</p>
+</section>
+<section id="available-workflows">
+<h2>Available Workflows<a class="headerlink" href="#available-workflows" title="Link to this heading"></a></h2>
+<section id="python-ci">
+<h3>Python CI<a class="headerlink" href="#python-ci" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># .github/workflows/ci.yml</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">python-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.11&#39;</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- Black formatting check
+- isort import sorting check
+- Flake8 linting
+- Syntax validation</p>
+</section>
+<section id="shell-ci">
+<h3>Shell CI<a class="headerlink" href="#shell-ci" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">shell-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- ShellCheck linting
+- Bash syntax validation</p>
+</section>
+<section id="docker-build">
+<h3>Docker Build<a class="headerlink" href="#docker-build" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">docker-build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-docker-build.yml@main</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">platforms</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;linux/amd64,linux/arm64&#39;</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- Multi-platform Docker builds
+- Image inspection</p>
+</section>
+<section id="pre-commit">
+<h3>Pre-commit<a class="headerlink" href="#pre-commit" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pre-commit</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-pre-commit.yml@main</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- Runs all pre-commit hooks
+- Enforces standards</p>
+</section>
+<section id="config-validation">
+<h3>Config Validation<a class="headerlink" href="#config-validation" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">config-validation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-config-validation.yml@main</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- Validates required config files exist
+- Checks content requirements</p>
+</section>
+<section id="architecture-update">
+<h3>Architecture Update<a class="headerlink" href="#architecture-update" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">update-architecture</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-update-architecture.yml@main</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">output-path</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;docs/ARCHITECTURE_AUTO.md&#39;</span>
+<span class="w">      </span><span class="nt">diagrams</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;all&#39;</span>
+</pre></div>
+</div>
+<p><strong>What it does:</strong>
+- Generates architecture diagrams
+- Creates PR with updates</p>
+</section>
+</section>
+<section id="complete-example">
+<h2>Complete Example<a class="headerlink" href="#complete-example" title="Link to this heading"></a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CI</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+
+<span class="nt">permissions</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">read</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Validate configs</span>
+<span class="w">  </span><span class="nt">config-validation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-config-validation.yml@main</span>
+
+<span class="w">  </span><span class="c1"># Python standards</span>
+<span class="w">  </span><span class="nt">python-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.11&#39;</span>
+
+<span class="w">  </span><span class="c1"># Shell standards</span>
+<span class="w">  </span><span class="nt">shell-standards</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main</span>
+
+<span class="w">  </span><span class="c1"># Pre-commit checks</span>
+<span class="w">  </span><span class="nt">pre-commit</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-pre-commit.yml@main</span>
+
+<span class="w">  </span><span class="c1"># Docker build</span>
+<span class="w">  </span><span class="nt">docker-build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-docker-build.yml@main</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">python-standards</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">shell-standards</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="versioning">
+<h3>Versioning<a class="headerlink" href="#versioning" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">&#64;main</span></code> for automatic updates:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+</pre></div>
+</div>
+<p>Or pin to specific version:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@v1.0.0</span>
+</pre></div>
+</div>
+</section>
+<section id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">needs:</span></code> to control order:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span><span class="w">  </span><span class="c1"># Run after test passes</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-docker-build.yml@main</span>
+</pre></div>
+</div>
+</section>
+<section id="permissions">
+<h3>Permissions<a class="headerlink" href="#permissions" title="Link to this heading"></a></h3>
+<p>Grant minimal permissions:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">push</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
+
+<span class="nt">permissions</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">read</span><span class="w">  </span><span class="c1"># Minimal for CI</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+</pre></div>
+</div>
+</section>
+<section id="triggers">
+<h3>Triggers<a class="headerlink" href="#triggers" title="Link to this heading"></a></h3>
+<p>Be specific with triggers:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;src/**&#39;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;tests/**&#39;</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="common-patterns">
+<h2>Common Patterns<a class="headerlink" href="#common-patterns" title="Link to this heading"></a></h2>
+<section id="multi-language-project">
+<h3>Multi-Language Project<a class="headerlink" href="#multi-language-project" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">python</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+
+<span class="w">  </span><span class="nt">shell</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main</span>
+
+<span class="w">  </span><span class="nt">docker</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">python</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">shell</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-docker-build.yml@main</span>
+</pre></div>
+</div>
+</section>
+<section id="monorepo">
+<h3>Monorepo<a class="headerlink" href="#monorepo" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">service-a</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+<span class="w">    </span><span class="c1"># Add path filters in &#39;on:&#39; section</span>
+
+<span class="w">  </span><span class="nt">service-b</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/workflows.html"><span class="doc">Workflows Reference</span></a> - Workflow reference</p></li>
+<li><p><a class="reference internal" href="getting-started.html"><span class="doc">Getting Started</span></a> - Setup guide</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="shell-standards.html" class="btn btn-neutral float-left" title="Shell Standards" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker-standards.html" class="btn btn-neutral float-right" title="Docker Standards" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zepfu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
