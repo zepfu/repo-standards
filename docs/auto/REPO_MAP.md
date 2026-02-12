@@ -14,6 +14,7 @@
 
 ```
 repo-standards/
+├── MESSAGING_STANDARDS.md
 ├── ⭐ Makefile
 ├── ⭐ README.md
 ├── pyproject.toml
@@ -66,6 +67,8 @@ repo-standards/
 
 ## Documentation
 
+- **`MESSAGING_STANDARDS.md`**
+  - Messaging Standards
 - **`README.md`**
   - Documentation System Implementation for repo-standards
 - **`ARCHITECTURE_AUTO.md`**

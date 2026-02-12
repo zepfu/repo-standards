@@ -39,6 +39,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- workflow standardization
+  ([4be9aa9](https://github.com/zepfu/repo-standards/commit/4be9aa997d3290e2891b692f612895c29343dff5))
+- Auto-update architecture documentation
+  ([4bde135](https://github.com/zepfu/repo-standards/commit/4bde135e6eda0c5837f60d56f6edec8ee2262471))
+- workflow standardization
+  ([c7db8dc](https://github.com/zepfu/repo-standards/commit/c7db8dcef25b714a497d6a3618368eb1c2c1405d))
+- pre-commit workflow
+  ([bf6d54f](https://github.com/zepfu/repo-standards/commit/bf6d54fda91ca29eedcc4e1860d15b840e3e717c))
+- workflow updates ([bee6523](https://github.com/zepfu/repo-standards/commit/bee65239af5a378da17c31936e16185f38198fcf))
+- Auto-update documentation [skip ci]
+  ([3d5b2ed](https://github.com/zepfu/repo-standards/commit/3d5b2ed7a3f23c0db8c00757669df8e605dc070e))
 - Auto-update documentation [skip ci]
   ([100bf30](https://github.com/zepfu/repo-standards/commit/100bf30ae9ced4130a4d7cfde41568344b26f53e))
 - mermaid image generation
@@ -58,6 +69,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- make file workflow fix
+  ([8ac1163](https://github.com/zepfu/repo-standards/commit/8ac1163408aea95966b6a671a4a4d4ce217933ee))
 - fix make for sync config
   ([3fc233d](https://github.com/zepfu/repo-standards/commit/3fc233d73f4e75783a259dde91bdf10e340f90fd))
 - fix make for sync config
