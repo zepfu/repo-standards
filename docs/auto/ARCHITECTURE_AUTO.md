@@ -1,13 +1,13 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-12 02:33:13 **Project:** /home/runner/work/repo-standards/repo-standards
+**Generated:** 2026-02-12 04:13:55 **Project:** /home/runner/work/repo-standards/repo-standards
 
 ## Overview
 
-Analyzed **4** Python modules containing:
+Analyzed **5** Python modules containing:
 
-- **2** classes
-- **46** functions
+- **4** classes
+- **78** functions
 - **0** async functions
 
 ### Detected Patterns
@@ -52,7 +52,7 @@ architecture-beta
     group scripts(cloud)[Scripts]
         service scripts_changelog(server)[changelog] in scripts
         service scripts_generate_architecture(server)[generate_architecture] in scripts
-        service scripts_repo_map(server)[repo_map] in scripts
+        service scripts_generate_workflow_registry(server)[generate_workflow_registry] in scripts
     end
     group docs(cloud)[Docs]
         service docs_conf(server)[conf] in docs
@@ -81,6 +81,22 @@ classDiagram
         +generate_sequence_diagram()
         +generate_architecture_diagram()
     }
+    class scripts_generate_workflow_registry_WorkflowParser {
+        +KNOWN_TOOLS
+        +BASH_CHECK_PATTERNS
+        +__init__(root_path)
+        +parse_all()
+        +_parse_workflows()
+        +_extract_workflow(filename, data)
+        +_detect_tools_in_steps(steps, job_id)
+    }
+    class scripts_generate_workflow_registry_RegistryDocGenerator {
+        +__init__(parser)
+        +generate()
+        +_header()
+        +_precommit_vs_ci()
+        +_workflow_registry()
+    }
 ```
 
 ## Journey Diagram
@@ -97,6 +113,7 @@ mindmap
     scripts
       changelog
       generate_architecture
+      generate_workflow_registry
       repo_map
 ```
 
@@ -191,6 +208,16 @@ Generates multiple Mermaid diagram types based on codebase analysis:
 
 - **Functions:** 26
 
+- **Async Functions:** 0
+
+### `scripts.generate_workflow_registry`
+
+generate_workflow_registry.py - Generate workflow registry and tool coverage matrix
+
+Parses all reusable GitHub Actions workflow YAML files and the pre-commit config to produce a comprehensive referen...
+
+- **Classes:** 2
+- **Functions:** 32
 - **Async Functions:** 0
 
 ### `scripts.repo_map`
