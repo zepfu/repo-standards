@@ -30,14 +30,22 @@ python_files = "test_*.py"
 python_functions = "test_*"
 addopts = "-v --tb=short"
 
-[tool.mdformat]
-wrap = 120
-number = false
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv", "build", "dist"]
+# B101: assert used - acceptable in tests and scripts
+# B404: import subprocess - needed for automation scripts
+# B603: subprocess without shell - needed for automation scripts
+skips = ["B101", "B404", "B603"]
 
-[tool.vulture]
-min_confidence = 80
-paths = ["scripts"]
-exclude = ["tests/", "build/"]
-
-[tool.autoflake]
-ignore-init-module-imports = true
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    "tests",
+]

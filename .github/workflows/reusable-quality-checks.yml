@@ -19,6 +19,7 @@ on:
       - '**.sh'
       - '**.md'
       - 'scripts/**'
+      - '.github/workflows/**'
 
   pull_request:
     paths:
@@ -26,6 +27,7 @@ on:
       - '**.sh'
       - '**.md'
       - 'scripts/**'
+      - '.github/workflows/**'
 
 jobs:
   detect-unused-python:
@@ -258,10 +260,133 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- [SKIP] No Markdown files found -- skipping formatting check" >> $GITHUB_STEP_SUMMARY
 
+  python-security:
+    name: Python Security (Bandit)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
+
+      - name: Install Bandit
+        run: |
+          pip install 'bandit[toml]'
+
+      - name: Run Bandit security scan
+        run: |
+          echo "### Python Security (Bandit)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
+             ! compgen -G "**/*.py" > /dev/null 2>&1; then
+            echo "- [SKIP] No Python files found -- skipping security scan" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          if bandit -c pyproject.toml -r . -f txt 2>&1 | tee /tmp/bandit.txt; then
+            echo "- [PASS] Bandit: no security issues detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -20 /tmp/bandit.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Bandit: security issues detected" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+  python-types:
+    name: Python Type Checking (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
+
+      - name: Install mypy
+        run: |
+          pip install mypy types-PyYAML
+
+      - name: Run mypy
+        run: |
+          echo "### Python Type Checking (mypy)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
+             ! compgen -G "**/*.py" > /dev/null 2>&1; then
+            echo "- [SKIP] No Python files found -- skipping type check" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          if mypy --ignore-missing-imports scripts/ 2>&1 | tee /tmp/mypy.txt; then
+            echo "- [PASS] mypy: no type errors detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -20 /tmp/mypy.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [WARN] mypy: type issues detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  actionlint:
+    name: GitHub Actions Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for workflow files
+        id: check_workflows
+        run: |
+          if compgen -G ".github/workflows/*.yml" > /dev/null 2>&1; then
+            echo "has_workflows=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_workflows=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install actionlint
+        if: steps.check_workflows.outputs.has_workflows == 'true'
+        run: |
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+
+      - name: Run actionlint
+        if: steps.check_workflows.outputs.has_workflows == 'true'
+        run: |
+          echo "### GitHub Actions Lint" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ./actionlint -color 2>&1 | tee /tmp/actionlint.txt; then
+            echo "- [PASS] actionlint: all workflow files valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/actionlint.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] actionlint: workflow issues detected" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: No workflow files found
+        if: steps.check_workflows.outputs.has_workflows == 'false'
+        run: |
+          echo "### GitHub Actions Lint" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No workflow files found -- skipping actionlint" >> $GITHUB_STEP_SUMMARY
+
   summary:
     name: Quality Check Summary
     runs-on: ubuntu-latest
-    needs: [detect-unused-python, detect-unused-shell, markdown-lint]
+    needs: [detect-unused-python, detect-unused-shell, markdown-lint, python-security, python-types, actionlint]
     if: always()
 
     steps:
