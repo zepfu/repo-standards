@@ -8,7 +8,7 @@ on:
         description: 'Python version to use'
         required: false
         type: string
-        default: '3.11'
+        default: '3.13'
       docs-directory:
         description: 'Documentation directory path'
         required: false
@@ -71,7 +71,7 @@ jobs:
           GEN_ARCH="${{ inputs.generate-architecture }}"
           ARCH_DIAGRAMS="${{ inputs.architecture-diagrams }}"
 
-          [ -z "$PYTHON_VERSION" ] && PYTHON_VERSION="3.11"
+          [ -z "$PYTHON_VERSION" ] && PYTHON_VERSION="3.13"
           [ -z "$DOCS_DIR" ] && DOCS_DIR="docs"
           [ -z "$AUTO_DOCS_DIR" ] && AUTO_DOCS_DIR="docs/auto"
           [ -z "$GEN_ARCH" ] && GEN_ARCH="true"

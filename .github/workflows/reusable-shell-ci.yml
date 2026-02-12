@@ -10,7 +10,7 @@ on:
         description: 'ShellCheck severity level (error, warning, info, style)'
       shellcheck-version:
         type: string
-        default: 'v0.9.0'
+        default: 'latest'
         description: 'ShellCheck version to use'
 
   push:
@@ -52,12 +52,56 @@ jobs:
 
       - name: Run ShellCheck
         if: steps.check_scripts.outputs.has_scripts == 'true'
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          scandir: './scripts'
-          severity: ${{ inputs.severity || 'error' }}
-          check_together: 'yes'
-          version: ${{ inputs.shellcheck-version || 'v0.9.0' }}
+        run: |
+          echo "Running ShellCheck with Docker..."
+
+          # Pull ShellCheck Docker image
+          docker pull koalaman/shellcheck-alpine:${{ inputs.shellcheck-version || 'latest' }}
+
+          # Create wrapper script for easier usage
+          cat > /tmp/shellcheck << 'EOF'
+          #!/bin/bash
+          docker run --rm -v "$(pwd)":/mnt -w /mnt koalaman/shellcheck-alpine:${{ inputs.shellcheck-version || 'latest' }} "$@"
+          EOF
+          chmod +x /tmp/shellcheck
+
+          # Run ShellCheck on all shell scripts
+          SEVERITY="${{ inputs.severity || 'error' }}"
+          FAILED=false
+
+          echo "## 🐚 ShellCheck Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Severity:** $SEVERITY" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          shopt -s globstar nullglob
+          for file in scripts/**/*.sh **/*.sh; do
+            if [ -f "$file" ]; then
+              echo "Checking: $file"
+
+              if /tmp/shellcheck -S "$SEVERITY" -x "$file" 2>&1 | tee -a /tmp/shellcheck.txt; then
+                echo "  ✓ $file passed"
+              else
+                echo "  ✗ $file has issues"
+                FAILED=true
+              fi
+            fi
+          done
+
+          if [ -s /tmp/shellcheck.txt ]; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat /tmp/shellcheck.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "$FAILED" = "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ ShellCheck found issues" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ All shell scripts passed ShellCheck" >> $GITHUB_STEP_SUMMARY
+          fi
 
   bash-syntax:
     name: Bash Syntax Validation

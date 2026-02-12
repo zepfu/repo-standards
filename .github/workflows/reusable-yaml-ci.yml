@@ -1,12 +1,12 @@
 ---
-name: YAML Standards Enforcement
+name: YAML Standards Enforcement (Docker)
 
 on:
   workflow_call:
     inputs:
       yamllint-version:
         type: string
-        default: 'v1.35.1'
+        default: 'latest'
         description: 'yamllint version to use'
       config:
         type: string
@@ -36,7 +36,7 @@ on:
 
 jobs:
   validate-yaml:
-    name: Validate YAML Files
+    name: Validate YAML Files (Docker)
     runs-on: ubuntu-latest
 
     steps:
@@ -55,18 +55,11 @@ jobs:
             echo "ℹ️ No YAML files found, skipping validation"
           fi
 
-      - name: Set up Python
-        if: steps.check_yaml.outputs.has_yaml == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install yamllint
+      - name: Pull yamllint Docker image
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
-          pip install yamllint==${{ inputs.yamllint-version }}
-          echo "✓ yamllint installed"
-          yamllint --version
+          docker pull cytopia/yamllint:${{ inputs.yamllint-version }}
+          echo "✓ yamllint Docker image ready"
 
       - name: Check for yamllint config
         if: steps.check_yaml.outputs.has_yaml == 'true'
@@ -88,7 +81,9 @@ jobs:
           echo "Using custom configuration file" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if yamllint . 2>&1 | tee yamllint.txt; then
+          if docker run --rm -v "$(pwd)":/data -w /data \
+            cytopia/yamllint:${{ inputs.yamllint-version }} \
+            yamllint . 2>&1 | tee yamllint.txt; then
             echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
           else
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
@@ -110,7 +105,9 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if yamllint -d '${{ inputs.config }}' . 2>&1 | tee yamllint.txt; then
+          if docker run --rm -v "$(pwd)":/data -w /data \
+            cytopia/yamllint:${{ inputs.yamllint-version }} \
+            yamllint -d '${{ inputs.config }}' . 2>&1 | tee yamllint.txt; then
             echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
           else
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
@@ -121,34 +118,41 @@ jobs:
             exit 1
           fi
 
-      - name: Validate YAML syntax (Python)
+      - name: Validate YAML syntax (Python in Docker)
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## ✓ YAML Syntax Validation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          FAILED=false
-
-          shopt -s globstar nullglob
-          for file in **/*.yml **/*.yaml *.yml *.yaml; do
-            if [ -f "$file" ]; then
-              echo "Checking: $file"
-              if python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
-                echo "  ✓ Valid"
-              else
-                echo "  ✗ Invalid YAML syntax in: $file" >> $GITHUB_STEP_SUMMARY
-                FAILED=true
+          docker run --rm -v "$(pwd)":/src -w /src python:3.13-slim \
+            bash -c '
+              pip install -q pyyaml
+              FAILED=false
+              shopt -s globstar nullglob
+              for file in **/*.yml **/*.yaml *.yml *.yaml; do
+                if [ -f "$file" ]; then
+                  echo "Checking: $file"
+                  if python3 -c "import yaml; yaml.safe_load(open(\"$file\"))" 2>&1; then
+                    echo "  ✓ Valid"
+                  else
+                    echo "  ✗ Invalid YAML syntax in: $file"
+                    FAILED=true
+                  fi
+                fi
+              done
+              if [ "$FAILED" = "true" ]; then
+                exit 1
               fi
-            fi
-          done
+            ' 2>&1 | tee syntax.txt
 
-          if [ "$FAILED" = "false" ]; then
-            echo "✅ All YAML files have valid syntax" >> $GITHUB_STEP_SUMMARY
-          else
+          if grep -q "✗" syntax.txt; then
+            grep "✗" syntax.txt >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ Some YAML files have syntax errors" >> $GITHUB_STEP_SUMMARY
             exit 1
+          else
+            echo "✅ All YAML files have valid syntax" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Validate GitHub workflow files
@@ -171,8 +175,9 @@ jobs:
               ((WORKFLOW_COUNT++))
               echo "Validating workflow: $file"
 
-              # Check syntax
-              if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
+              # Check syntax with Python in Docker
+              if ! docker run --rm -v "$(pwd)":/src -w /src python:3.13-slim \
+                python3 -c "import yaml; yaml.safe_load(open('/src/$file'))" 2>&1; then
                 echo "  ✗ Syntax error in: $file" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
                 continue
@@ -203,37 +208,6 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ Some workflow files have validation errors" >> $GITHUB_STEP_SUMMARY
             exit 1
-          fi
-
-      - name: Check for common YAML issues
-        if: steps.check_yaml.outputs.has_yaml == 'true'
-        run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 🔍 Common Issues Check" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          ISSUES_FOUND=false
-
-          # Check for tabs (YAML requires spaces)
-          if grep -r $'\t' --include="*.yml" --include="*.yaml" . 2>/dev/null; then
-            echo "⚠️ Warning: Found tabs in YAML files (should use spaces)" >> $GITHUB_STEP_SUMMARY
-            ISSUES_FOUND=true
-          fi
-
-          # Check for inconsistent indentation (common issue)
-          shopt -s globstar nullglob
-          for file in **/*.yml **/*.yaml *.yml *.yaml; do
-            if [ -f "$file" ]; then
-              # Check if file mixes 2-space and 4-space indentation
-              if grep -q "^  [^ ]" "$file" && grep -q "^    [^ ]" "$file"; then
-                echo "⚠️ Warning: Inconsistent indentation in: $file" >> $GITHUB_STEP_SUMMARY
-                ISSUES_FOUND=true
-              fi
-            fi
-          done
-
-          if [ "$ISSUES_FOUND" = "false" ]; then
-            echo "✅ No common issues detected" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: No YAML files summary

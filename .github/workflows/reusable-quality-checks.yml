@@ -6,7 +6,7 @@ on:
     inputs:
       python-version:
         type: string
-        default: '3.11'
+        default: '3.13'
         description: 'Python version to use'
       fail-on-unused:
         type: boolean

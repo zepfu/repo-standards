@@ -1,0 +1,216 @@
+# Dependabot Configuration for repo-standards
+# Complete configuration covering all ecosystems used in the repository
+# Place at: .github/dependabot.yml
+
+version: 2
+
+# ============================================================================
+# Multi-Ecosystem Groups (Optional - Group related updates together)
+# ============================================================================
+# Uncomment to group updates across ecosystems
+# multi-ecosystem-groups:
+#   infrastructure:
+#     schedule:
+#       interval: "weekly"
+#     updates:
+#       - package-ecosystem: "github-actions"
+#       - package-ecosystem: "docker"
+#       - package-ecosystem: "pip"
+
+# ============================================================================
+# Individual Ecosystem Updates
+# ============================================================================
+
+updates:
+  # ==========================================================================
+  # GitHub Actions - Workflows and Reusable Workflows
+  # ==========================================================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+
+    # Check for updates weekly
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+
+    # Create up to 10 PRs at once
+    open-pull-requests-limit: 10
+
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+    # Commit message prefix
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+    # Reviewers (optional - uncomment and customize)
+    # reviewers:
+    #   - "your-github-username"
+
+    # Assignees (optional - uncomment and customize)
+    # assignees:
+    #   - "your-github-username"
+
+  # ==========================================================================
+  # Docker - Dockerfile and docker-compose.yml
+  # ==========================================================================
+  - package-ecosystem: "docker"
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+
+    open-pull-requests-limit: 5
+
+    # Group Docker images by type
+    groups:
+      docker-base-images:
+        patterns:
+          - "python*"
+          - "node*"
+          - "ubuntu*"
+          - "alpine*"
+
+      docker-tools:
+        patterns:
+          - "checkmake/*"
+          - "shellcheck/*"
+          - "*"
+
+    labels:
+      - "dependencies"
+      - "docker"
+
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # ==========================================================================
+  # Python - requirements.txt, setup.py, pyproject.toml
+  # ==========================================================================
+  - package-ecosystem: "pip"
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+
+    open-pull-requests-limit: 10
+
+    # Group Python packages by category
+    groups:
+      python-dev-dependencies:
+        patterns:
+          - "black"
+          - "isort"
+          - "flake8"
+          - "pylint"
+          - "mypy"
+          - "pytest*"
+          - "pre-commit"
+
+      python-docs-dependencies:
+        patterns:
+          - "sphinx*"
+          - "myst-parser"
+          - "linkify-it-py"
+
+      python-build-dependencies:
+        patterns:
+          - "setuptools"
+          - "wheel"
+          - "build"
+          - "twine"
+
+    labels:
+      - "dependencies"
+      - "python"
+
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+    # Allow pre-release versions for dev dependencies
+    # allow:
+    #   - dependency-type: "development"
+
+    # Ignore specific packages (if needed)
+    # ignore:
+    #   - dependency-name: "sphinx"
+    #     versions: ["6.x"]  # Skip v6 if it has issues
+
+  # ==========================================================================
+  # Python - docs/requirements.txt (Sphinx documentation dependencies)
+  # ==========================================================================
+  - package-ecosystem: "pip"
+    directory: "/docs"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+
+    open-pull-requests-limit: 5
+
+    groups:
+      sphinx-dependencies:
+        patterns:
+          - "sphinx*"
+          - "myst-parser"
+          - "linkify-it-py"
+
+    labels:
+      - "dependencies"
+      - "documentation"
+      - "python"
+
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+# ============================================================================
+# Notes on Ecosystem Selection
+# ============================================================================
+#
+#
+# Complete list of supported ecosystems (30+):
+# - bundler (Ruby)
+# - cargo (Rust)
+# - composer (PHP)
+# - docker (Docker/Kubernetes)
+# - elm (Elm)
+# - gitsubmodule (Git submodules)
+# - github-actions (GitHub Actions)
+# - gomod (Go)
+# - gradle (Java/Gradle)
+# - maven (Java/Maven)
+# - mix (Elixir)
+# - npm (JavaScript/npm)
+# - nuget (NuGet/.NET)
+# - pip (Python)
+# - pub (Dart)
+# - swift (Swift Package Manager)
+# - terraform (Terraform)
+# - yarn (JavaScript/Yarn)
+# - pnpm (JavaScript/pnpm)
+# - bun (JavaScript/Bun)
+# - devcontainers (Dev Containers)
+# - conda (Conda)
+# - hex (Elixir/Hex)
+# - pub (Flutter/Dart)
+#
+# ============================================================================
