@@ -31,7 +31,8 @@ for arg in "$@"; do
             echo "Files synced:"
             echo "  .gitattributes, .gitignore, .editorconfig, .flake8,"
             echo "  .shellcheckrc, .pre-commit-config.yaml, .readthedocs.yml,"
-            echo "  pyproject.toml, Makefile, repo.mk.example, .checkmake"
+            echo "  pyproject.toml, Makefile, repo.mk.example, .checkmake,"
+            echo "  .checkmake-mk, REUSABLE_WORKFLOW_REGISTRY.md"
             echo ""
             echo "Example:"
             echo "  curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
@@ -143,6 +144,8 @@ git sparse-checkout set \
   Makefile \
   repo.mk.example \
   .checkmake \
+  .checkmake-mk \
+  docs/auto/WORKFLOW_REGISTRY.md \
   2>&1 | grep -v "^$" || true
 
 log_info "Sparse checkout complete"
@@ -170,6 +173,7 @@ CONFIG_FILES=(
   "Makefile"
   "repo.mk.example"
   ".checkmake"
+  ".checkmake-mk"
 )
 
 for file in "${CONFIG_FILES[@]}"; do
@@ -199,6 +203,30 @@ for file in "${CONFIG_FILES[@]}"; do
 done
 
 echo ""
+
+# Copy WORKFLOW_REGISTRY.md (reference copy from repo-standards)
+REGISTRY_SOURCE="$TEMP_DIR/repo-standards/docs/auto/WORKFLOW_REGISTRY.md"
+REGISTRY_DEST="REUSABLE_WORKFLOW_REGISTRY.md"
+
+if [ -f "$REGISTRY_SOURCE" ]; then
+    if [ -f "$REGISTRY_DEST" ]; then
+        cp "$REGISTRY_DEST" "${REGISTRY_DEST}.bak"
+    fi
+
+    if cp "$REGISTRY_SOURCE" "$REGISTRY_DEST"; then
+        log_info "Synced: $REGISTRY_DEST (from docs/auto/WORKFLOW_REGISTRY.md)"
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+    else
+        log_error "Failed to copy: $REGISTRY_DEST"
+        if [ -f "${REGISTRY_DEST}.bak" ]; then
+            mv "${REGISTRY_DEST}.bak" "$REGISTRY_DEST"
+        fi
+    fi
+else
+    log_warn "WORKFLOW_REGISTRY.md not found in repo-standards"
+fi
+
+echo ""
 echo "=========================================="
 echo "Sync complete!"
 echo "  Synced:  $SUCCESS_COUNT files"
@@ -212,6 +240,11 @@ for file in "${CONFIG_FILES[@]}"; do
         echo "  ✗ $file (missing)"
     fi
 done
+if [ -f "$REGISTRY_DEST" ]; then
+    echo "  ✓ $REGISTRY_DEST"
+else
+    echo "  ✗ $REGISTRY_DEST (missing)"
+fi
 echo ""
 
 # Exit successfully

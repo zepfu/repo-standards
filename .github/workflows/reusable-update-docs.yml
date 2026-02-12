@@ -111,7 +111,10 @@ jobs:
         run: |
           AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
           CHANGELOG_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/changelog.py"
-          curl -fsSL "$CHANGELOG_URL" | python3 - \
+          curl -fsSL "$CHANGELOG_URL" -o /tmp/changelog.py
+          chmod +x /tmp/changelog.py
+
+          python3 /tmp/changelog.py \
             --output "$AUTO_DOCS_DIR/CHANGELOG.md" \
             --from-git \
             --with-commits
@@ -120,7 +123,10 @@ jobs:
         run: |
           AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
           REPO_MAP_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/repo_map.py"
-          curl -fsSL "$REPO_MAP_URL" | python3 - \
+          curl -fsSL "$REPO_MAP_URL" -o /tmp/repo_map.py
+          chmod +x /tmp/repo_map.py
+
+          python3 /tmp/repo_map.py \
             --output "$AUTO_DOCS_DIR/REPO_MAP.md"
 
       - name: Generate ARCHITECTURE_AUTO.md
@@ -142,6 +148,16 @@ jobs:
               --output "$AUTO_DOCS_DIR/ARCHITECTURE_AUTO.md" \
               --diagrams "$ARCH_DIAGRAMS"
           fi
+
+      - name: Generate WORKFLOW_REGISTRY.md
+        run: |
+          AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
+          REGISTRY_URL="https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/generate_workflow_registry.py"
+          curl -fsSL "$REGISTRY_URL" -o /tmp/generate_workflow_registry.py
+          chmod +x /tmp/generate_workflow_registry.py
+
+          python3 /tmp/generate_workflow_registry.py \
+            --output "$AUTO_DOCS_DIR/WORKFLOW_REGISTRY.md"
 
       - name: Format all markdown files
         run: |
@@ -222,6 +238,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- CHANGELOG.md -- git history" >> $GITHUB_STEP_SUMMARY
           echo "- REPO_MAP.md -- repository structure" >> $GITHUB_STEP_SUMMARY
+          echo "- WORKFLOW_REGISTRY.md -- workflow registry and tool coverage" >> $GITHUB_STEP_SUMMARY
 
           if [ "$GEN_ARCH" = "true" ]; then
             echo "- ARCHITECTURE_AUTO.md -- architecture diagrams" >> $GITHUB_STEP_SUMMARY

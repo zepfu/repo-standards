@@ -37,6 +37,7 @@ to maintain consistent code quality across all projects.
    auto/CHANGELOG
    auto/REPO_MAP
    auto/ARCHITECTURE_AUTO
+   auto/WORKFLOW_REGISTRY
 
 Features
 --------
@@ -60,6 +61,7 @@ Features
    - `changelog.py` - Generate changelogs from git history
    - `repo_map.py` - Generate repository structure docs
    - `generate_architecture.py` - Generate architecture diagrams
+   - `generate_workflow_registry.py` - Generate workflow registry & tool coverage
    - `sync-configs.sh` - Sync config files from repo-standards
 
 Quick Links

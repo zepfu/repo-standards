@@ -30,10 +30,11 @@ sphinx: ## Build and serve Sphinx documentation locally
 	@echo "Serving documentation at http://localhost:8000"
 	@cd docs/_build/html && python3 -m http.server 8000
 
-docs: ## Generate auto-documentation (changelog, repo map, architecture)
+docs: ## Generate auto-documentation (changelog, repo map, architecture, workflow registry)
 	@curl -fsSL $(REPO_STANDARDS_URL)/repo_map.py | $(PYTHON) - --output docs/auto/REPO_MAP.md
 	@curl -fsSL $(REPO_STANDARDS_URL)/changelog.py | $(PYTHON) - --from-git --with-commits --output docs/auto/CHANGELOG.md
 	@curl -fsSL $(REPO_STANDARDS_URL)/generate_architecture.py | $(PYTHON) - --output docs/auto/ARCHITECTURE_AUTO.md
+	@curl -fsSL $(REPO_STANDARDS_URL)/generate_workflow_registry.py | $(PYTHON) - --output docs/auto/WORKFLOW_REGISTRY.md
 	@echo "[INFO] Formatting auto-generated markdown..."
 	@mdformat --wrap 120 docs/auto/*.md 2>/dev/null \
 		|| echo "[WARN] mdformat not installed -- skipping formatting (pip install mdformat)"
