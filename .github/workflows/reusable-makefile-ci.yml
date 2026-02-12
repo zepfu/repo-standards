@@ -63,8 +63,7 @@ jobs:
       - name: Install checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          # Install checkmake via Go
-          go install github.com/mrtazz/checkmake/cmd/checkmake@latest
+          go install github.com/checkmake/checkmake/cmd/checkmake@latest
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Run checkmake
