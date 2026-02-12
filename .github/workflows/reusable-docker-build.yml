@@ -20,7 +20,6 @@ on:
       - '.dockerignore'
       - 'docker-compose.yml'
       - 'docker-compose.*.yml'
-
   pull_request:
     paths:
       - 'Dockerfile'
@@ -42,15 +41,37 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
+        run: |
+          PLATFORMS="${{ inputs.platforms }}"
+          [ -z "$PLATFORMS" ] && PLATFORMS="linux/amd64"
+
+          PUSH="${{ inputs.push }}"
+          [ -z "$PUSH" ] && PUSH="false"
+
+          echo "## Docker Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Platform(s): \`$PLATFORMS\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Push: \`$PUSH\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ inputs.push }}
-          platforms: ${{ inputs.platforms }}
+          push: ${{ inputs.push || false }}
+          platforms: ${{ inputs.platforms || 'linux/amd64' }}
           tags: test:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Inspect image
         if: ${{ !inputs.push }}
-        run: docker images test:latest
+        run: |
+          docker images test:latest
+
+      - name: Summary
+        run: |
+          echo "- [PASS] Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Docker build complete**" >> $GITHUB_STEP_SUMMARY

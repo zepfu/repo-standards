@@ -1,13 +1,9 @@
 ---
-name: YAML Standards Enforcement (Docker)
+name: YAML Standards Enforcement
 
 on:
   workflow_call:
     inputs:
-      yamllint-version:
-        type: string
-        default: 'latest'
-        description: 'yamllint version to use'
       config:
         type: string
         default: '{extends: relaxed, rules: {line-length: {max: 150}}}'
@@ -36,7 +32,7 @@ on:
 
 jobs:
   validate-yaml:
-    name: Validate YAML Files (Docker)
+    name: Validate YAML Files
     runs-on: ubuntu-latest
 
     steps:
@@ -46,20 +42,26 @@ jobs:
       - name: Check for YAML files
         id: check_yaml
         run: |
-          if compgen -G "*.yml" > /dev/null || compgen -G "*.yaml" > /dev/null || \
-             compgen -G "**/*.yml" > /dev/null || compgen -G "**/*.yaml" > /dev/null; then
+          shopt -s globstar nullglob
+          YAMLS=( **/*.yml **/*.yaml )
+
+          if [ ${#YAMLS[@]} -gt 0 ]; then
             echo "has_yaml=true" >> $GITHUB_OUTPUT
-            echo "✓ YAML files found"
+            echo "Found ${#YAMLS[@]} YAML file(s)"
           else
             echo "has_yaml=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No YAML files found, skipping validation"
           fi
 
-      - name: Pull yamllint Docker image
+      - name: Set up Python
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install yamllint
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
-          docker pull cytopia/yamllint:${{ inputs.yamllint-version }}
-          echo "✓ yamllint Docker image ready"
+          pip install yamllint pyyaml
 
       - name: Check for yamllint config
         if: steps.check_yaml.outputs.has_yaml == 'true'
@@ -67,103 +69,84 @@ jobs:
         run: |
           if [ -f ".yamllint" ] || [ -f ".yamllint.yml" ]; then
             echo "has_config=true" >> $GITHUB_OUTPUT
-            echo "✓ Found custom yamllint config"
           else
             echo "has_config=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No custom yamllint config, using workflow defaults"
           fi
 
-      - name: Run yamllint with custom config
-        if: steps.check_yaml.outputs.has_yaml == 'true' && steps.check_config.outputs.has_config == 'true'
-        run: |
-          echo "## 📋 YAML Linting (yamllint)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Using custom configuration file" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if docker run --rm -v "$(pwd)":/data -w /data \
-            cytopia/yamllint:${{ inputs.yamllint-version }} \
-            yamllint . 2>&1 | tee yamllint.txt; then
-            echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            cat yamllint.txt >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "❌ YAML linting issues found" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
-
-      - name: Run yamllint with workflow config
-        if: steps.check_yaml.outputs.has_yaml == 'true' && steps.check_config.outputs.has_config == 'false'
-        run: |
-          echo "## 📋 YAML Linting (yamllint)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Using workflow configuration:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`yaml" >> $GITHUB_STEP_SUMMARY
-          echo "${{ inputs.config }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if docker run --rm -v "$(pwd)":/data -w /data \
-            cytopia/yamllint:${{ inputs.yamllint-version }} \
-            yamllint -d '${{ inputs.config }}' . 2>&1 | tee yamllint.txt; then
-            echo "✅ All YAML files passed linting" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            cat yamllint.txt >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "❌ YAML linting issues found" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
-
-      - name: Validate YAML syntax (Python in Docker)
+      - name: Run yamllint
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## ✓ YAML Syntax Validation" >> $GITHUB_STEP_SUMMARY
+          CONFIG="${{ inputs.config }}"
+          [ -z "$CONFIG" ] && CONFIG="{extends: relaxed, rules: {line-length: {max: 150}}}"
+
+          STRICT="${{ inputs.strict }}"
+          [ -z "$STRICT" ] && STRICT="false"
+
+          STRICT_FLAG=""
+          if [ "$STRICT" = "true" ]; then
+            STRICT_FLAG="--strict"
+          fi
+
+          echo "## YAML Standards" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          docker run --rm -v "$(pwd)":/src -w /src python:3.13-slim \
-            bash -c '
-              pip install -q pyyaml
-              FAILED=false
-              shopt -s globstar nullglob
-              for file in **/*.yml **/*.yaml *.yml *.yaml; do
-                if [ -f "$file" ]; then
-                  echo "Checking: $file"
-                  if python3 -c "import yaml; yaml.safe_load(open(\"$file\"))" 2>&1; then
-                    echo "  ✓ Valid"
-                  else
-                    echo "  ✗ Invalid YAML syntax in: $file"
-                    FAILED=true
-                  fi
-                fi
-              done
-              if [ "$FAILED" = "true" ]; then
-                exit 1
-              fi
-            ' 2>&1 | tee syntax.txt
-
-          if grep -q "✗" syntax.txt; then
-            grep "✗" syntax.txt >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_config.outputs.has_config }}" = "true" ]; then
+            echo "Using project yamllint config" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "❌ Some YAML files have syntax errors" >> $GITHUB_STEP_SUMMARY
+
+            if yamllint $STRICT_FLAG . 2>&1 | tee /tmp/yamllint.txt; then
+              echo "- [PASS] yamllint: all files passed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              cat /tmp/yamllint.txt >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "- [FAIL] yamllint: issues found" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+          else
+            echo "Using workflow default config" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if yamllint -d "$CONFIG" $STRICT_FLAG . 2>&1 | tee /tmp/yamllint.txt; then
+              echo "- [PASS] yamllint: all files passed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              cat /tmp/yamllint.txt >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "- [FAIL] yamllint: issues found" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+          fi
+
+      - name: Validate YAML syntax
+        if: steps.check_yaml.outputs.has_yaml == 'true'
+        run: |
+          FAILED=false
+
+          shopt -s globstar nullglob
+          for file in **/*.yml **/*.yaml; do
+            if [ -f "$file" ]; then
+              if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
+                echo "- [FAIL] Syntax error: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                FAILED=true
+              fi
+            fi
+          done
+
+          if [ "$FAILED" = "true" ]; then
+            echo "- [FAIL] YAML syntax: errors found" >> $GITHUB_STEP_SUMMARY
             exit 1
           else
-            echo "✅ All YAML files have valid syntax" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] YAML syntax: all files valid" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Validate GitHub workflow files
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## ⚙️ GitHub Workflow Validation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
           if [ ! -d ".github/workflows" ]; then
-            echo "ℹ️ No .github/workflows directory found" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No .github/workflows directory found" >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
@@ -173,54 +156,45 @@ jobs:
           for file in .github/workflows/*.yml .github/workflows/*.yaml; do
             if [ -f "$file" ]; then
               ((WORKFLOW_COUNT++))
-              echo "Validating workflow: $file"
 
-              # Check syntax with Python in Docker
-              if ! docker run --rm -v "$(pwd)":/src -w /src python:3.13-slim \
-                python3 -c "import yaml; yaml.safe_load(open('/src/$file'))" 2>&1; then
-                echo "  ✗ Syntax error in: $file" >> $GITHUB_STEP_SUMMARY
+              if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
+                echo "- [FAIL] Workflow syntax error: \`$file\`" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
                 continue
               fi
 
-              # Check for required fields
               if ! grep -q "^name:" "$file"; then
-                echo "  ⚠️ Warning: No 'name' field in: $file" >> $GITHUB_STEP_SUMMARY
+                echo "- [WARN] No 'name' field: \`$file\`" >> $GITHUB_STEP_SUMMARY
               fi
 
               if ! grep -q "^on:" "$file" && ! grep -q "^'on':" "$file"; then
-                echo "  ✗ Error: No 'on' trigger field in: $file" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] No 'on' trigger: \`$file\`" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
               fi
 
               if ! grep -q "^jobs:" "$file"; then
-                echo "  ✗ Error: No 'jobs' field in: $file" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] No 'jobs' field: \`$file\`" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
               fi
             fi
           done
 
           if [ $WORKFLOW_COUNT -eq 0 ]; then
-            echo "ℹ️ No workflow files found in .github/workflows/" >> $GITHUB_STEP_SUMMARY
-          elif [ "$FAILED" = "false" ]; then
-            echo "✅ All $WORKFLOW_COUNT workflow files are valid" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "❌ Some workflow files have validation errors" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No workflow files in .github/workflows/" >> $GITHUB_STEP_SUMMARY
+          elif [ "$FAILED" = "true" ]; then
+            echo "- [FAIL] Workflow validation: errors found" >> $GITHUB_STEP_SUMMARY
             exit 1
+          else
+            echo "- [PASS] Workflow validation: all $WORKFLOW_COUNT files valid" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: No YAML files summary
-        if: steps.check_yaml.outputs.has_yaml == 'false'
-        run: |
-          echo "## YAML Validation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "ℹ️ No YAML files found - skipping validation" >> $GITHUB_STEP_SUMMARY
-
-      - name: Summary
-        if: steps.check_yaml.outputs.has_yaml == 'true'
-        run: |
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**YAML validation complete**" >> $GITHUB_STEP_SUMMARY
+
+      - name: No YAML files found
+        if: steps.check_yaml.outputs.has_yaml == 'false'
+        run: |
+          echo "## YAML Standards" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**YAML validation complete** ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No YAML files found -- skipping validation" >> $GITHUB_STEP_SUMMARY

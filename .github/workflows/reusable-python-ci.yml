@@ -1,5 +1,5 @@
 ---
-name: Python Standards Enforcement (Docker)
+name: Python Standards Enforcement
 
 on:
   workflow_call:
@@ -29,15 +29,19 @@ jobs:
         run: |
           REQUIRED="3.11"
           PROVIDED="${{ inputs.python-version }}"
+          [ -z "$PROVIDED" ] && PROVIDED="3.13"
+
           if [[ "$PROVIDED" < "$REQUIRED" ]]; then
-            echo "ERROR: Python version must be $REQUIRED+ (organization standard)"
-            echo "Provided: $PROVIDED"
-            echo "See: https://github.com/zepfu/repo-standards#python-standards"
+            echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**[FAIL] Python version must be $REQUIRED+ (organization standard)**" >> $GITHUB_STEP_SUMMARY
+            echo "- Provided: \`$PROVIDED\`" >> $GITHUB_STEP_SUMMARY
+            echo "- See: https://github.com/zepfu/repo-standards#python-standards" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
 
   python-lint:
-    name: Python Linting (Docker)
+    name: Python Linting
     runs-on: ubuntu-latest
     needs: validate-python-version
 
@@ -48,50 +52,67 @@ jobs:
       - name: Check for Python files
         id: check_files
         run: |
-          if compgen -G "scripts/*.py" > /dev/null || compgen -G "**/*.py" > /dev/null; then
+          if compgen -G "**/*.py" > /dev/null 2>&1; then
             echo "has_python=true" >> $GITHUB_OUTPUT
           else
             echo "has_python=false" >> $GITHUB_OUTPUT
-            echo "No Python files found, skipping linting"
+            echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No Python files found -- skipping linting" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Pull Docker images
+      - name: Set up Python
+        if: steps.check_files.outputs.has_python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
+
+      - name: Install linting tools
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          echo "Pulling Docker images for Python tools..."
-          docker pull cytopia/black:latest
-          docker pull alpine/flake8:latest
-          echo "✓ Docker images ready"
+          python -m pip install --upgrade pip
+          pip install black isort flake8
 
       - name: Run Black (check only)
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          docker run --rm \
-            -v "$(pwd)":/src \
-            -w /src \
-            cytopia/black:latest \
-            black --check --line-length=100 .
+          echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if black --check --line-length=100 . 2>&1; then
+            echo "- [PASS] Black: formatting check passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- [FAIL] Black: formatting issues found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`black --line-length=100 .\` to fix" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: Run isort (check only)
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          docker run --rm \
-            -v "$(pwd)":/src \
-            -w /src \
-            python:3.13-slim \
-            sh -c "pip install -q isort && isort --check --profile=black --line-length=100 ."
+          if isort --check --profile=black --line-length=100 . 2>&1; then
+            echo "- [PASS] isort: import ordering check passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- [FAIL] isort: import ordering issues found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`isort --profile=black --line-length=100 .\` to fix" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: Run Flake8
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          docker run --rm \
-            -v "$(pwd)":/src \
-            -w /src \
-            alpine/flake8:latest \
-            flake8 . \
-              --max-line-length=120 \
-              --extend-ignore=E203,W503 \
-              --max-complexity=20
+          if flake8 . --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=20 2>&1; then
+            echo "- [PASS] Flake8: linting check passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- [FAIL] Flake8: linting issues found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Python linting complete**" >> $GITHUB_STEP_SUMMARY
 
   python-syntax:
     name: Python Syntax Validation
@@ -105,26 +126,36 @@ jobs:
       - name: Check for Python files
         id: check_files
         run: |
-          if compgen -G "scripts/*.py" > /dev/null || compgen -G "**/*.py" > /dev/null; then
+          if compgen -G "**/*.py" > /dev/null 2>&1; then
             echo "has_python=true" >> $GITHUB_OUTPUT
           else
             echo "has_python=false" >> $GITHUB_OUTPUT
-            echo "No Python files found, skipping validation"
           fi
+
+      - name: Set up Python
+        if: steps.check_files.outputs.has_python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
 
       - name: Validate Python files compile
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          docker run --rm \
-            -v "$(pwd)":/src \
-            -w /src \
-            python:3.13-slim \
-            bash -c '
-              shopt -s nullglob
-              for file in scripts/*.py **/*.py; do
-                if [ -f "$file" ]; then
-                  echo "Checking $file"
-                  python -m py_compile "$file"
-                fi
-              done
-            '
+          FAILED=false
+
+          shopt -s globstar nullglob
+          for file in **/*.py; do
+            if [ -f "$file" ]; then
+              echo "Checking $file"
+              if ! python -m py_compile "$file" 2>&1; then
+                FAILED=true
+              fi
+            fi
+          done
+
+          if [ "$FAILED" = "true" ]; then
+            echo "- [FAIL] Python syntax: compilation errors found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "- [PASS] Python syntax: all files compile" >> $GITHUB_STEP_SUMMARY
+          fi

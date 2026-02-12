@@ -8,7 +8,7 @@ on:
         description: 'Output file path for generated documentation'
         required: false
         type: string
-        default: 'docs/ARCHITECTURE_AUTO.md'
+        default: 'docs/auto/ARCHITECTURE_AUTO.md'
       diagrams:
         description: 'Comma-separated list of diagram types to generate (or "all" for all diagrams)'
         required: false
@@ -57,14 +57,32 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set defaults for inputs
+        id: defaults
+        run: |
+          OUTPUT_PATH="${{ inputs.output-path }}"
+          DIAGRAMS="${{ inputs.diagrams }}"
+          PYTHON_VERSION="${{ inputs.python-version }}"
+          CREATE_PR="${{ inputs.create-pr }}"
+
+          [ -z "$OUTPUT_PATH" ] && OUTPUT_PATH="docs/auto/ARCHITECTURE_AUTO.md"
+          [ -z "$DIAGRAMS" ] && DIAGRAMS="all"
+          [ -z "$PYTHON_VERSION" ] && PYTHON_VERSION="3.13"
+          [ -z "$CREATE_PR" ] && CREATE_PR="true"
+
+          echo "output_path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
+          echo "diagrams=$DIAGRAMS" >> $GITHUB_OUTPUT
+          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+          echo "create_pr=$CREATE_PR" >> $GITHUB_OUTPUT
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ steps.defaults.outputs.python_version }}
 
       - name: Install PyYAML
         run: |
-          python3 -m pip install --user pyyaml
+          pip install pyyaml
 
       - name: Download architecture generator
         run: |
@@ -74,22 +92,9 @@ jobs:
 
       - name: Generate architecture documentation
         run: |
-          # Set defaults if inputs are empty (happens when triggered by push/PR)
-          OUTPUT_PATH="${{ inputs.output-path }}"
-          DIAGRAMS="${{ inputs.diagrams }}"
+          OUTPUT_PATH="${{ steps.defaults.outputs.output_path }}"
+          DIAGRAMS="${{ steps.defaults.outputs.diagrams }}"
 
-          if [ -z "$OUTPUT_PATH" ]; then
-            OUTPUT_PATH="docs/auto/ARCHITECTURE_AUTO.md"
-          fi
-
-          if [ -z "$DIAGRAMS" ]; then
-            DIAGRAMS="all"
-          fi
-
-          echo "Output path: $OUTPUT_PATH"
-          echo "Diagrams: $DIAGRAMS"
-
-          # Create output directory if it doesn't exist
           mkdir -p "$(dirname "$OUTPUT_PATH")"
 
           if [ "$DIAGRAMS" = "all" ]; then
@@ -105,61 +110,44 @@ jobs:
       - name: Check if documentation changed
         id: check_changes
         run: |
-          OUTPUT_PATH="${{ inputs.output-path }}"
+          OUTPUT_PATH="${{ steps.defaults.outputs.output_path }}"
 
-          if [ -z "$OUTPUT_PATH" ]; then
-            OUTPUT_PATH="docs/auto/ARCHITECTURE_AUTO.md"
-          fi
-
-          if git diff --quiet "$OUTPUT_PATH"; then
+          if git diff --quiet "$OUTPUT_PATH" 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected in architecture documentation"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in architecture documentation"
           fi
 
       - name: Create Pull Request
-        if: steps.check_changes.outputs.changed == 'true' && (inputs.create-pr == true || inputs.create-pr == '')
+        if: steps.check_changes.outputs.changed == 'true' && steps.defaults.outputs.create_pr == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'docs: auto-update architecture documentation'
           title: 'Auto-update Architecture Documentation'
           body: |
-            ## 🤖 Automated Architecture Update
+            ## Automated Architecture Update
 
             This PR was automatically generated because changes were detected in the codebase.
 
             ### What Changed
 
             The architecture documentation has been regenerated from the current codebase using:
-            - **Generator:** `generate_architecture.py` from [repo-standards](https://github.com/zepfu/repo-standards)
-            - **Diagrams:** ${{ inputs.diagrams }}
-            - **Output:** `${{ inputs.output-path }}`
+            - Generator: `generate_architecture.py` from [repo-standards](https://github.com/zepfu/repo-standards)
+            - Diagrams: ${{ steps.defaults.outputs.diagrams }}
+            - Output: `${{ steps.defaults.outputs.output_path }}`
 
-            ### What to Review
+            ### Review Checklist
 
-            - ✅ Check that diagrams accurately reflect the current codebase
-            - ✅ Verify relationships between components are correct
-            - ✅ Ensure no sensitive information is exposed
-            - ✅ Confirm state machines and workflows are accurate
+            - [ ] Diagrams accurately reflect the current codebase
+            - [ ] Relationships between components are correct
+            - [ ] No sensitive information is exposed
+            - [ ] State machines and workflows are accurate
 
             ### Known Limitations
 
-            Auto-generated diagrams may miss:
-            - Dynamic behavior (runtime, plugins)
-            - External systems (databases, queues)
-            - Configuration-driven behavior
-            - Dead code (appears equal to active code)
-
-            See [GOTCHAS_AND_LIMITATIONS.md](https://github.com/zepfu/repo-standards/blob/main/docs/GOTCHAS_AND_LIMITATIONS.md) for details.
-
-            ### Next Steps
-
-            1. Review the changes carefully
-            2. Add manual enhancements to `docs/ARCHITECTURE.md` if needed
-            3. Merge when satisfied
+            Auto-generated diagrams may miss dynamic behavior, external systems,
+            configuration-driven behavior, and dead code.
 
             ---
 
@@ -172,32 +160,22 @@ jobs:
             architecture
 
       - name: Summary
-        if: steps.check_changes.outputs.changed == 'true'
+        if: always()
         run: |
-          OUTPUT_PATH="${{ inputs.output-path }}"
-          CREATE_PR="${{ inputs.create-pr }}"
-
-          if [ -z "$OUTPUT_PATH" ]; then
-            OUTPUT_PATH="docs/auto/ARCHITECTURE_AUTO.md"
-          fi
-
-          if [ -z "$CREATE_PR" ]; then
-            CREATE_PR="true"
-          fi
-
-          echo "## Architecture Documentation Updated" >> $GITHUB_STEP_SUMMARY
+          echo "## Architecture Documentation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Generated: \`$OUTPUT_PATH\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "$CREATE_PR" = "true" ]; then
-            echo "📝 Pull request created for review" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check_changes.outputs.changed }}" = "true" ]; then
+            echo "- [PASS] Generated: \`${{ steps.defaults.outputs.output_path }}\`" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.defaults.outputs.create_pr }}" = "true" ]; then
+              echo "- Pull request created for review" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- Changes committed directly (no PR)" >> $GITHUB_STEP_SUMMARY
+            fi
           else
-            echo "📝 Changes committed directly (no PR)" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] Architecture documentation is already up to date" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: No changes summary
-        if: steps.check_changes.outputs.changed == 'false'
-        run: |
-          echo "## No Changes Detected" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Architecture documentation is already up to date." >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Architecture generation complete**" >> $GITHUB_STEP_SUMMARY

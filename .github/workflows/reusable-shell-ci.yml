@@ -10,7 +10,7 @@ on:
         description: 'ShellCheck severity level (error, warning, info, style)'
       shellcheck-version:
         type: string
-        default: 'latest'
+        default: 'v0.10.0'
         description: 'ShellCheck version to use'
 
   push:
@@ -42,66 +42,59 @@ jobs:
       - name: Check for shell scripts
         id: check_scripts
         run: |
-          if compgen -G "scripts/*.sh" > /dev/null || compgen -G "**/*.sh" > /dev/null; then
+          shopt -s globstar nullglob
+          SCRIPTS=( **/*.sh )
+
+          if [ ${#SCRIPTS[@]} -gt 0 ]; then
             echo "has_scripts=true" >> $GITHUB_OUTPUT
-            echo "✓ Shell scripts found"
+            echo "Found ${#SCRIPTS[@]} shell script(s)"
           else
             echo "has_scripts=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No shell scripts found, skipping validation"
           fi
 
       - name: Run ShellCheck
         if: steps.check_scripts.outputs.has_scripts == 'true'
         run: |
-          echo "Running ShellCheck with Docker..."
+          SEVERITY="${{ inputs.severity }}"
+          [ -z "$SEVERITY" ] && SEVERITY="error"
 
-          # Pull ShellCheck Docker image
-          docker pull koalaman/shellcheck-alpine:${{ inputs.shellcheck-version || 'latest' }}
+          pip install shellcheck-py
 
-          # Create wrapper script for easier usage
-          cat > /tmp/shellcheck << 'EOF'
-          #!/bin/bash
-          docker run --rm -v "$(pwd)":/mnt -w /mnt koalaman/shellcheck-alpine:${{ inputs.shellcheck-version || 'latest' }} "$@"
-          EOF
-          chmod +x /tmp/shellcheck
+          echo "## Shell Script Standards" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Severity level: \`$SEVERITY\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Run ShellCheck on all shell scripts
-          SEVERITY="${{ inputs.severity || 'error' }}"
           FAILED=false
 
-          echo "## 🐚 ShellCheck Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Severity:** $SEVERITY" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
           shopt -s globstar nullglob
-          for file in scripts/**/*.sh **/*.sh; do
+          for file in **/*.sh; do
             if [ -f "$file" ]; then
               echo "Checking: $file"
-
-              if /tmp/shellcheck -S "$SEVERITY" -x "$file" 2>&1 | tee -a /tmp/shellcheck.txt; then
-                echo "  ✓ $file passed"
+              if shellcheck -S "$SEVERITY" -x "$file" 2>&1; then
+                echo "- [PASS] \`$file\`" >> $GITHUB_STEP_SUMMARY
               else
-                echo "  ✗ $file has issues"
+                echo "- [FAIL] \`$file\`" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
               fi
             fi
           done
 
-          if [ -s /tmp/shellcheck.txt ]; then
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            cat /tmp/shellcheck.txt >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "$FAILED" = "true" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "❌ ShellCheck found issues" >> $GITHUB_STEP_SUMMARY
+            echo "**[FAIL] ShellCheck found issues**" >> $GITHUB_STEP_SUMMARY
             exit 1
           else
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ All shell scripts passed ShellCheck" >> $GITHUB_STEP_SUMMARY
+            echo "**[PASS] All shell scripts passed ShellCheck**" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: No scripts found
+        if: steps.check_scripts.outputs.has_scripts == 'false'
+        run: |
+          echo "## Shell Script Standards" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No shell scripts found -- skipping ShellCheck" >> $GITHUB_STEP_SUMMARY
 
   bash-syntax:
     name: Bash Syntax Validation
@@ -114,45 +107,42 @@ jobs:
       - name: Check for shell scripts
         id: check_scripts
         run: |
-          if compgen -G "scripts/*.sh" > /dev/null || compgen -G "**/*.sh" > /dev/null; then
+          shopt -s globstar nullglob
+          SCRIPTS=( **/*.sh )
+
+          if [ ${#SCRIPTS[@]} -gt 0 ]; then
             echo "has_scripts=true" >> $GITHUB_OUTPUT
           else
             echo "has_scripts=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No shell scripts found"
           fi
 
-      - name: Validate Bash scripts syntax
+      - name: Validate Bash syntax
         if: steps.check_scripts.outputs.has_scripts == 'true'
         run: |
-          echo "Validating Bash syntax..."
-
           FAILED=false
 
           shopt -s globstar nullglob
-          for file in scripts/**/*.sh **/*.sh; do
+          for file in **/*.sh; do
             if [ -f "$file" ]; then
               echo "Checking: $file"
-              if bash -n "$file" 2>&1; then
-                echo "  ✓ Valid syntax"
-              else
-                echo "  ✗ Syntax error"
+              if ! bash -n "$file" 2>&1; then
                 FAILED=true
               fi
             fi
           done
 
           if [ "$FAILED" = "true" ]; then
-            echo ""
-            echo "✗ Some scripts have syntax errors"
+            echo "- [FAIL] Bash syntax: errors found" >> $GITHUB_STEP_SUMMARY
             exit 1
           else
-            echo ""
-            echo "✓ All scripts have valid syntax"
+            echo "- [PASS] Bash syntax: all scripts valid" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: No scripts summary
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Shell script checks complete**" >> $GITHUB_STEP_SUMMARY
+
+      - name: No scripts found
         if: steps.check_scripts.outputs.has_scripts == 'false'
         run: |
-          echo "## Shell Script Validation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "ℹ️ No shell scripts found - skipping validation" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No shell scripts found -- skipping syntax validation" >> $GITHUB_STEP_SUMMARY

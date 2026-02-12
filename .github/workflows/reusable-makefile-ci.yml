@@ -31,113 +31,78 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check if Makefile exists
+      - name: Check for Makefile
         id: check_makefile
         run: |
           if [ -f "Makefile" ]; then
             echo "has_makefile=true" >> $GITHUB_OUTPUT
-            echo "✓ Makefile found"
           else
             echo "has_makefile=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No Makefile found, skipping validation"
           fi
 
       - name: Validate Makefile syntax
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Checking Makefile syntax with 'make -n'..."
+          echo "## Makefile Standards" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Get list of targets from help (or use 'all' as fallback)
-          TARGETS=$(make -qp 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u | head -1)
+          # Get first available target
+          TARGETS=$(make -qp 2>/dev/null \
+            | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' \
+            | sort -u | head -1)
+          [ -z "$TARGETS" ] && TARGETS="help"
 
-          if [ -z "$TARGETS" ]; then
-            TARGETS="help"
-          fi
-
-          echo "Testing target: $TARGETS"
-
-          if make -n $TARGETS >/dev/null 2>&1; then
-            echo "✓ Makefile syntax is valid"
+          if make -n "$TARGETS" >/dev/null 2>&1; then
+            echo "- [PASS] Makefile syntax is valid" >> $GITHUB_STEP_SUMMARY
           else
-            echo "✗ Makefile has syntax errors:"
-            make -n $TARGETS
+            echo "- [FAIL] Makefile syntax errors detected" >> $GITHUB_STEP_SUMMARY
+            make -n "$TARGETS" 2>&1 || true
             exit 1
           fi
 
-      - name: Setup checkmake
+      - name: Install checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Setting up checkmake (latest version via Docker)..."
+          # Install checkmake via Go
+          go install github.com/mrtazz/checkmake/cmd/checkmake@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
 
-          # Pull latest Docker image
-          docker pull quay.io/checkmake/checkmake:latest
-
-          # Create wrapper script
-          cat > /tmp/checkmake << 'EOFMARKER'
-          #!/bin/bash
-          docker run --rm -v "$(pwd)":/data -w /data quay.io/checkmake/checkmake:latest "$@"
-          EOFMARKER
-
-          chmod +x /tmp/checkmake
-          sudo mv /tmp/checkmake /usr/local/bin/checkmake
-
-          echo "✓ checkmake installed (Docker-based)"
-          checkmake --version
-
-      - name: Lint Makefile with checkmake
+      - name: Run checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Running checkmake on Makefile..."
-
-          # Set default if input is empty
           FAIL_ON_WARNINGS="${{ inputs.fail-on-warnings }}"
           [ -z "$FAIL_ON_WARNINGS" ] && FAIL_ON_WARNINGS="false"
 
           FAILED=false
 
-          if checkmake Makefile; then
-            echo "✓ Makefile: No issues found"
+          # Check Makefile
+          if checkmake Makefile 2>&1; then
+            echo "- [PASS] checkmake: Makefile has no issues" >> $GITHUB_STEP_SUMMARY
           else
-            EXIT_CODE=$?
-
             if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-              echo "✗ Makefile: checkmake found issues"
+              echo "- [FAIL] checkmake: Makefile has issues" >> $GITHUB_STEP_SUMMARY
               FAILED=true
             else
-              echo "⚠️ Makefile: checkmake found issues (non-blocking)"
+              echo "- [WARN] checkmake: Makefile has issues (non-blocking)" >> $GITHUB_STEP_SUMMARY
             fi
           fi
 
-          # Find and check all .mk files
-          echo ""
-          echo "Searching for .mk files..."
-
+          # Check .mk files
           MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
 
           if [ -n "$MK_FILES" ]; then
-            MK_COUNT=$(echo "$MK_FILES" | wc -l)
-            echo "Found $MK_COUNT .mk file(s)"
-            echo ""
-
             while IFS= read -r mk_file; do
-              echo "Running checkmake on $mk_file..."
-
-              if checkmake "$mk_file"; then
-                echo "✓ $mk_file: No issues found"
+              if checkmake "$mk_file" 2>&1; then
+                echo "- [PASS] checkmake: \`$mk_file\` has no issues" >> $GITHUB_STEP_SUMMARY
               else
-                EXIT_CODE=$?
-
                 if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-                  echo "✗ $mk_file: checkmake found issues"
+                  echo "- [FAIL] checkmake: \`$mk_file\` has issues" >> $GITHUB_STEP_SUMMARY
                   FAILED=true
                 else
-                  echo "⚠️ $mk_file: checkmake found issues (non-blocking)"
+                  echo "- [WARN] checkmake: \`$mk_file\` has issues (non-blocking)" >> $GITHUB_STEP_SUMMARY
                 fi
               fi
-              echo ""
             done <<< "$MK_FILES"
-          else
-            echo "ℹ️ No .mk files found"
           fi
 
           if [ "$FAILED" = "true" ]; then
@@ -147,33 +112,20 @@ jobs:
       - name: Check for .PHONY declarations
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Checking for .PHONY declarations..."
-
           if grep -q "^\.PHONY:" Makefile; then
-            echo "✓ Makefile: .PHONY declarations found"
-
-            # Show what's declared as phony
-            echo ""
-            echo "Phony targets in Makefile:"
-            grep "^\.PHONY:" Makefile | sed 's/^\.PHONY: /  - /'
+            echo "- [PASS] Makefile has .PHONY declarations" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ Makefile: No .PHONY declarations found"
-            echo "Consider adding .PHONY declarations for non-file targets"
+            echo "- [WARN] Makefile has no .PHONY declarations (non-blocking)" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Check all .mk files
           MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
 
           if [ -n "$MK_FILES" ]; then
             while IFS= read -r mk_file; do
-              echo ""
               if grep -q "^\.PHONY:" "$mk_file"; then
-                echo "✓ $mk_file: .PHONY declarations found"
-                echo ""
-                echo "Phony targets in $mk_file:"
-                grep "^\.PHONY:" "$mk_file" | sed 's/^\.PHONY: /  - /'
+                echo "- [PASS] \`$mk_file\` has .PHONY declarations" >> $GITHUB_STEP_SUMMARY
               else
-                echo "⚠️ $mk_file: No .PHONY declarations found"
+                echo "- [WARN] \`$mk_file\` has no .PHONY declarations (non-blocking)" >> $GITHUB_STEP_SUMMARY
               fi
             done <<< "$MK_FILES"
           fi
@@ -181,54 +133,41 @@ jobs:
       - name: Check for tabs (not spaces)
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "Checking that recipes use tabs (not spaces)..."
-
           FAILED=false
 
-          # Check Makefile
-          if grep -n '^        [a-zA-Z@-]' Makefile >/dev/null 2>&1; then
-            echo "✗ Makefile: Found potential recipes using spaces instead of tabs:"
-            grep -n '^        [a-zA-Z@-]' Makefile
+          if grep -Pn '^ {8}[a-zA-Z@-]' Makefile >/dev/null 2>&1; then
+            echo "- [FAIL] Makefile: recipes may be using spaces instead of tabs" >> $GITHUB_STEP_SUMMARY
             FAILED=true
           else
-            echo "✓ Makefile: Recipe indentation looks correct"
+            echo "- [PASS] Makefile: recipe indentation is correct" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Check all .mk files
           MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
 
           if [ -n "$MK_FILES" ]; then
             while IFS= read -r mk_file; do
-              echo ""
-              if grep -n '^        [a-zA-Z@-]' "$mk_file" >/dev/null 2>&1; then
-                echo "✗ $mk_file: Found potential recipes using spaces instead of tabs:"
-                grep -n '^        [a-zA-Z@-]' "$mk_file"
+              if grep -Pn '^ {8}[a-zA-Z@-]' "$mk_file" >/dev/null 2>&1; then
+                echo "- [FAIL] \`$mk_file\`: recipes may be using spaces instead of tabs" >> $GITHUB_STEP_SUMMARY
                 FAILED=true
               else
-                echo "✓ $mk_file: Recipe indentation looks correct"
+                echo "- [PASS] \`$mk_file\`: recipe indentation is correct" >> $GITHUB_STEP_SUMMARY
               fi
             done <<< "$MK_FILES"
           fi
 
           if [ "$FAILED" = "true" ]; then
-            echo ""
-            echo "Makefiles require tabs for recipe indentation, not spaces!"
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Makefiles require tabs for recipe indentation, not spaces" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
 
-      - name: Summary
-        if: steps.check_makefile.outputs.has_makefile == 'true'
-        run: |
-          echo "## Makefile Validation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Makefile syntax validation passed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ checkmake linting completed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ .PHONY declarations checked" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Tab indentation verified" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Makefile validation complete**" >> $GITHUB_STEP_SUMMARY
 
-      - name: No Makefile summary
+      - name: No Makefile found
         if: steps.check_makefile.outputs.has_makefile == 'false'
         run: |
-          echo "## Makefile Validation" >> $GITHUB_STEP_SUMMARY
+          echo "## Makefile Standards" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "ℹ️ No Makefile found - skipping validation" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No Makefile found -- skipping validation" >> $GITHUB_STEP_SUMMARY
