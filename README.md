@@ -1,414 +1,125 @@
-# Documentation System Implementation for repo-standards
+# repo-standards
 
-[![CI](https://github.com/zepfu/repo-standards/actions/workflows/ci.yml/badge.svg)](https://github.com/zepfu/repo-standards/actions/workflows/ci.yml)
-[![Documentation](https://github.com/zepfu/repo-standards/actions/workflows/build-docs.yml/badge.svg)](https://github.com/zepfu/repo-standards/actions/workflows/build-docs.yml)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://zepfu.github.io/repo-standards/)
 [![ReadTheDocs](https://readthedocs.org/projects/repo-standards/badge/?version=latest)](https://repo-standards.readthedocs.io/en/latest/)
 
-**Organization-wide code quality standards and configuration templates.**
-
-Complete Sphinx documentation setup with automated generation.
-
-## 📦 What's Included
-
-```
-repo-standards-docs-implementation/
-├── docs/                                    # Sphinx documentation
-│   ├── conf.py                             # Sphinx configuration
-│   ├── index.rst                           # Main index
-│   ├── requirements.txt                    # Sphinx dependencies
-│   ├── .gitignore                          # Ignore build artifacts
-│   │
-│   ├── guides/                             # User guides
-│   │   ├── getting-started.rst            # Getting started
-│   │   ├── quick-setup.rst                # Quick setup examples
-│   │   ├── python-standards.rst           # Python standards
-│   │   ├── shell-standards.rst            # Shell standards
-│   │   ├── workflow-standards.rst         # GitHub Actions
-│   │   └── docker-standards.rst           # Docker (stub)
-│   │
-│   ├── reference/                          # Reference docs
-│   │   ├── scripts.rst                    # Script reference
-│   │   ├── workflows.rst                  # Workflow reference
-│   │   └── configs.rst                    # Config reference
-│   │
-│   ├── _static/                            # Custom CSS/JS (empty)
-│   ├── _templates/                         # Custom templates (empty)
-│   └── auto/                               # Auto-generated (gitignored)
-│       ├── CHANGELOG.md                   # From changelog.py
-│       ├── REPO_MAP.md                    # From repo_map.py
-│       └── ARCHITECTURE_AUTO.md           # From generate_architecture.py
-│
-├── .github/workflows/                      # GitHub Actions
-│   ├── update-docs.yml                    # Auto-generate docs
-│   └── build-docs.yml                     # Build & deploy Sphinx
-│
-├── Makefile                                # Development commands
-└── README.md                               # This file
-```
+Organization-wide code quality standards and configuration templates.
 
 ______________________________________________________________________
 
-## 🚀 Installation
+## What This Provides
 
-### 1. Copy to repo-standards
+**Config files** synced to every repo: `.editorconfig`, `.gitattributes`, `.gitignore`, `.flake8`, `.shellcheckrc`,
+`.pre-commit-config.yaml`, `pyproject.toml`, `.markdownlint.json`.
+
+**Pre-commit hooks** covering Python (Black, isort, Flake8, Bandit, mypy, pydocstyle, autoflake, eradicate), shell
+(ShellCheck), YAML (yamllint), Markdown (mdformat), Dockerfile (hadolint), GitHub Actions (actionlint), and Makefile
+(checkmake).
+
+**Reusable CI workflows** that run the same checks in GitHub Actions:
+
+| Workflow                           | Purpose                                          |
+| ---------------------------------- | ------------------------------------------------ |
+| `reusable-python-ci.yml`           | Black, isort, Flake8, syntax validation          |
+| `reusable-shell-ci.yml`            | ShellCheck, bash syntax validation               |
+| `reusable-pre-commit.yml`          | All pre-commit hooks                             |
+| `reusable-config-validation.yml`   | Required config files exist and are valid        |
+| `reusable-yaml-ci.yml`             | YAML linting                                     |
+| `reusable-docker-build.yml`        | Docker build test                                |
+| `reusable-makefile-ci.yml`         | Makefile linting                                 |
+| `reusable-quality-checks.yml`      | Security, types, docstyle, dead code, actionlint |
+| `reusable-update-docs.yml`         | Auto-generate changelog, repo map, architecture  |
+| `reusable-update-architecture.yml` | Architecture diagram generation                  |
+
+**Automation scripts** for documentation generation: `changelog.py`, `repo_map.py`, `generate_architecture.py`,
+`sync-configs.sh`.
+
+______________________________________________________________________
+
+## Quick Start
 
 ```bash
-cd repo-standards
+# 1. Sync config files
+curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
 
-# Copy documentation
-cp -r repo-standards-docs-implementation/docs .
+# 2. Install pre-commit hooks
+pip install pre-commit
+pre-commit install
 
-# Copy workflows
-cp repo-standards-docs-implementation/.github/workflows/update-docs.yml .github/workflows/
-cp repo-standards-docs-implementation/.github/workflows/build-docs.yml .github/workflows/
+# 3. Add CI workflow
+mkdir -p .github/workflows
+cat > .github/workflows/ci.yml << 'EOF'
+---
+name: CI
+on: [push, pull_request]
+jobs:
+  python:
+    uses: zepfu/repo-standards/.github/workflows/reusable-python-ci.yml@main
+  shell:
+    uses: zepfu/repo-standards/.github/workflows/reusable-shell-ci.yml@main
+  pre-commit:
+    uses: zepfu/repo-standards/.github/workflows/reusable-pre-commit.yml@main
+EOF
 
-# Copy Makefile
-cp repo-standards-docs-implementation/Makefile .
-
-# Commit
-git add docs/ .github/workflows/update-docs.yml .github/workflows/build-docs.yml Makefile
-git commit -m "feat: add Sphinx documentation system"
-git push
+# 4. Verify and commit
+pre-commit run --all-files
+git add . && git commit -m "feat: adopt repo standards"
 ```
 
-### 2. Configure GitHub Pages
+______________________________________________________________________
 
-1. Go to repository **Settings** → **Pages**
-1. Source: **Deploy from a branch**
-1. Branch: **gh-pages** / **/ (root)**
-1. Save
-
-### 3. Test Locally
+## Updating
 
 ```bash
-cd repo-standards
-
-# Install Sphinx
-pip install -r docs/requirements.txt
-
-# Install PyYAML (for architecture generation)
-pip install pyyaml
-
-# Build docs
-make docs-build
-
-# Serve locally
-make docs-serve
-# Open http://localhost:8000
+bash scripts/sync-configs.sh
+pre-commit autoupdate
+pre-commit run --all-files
+git add . && git commit -m "chore: sync config files"
 ```
+
+The sync script updates itself from the latest version in this repo.
 
 ______________________________________________________________________
 
-## 📖 How It Works
+## Documentation
 
-### Automation Flow
+Full documentation is available at **[zepfu.github.io/repo-standards](https://zepfu.github.io/repo-standards/)**.
 
-```
-Code Push (scripts/**, .github/workflows/**)
-    ↓
-update-docs.yml Workflow
-    ↓
-Run Scripts:
-  - changelog.py → docs/auto/CHANGELOG.md
-  - repo_map.py → docs/auto/REPO_MAP.md
-  - generate_architecture.py → docs/auto/ARCHITECTURE_AUTO.md
-    ↓
-Create PR with updates
-    ↓
-Merge PR
-    ↓
-build-docs.yml Workflow
-    ↓
-Build Sphinx HTML
-    ↓
-Deploy to GitHub Pages (gh-pages branch)
-    ↓
-Live at https://zepfu.github.io/repo-standards/
-```
+Key pages:
 
-### Makefile Targets
+- [Getting Started](https://zepfu.github.io/repo-standards/guides/getting-started.html) — first-time setup
+- [Code Standards](CODE_STANDARDS.md) — all enforced rules and tool configurations
+- [Messaging Standards](MESSAGING_STANDARDS.md) — output formatting conventions
+- [Python Standards](https://zepfu.github.io/repo-standards/guides/python-standards.html) — Python-specific guidelines
+- [Shell Standards](https://zepfu.github.io/repo-standards/guides/shell-standards.html) — shell scripting guidelines
+- [Workflow Standards](https://zepfu.github.io/repo-standards/guides/workflow-standards.html) — GitHub Actions patterns
+
+### Building Docs Locally
 
 ```bash
-make docs-auto    # Generate auto-docs only
-make docs-build   # Build Sphinx docs
-make docs-serve   # Serve locally
-make docs-clean   # Clean build artifacts
-make docs         # Full build (auto + build)
+pip install -r docs/requirements.txt pyyaml
+make docs        # generates auto-docs, builds Sphinx
+make docs-serve  # serves at http://localhost:8000
 ```
 
 ______________________________________________________________________
 
-## 📝 What Gets Generated
+## Repository Structure
 
-### Automatically (Every Push)
-
-1. **CHANGELOG.md** - From git history
-
-   - Conventional commits
-   - Grouped by type (Added, Fixed, Changed)
-   - Keep a Changelog format
-
-1. **REPO_MAP.md** - Repository structure
-
-   - Directory tree
-   - File descriptions
-   - Categorization
-
-1. **ARCHITECTURE_AUTO.md** - Architecture diagrams
-
-   - 11 Mermaid diagrams
-   - Workflow diagrams
-   - Module summary
-
-### Manually Written
-
-- Getting started guide
-- Python standards guide
-- Shell standards guide
-- Workflow standards guide
-- Reference documentation
-
-______________________________________________________________________
-
-## 🔧 Configuration
-
-### Sphinx (docs/conf.py)
-
-```python
-project = "repo-standards"
-html_theme = "sphinx_rtd_theme"
-extensions = [
-    "sphinx.ext.autodoc",
-    "myst_parser",  # Markdown support
-]
 ```
-
-### Update Docs Workflow
-
-Triggers:
-
-- Push to main (scripts/**, .github/workflows/**)
-- Manual dispatch
-
-Creates PR with auto-generated docs.
-
-### Build Docs Workflow
-
-Triggers:
-
-- Push to main (docs/\*\*)
-- After update-docs workflow completes
-- Manual dispatch
-
-Builds Sphinx → Deploys to GitHub Pages.
-
-______________________________________________________________________
-
-## 🎯 Key Features
-
-### ✅ Auto-Generation
-
-- Changelog from git history
-- Repo map from file structure
-- Architecture from code
-
-### ✅ Automation
-
-- Workflows trigger on code changes
-- PRs created for review
-- Auto-deploy to GitHub Pages
-
-### ✅ Professional
-
-- Sphinx + Read the Docs theme
-- Mermaid diagram support (11 diagram types)
-- Searchable
-- Versioned
-- Mobile-friendly
-
-### ✅ Maintainable
-
-- One place to update
-- Reusable patterns
-- Clear separation (manual vs auto)
-
-______________________________________________________________________
-
-## 📚 Documentation Structure
-
-### User Guides
-
-- **Getting Started** - First-time setup
-- **Quick Setup** - Fast setup examples
-- **Python Standards** - Python code quality
-- **Shell Standards** - Shell scripting
-- **Workflow Standards** - GitHub Actions
-
-### Reference
-
-- **Scripts** - Automation script docs
-- **Workflows** - Reusable workflow reference
-- **Configs** - Configuration file reference
-
-### Auto-Generated
-
-- **Changelog** - From git history
-- **Repo Map** - Repository structure
-- **Architecture** - Diagrams from code
-
-______________________________________________________________________
-
-## 🧪 Testing
-
-### Local Build
-
-```bash
-# Clean build
-make docs-clean
-make docs-build
-make docs-serve
-
-# Open http://localhost:8000
-# Check all pages render correctly
+repo-standards/
+├── .github/workflows/       # CI and reusable workflows
+├── docs/                    # Sphinx documentation source
+│   ├── guides/              # User guides (rst)
+│   ├── reference/           # Reference docs (rst)
+│   └── auto/                # Auto-generated (changelog, repo map, architecture)
+├── scripts/                 # Automation scripts
+│   ├── changelog.py         # Generate changelog from git history
+│   ├── repo_map.py          # Generate repository structure docs
+│   ├── generate_architecture.py  # Generate Mermaid architecture diagrams
+│   └── sync-configs.sh      # Sync config files to consumer repos
+├── CODE_STANDARDS.md        # Complete standards reference
+├── MESSAGING_STANDARDS.md   # Output formatting conventions
+├── Makefile                 # Development commands
+└── pyproject.toml           # Python tool configuration
 ```
-
-### Test Workflows
-
-```bash
-# Push to feature branch
-git checkout -b test-docs
-git push origin test-docs
-
-# Watch workflows run
-# Check PR is created
-# Verify docs build
-```
-
-______________________________________________________________________
-
-## 🔄 Workflow Details
-
-### update-docs.yml
-
-**Triggers:**
-
-- Push to main (scripts/**, .github/workflows/**)
-- Manual dispatch
-
-**What it does:**
-
-1. Runs changelog.py
-1. Runs repo_map.py
-1. Runs generate_architecture.py
-1. Checks for changes
-1. Creates PR if changes detected
-
-**Permissions:**
-
-- `contents: write` - For commits
-- `pull-requests: write` - For PRs
-
-### build-docs.yml
-
-**Triggers:**
-
-- Push to main (docs/\*\*)
-- After update-docs completes
-- Manual dispatch
-
-**What it does:**
-
-1. Installs Sphinx dependencies
-1. Generates missing auto-docs
-1. Builds Sphinx HTML
-1. Deploys to gh-pages branch
-
-**Permissions:**
-
-- `contents: write` - For gh-pages push
-
-______________________________________________________________________
-
-## 🐛 Troubleshooting
-
-### Docs don't build
-
-Check Sphinx dependencies:
-
-```bash
-pip install -r docs/requirements.txt
-pip install pyyaml
-```
-
-### Auto-docs missing
-
-Generate manually:
-
-```bash
-make docs-auto
-```
-
-### GitHub Pages not working
-
-1. Check Settings → Pages is configured
-1. Verify gh-pages branch exists
-1. Check workflow runs completed successfully
-
-### Links broken
-
-Ensure relative links use correct format:
-
-```rst
-:doc:`/guides/getting-started`  # Correct
-:doc:`guides/getting-started`   # Also works
-```
-
-______________________________________________________________________
-
-## 📈 Future Enhancements
-
-Potential additions:
-
-- [ ] API documentation (autodoc)
-- [ ] Tutorial videos/GIFs
-- [ ] Interactive examples
-- [ ] Versioned docs (multiple versions)
-- [ ] PDF export
-- [ ] Internationalization (i18n)
-
-______________________________________________________________________
-
-## 🎉 Summary
-
-### Before
-
-- ✅ Scripts exist (changelog, repo_map, architecture)
-- ❌ No documentation site
-- ❌ No automation
-- ❌ No published docs
-
-### After
-
-- ✅ Complete Sphinx documentation
-- ✅ Automated generation
-- ✅ GitHub Pages hosting
-- ✅ Professional presentation
-- ✅ Always up-to-date
-
-### Commands
-
-```bash
-# Development
-make docs-build   # Build docs
-make docs-serve   # Serve locally
-
-# Deployment
-git push          # Auto-triggers workflows
-```
-
-### Result
-
-**Professional, auto-updating documentation site! 🚀**
-
-View at: https://zepfu.github.io/repo-standards/
