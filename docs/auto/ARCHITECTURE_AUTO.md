@@ -1,11 +1,11 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-11 23:09:39 **Project:** /home/runner/work/repo-standards/repo-standards
+**Generated:** 2026-02-12 01:05:20
+**Project:** /home/runner/work/repo-standards/repo-standards
 
 ## Overview
 
 Analyzed **4** Python modules containing:
-
 - **2** classes
 - **46** functions
 - **0** async functions
@@ -32,6 +32,7 @@ flowchart TD
     main --> End([End])
 ```
 
+
 ## State Diagram
 
 ```mermaid
@@ -41,9 +42,11 @@ stateDiagram-v2
     GenerateStateDiagram --> [*]
 ```
 
+
 ## Sequence Diagram
 
 *Sequence diagram not applicable for this codebase.*
+
 
 ## Architecture Diagram
 
@@ -59,9 +62,11 @@ architecture-beta
     end
 ```
 
+
 ## Er Diagram
 
 *Er diagram not applicable for this codebase.*
+
 
 ## Class Diagram
 
@@ -83,9 +88,11 @@ classDiagram
     }
 ```
 
+
 ## Journey Diagram
 
 *Journey diagram not applicable for this codebase.*
+
 
 ## Mindmap Diagram
 
@@ -100,15 +107,17 @@ mindmap
       repo_map
 ```
 
+
 ## Workflow Pipeline Diagram
 
 ```mermaid
 flowchart TD
 
     Push -->|Doc Changes| Docs[Build Docs]
+    Docs --> reusable_yaml_ci[YAML Standards Enforcement (Do]
     Docs --> reusable_docker_build[Docker Build Standards]
-    Docs --> reusable_update_architecture[Update Architecture Documentat]
 ```
+
 
 ## Workflow Triggers Diagram
 
@@ -116,9 +125,9 @@ flowchart TD
 graph TD
     reusable_makefile_ci[Makefile Standards Enforcement]
     reusable_config_validation[Config Standards Validation]
-    reusable_yaml_ci[YAML Standards Enforcement]
+    reusable_yaml_ci[YAML Standards Enforcement (Docker)]
     reusable_docker_build[Docker Build Standards]
-    reusable_python_ci[Python Standards Enforcement]
+    reusable_python_ci[Python Standards Enforcement (Docker)]
     reusable_update_architecture[Update Architecture Documentation]
     reusable_shell_ci[Shell Script Standards Enforcement]
     reusable_pre_commit[Pre-commit Standards Enforcement]
@@ -126,11 +135,12 @@ graph TD
     reusable_quality_checks[Advanced Quality Checks]
 ```
 
+
 ## Workflow Jobs Diagram
 
 ```mermaid
 flowchart LR
-    subgraph reusable_python_ci[Python Standards Enforcement]
+    subgraph reusable_python_ci[Python Standards Enforcement (Docker)]
         validate_python_version[validate-python-version]
         python_lint[python-lint]
         python_syntax[python-syntax]
@@ -139,22 +149,23 @@ flowchart LR
     end
 ```
 
+
 ## Development Workflows
 
 ### GitHub Workflows Summary
 
-| Workflow                           | Triggers | Jobs                                                        |
-| ---------------------------------- | -------- | ----------------------------------------------------------- |
-| Config Standards Validation        |          | validate-configs                                            |
-| Docker Build Standards             |          | docker-build                                                |
-| Makefile Standards Enforcement     |          | validate-makefile                                           |
-| Pre-commit Standards Enforcement   |          | pre-commit                                                  |
-| Python Standards Enforcement       |          | validate-python-version, python-lint, python-syntax         |
-| Advanced Quality Checks            |          | detect-unused-python, detect-unused-shell, markdown-lint... |
-| Shell Script Standards Enforcement |          | shellcheck, bash-syntax                                     |
-| Update Architecture Documentation  |          | generate-architecture                                       |
-| Update Documentation (Reusable)    |          | update-and-build-docs                                       |
-| YAML Standards Enforcement         |          | validate-yaml                                               |
+| Workflow | Triggers | Jobs |
+|----------|----------|------|
+| Config Standards Validation |  | validate-configs |
+| Docker Build Standards |  | docker-build |
+| Makefile Standards Enforcement |  | validate-makefile |
+| Pre-commit Standards Enforcement |  | pre-commit |
+| Python Standards Enforcement (Docker) |  | validate-python-version, python-lint, python-syntax |
+| Advanced Quality Checks |  | detect-unused-python, detect-unused-shell, markdown-lint... |
+| Shell Script Standards Enforcement |  | shellcheck, bash-syntax |
+| Update Architecture Documentation |  | generate-architecture |
+| Update Documentation (Reusable) |  | update-and-build-docs |
+| YAML Standards Enforcement (Docker) |  | validate-yaml |
 
 ## Module Summary
 
@@ -168,10 +179,11 @@ flowchart LR
 
 changelog.py - Generate changelog from git history
 
-Automatically generates and maintains a CHANGELOG.md file following the Keep a Changelog format using conventional
-commits.
+Automatically generates and maintains a CHANGELOG.md file following the
+Keep a Changelog format using conventional commits.
 
-Usage: python3 chan...
+Usage:
+    python3 chan...
 
 - **Classes:** 0
 - **Functions:** 8
@@ -182,28 +194,24 @@ Usage: python3 chan...
 generate_architecture.py - Comprehensive Architecture Diagram Generator
 
 Generates multiple Mermaid diagram types based on codebase analysis:
-
 - flowchart: Control flow and process flows
-
 - stateDiagram...
 
 - **Classes:** 2
-
 - **Functions:** 26
-
 - **Async Functions:** 0
 
 ### `scripts.repo_map`
 
 repo_map.py - Generate repository structure documentation
 
-Automatically generates comprehensive repository structure documentation including directory trees, file descriptions,
-and categorized overvi...
+Automatically generates comprehensive repository structure documentation
+including directory trees, file descriptions, and categorized overvi...
 
 - **Classes:** 0
 - **Functions:** 12
 - **Async Functions:** 0
 
-______________________________________________________________________
+---
 
 *Generated by: `generate_architecture.py` from repo-standards*
