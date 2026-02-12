@@ -143,6 +143,20 @@ jobs:
               --diagrams "$ARCH_DIAGRAMS"
           fi
 
+      - name: Format auto-generated markdown
+        run: |
+          AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
+
+          pip install mdformat mdformat-gfm mdformat-tables mdformat-frontmatter
+
+          echo "Formatting auto-generated markdown files..."
+          for file in "$AUTO_DOCS_DIR"/*.md; do
+            if [ -f "$file" ]; then
+              echo "Formatting: $file"
+              mdformat --wrap 120 "$file"
+            fi
+          done
+
       - name: Run pre-commit on auto-generated files
         run: |
           pip install pre-commit

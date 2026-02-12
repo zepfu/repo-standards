@@ -31,7 +31,7 @@ for arg in "$@"; do
             echo "Files synced:"
             echo "  .gitattributes, .gitignore, .editorconfig, .flake8,"
             echo "  .shellcheckrc, .pre-commit-config.yaml, .readthedocs.yml,"
-            echo "  pyproject.toml, Makefile, repo.mk.example"
+            echo "  pyproject.toml, Makefile, repo.mk.example, .checkmake"
             echo ""
             echo "Example:"
             echo "  curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash"
@@ -142,6 +142,7 @@ git sparse-checkout set \
   pyproject.toml \
   Makefile \
   repo.mk.example \
+  .checkmake \
   2>&1 | grep -v "^$" || true
 
 log_info "Sparse checkout complete"
@@ -168,6 +169,7 @@ CONFIG_FILES=(
   "pyproject.toml"
   "Makefile"
   "repo.mk.example"
+  ".checkmake"
 )
 
 for file in "${CONFIG_FILES[@]}"; do

@@ -100,5 +100,4 @@ repos:
     rev: v0.3.2
     hooks:
       - id: checkmake
-        # This builds checkmake from source using Go
-        # Alternative: use checkmake-system if checkmake is pre-installed
+        args: ['--config=.checkmake']
