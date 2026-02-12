@@ -1,5 +1,5 @@
 ---
-name: Pre-commit Standards Enforcement (Docker)
+name: Pre-commit Standards Enforcement
 
 on:
   workflow_call:
@@ -26,7 +26,7 @@ on:
 
 jobs:
   pre-commit:
-    name: Pre-commit Checks (Docker)
+    name: Pre-commit Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -41,23 +41,10 @@ jobs:
             exit 1
           fi
 
-      - name: Create cache directory
-        run: mkdir -p /tmp/pre-commit-cache
-
-      - name: Cache pre-commit hooks
-        uses: actions/cache@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: /tmp/pre-commit-cache
-          key: pre-commit-docker-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: |
-            pre-commit-docker-${{ runner.os }}-
+          python-version: ${{ inputs.python-version || '3.13' }}
 
-      - name: Run pre-commit with Docker
-        run: |
-          docker run --rm \
-            -v "$(pwd)":/src \
-            -w /src \
-            -v /tmp/pre-commit-cache:/cache \
-            -e PRE_COMMIT_HOME=/cache \
-            ghcr.io/pre-commit/pre-commit:latest \
-            run --all-files --show-diff-on-failure
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
