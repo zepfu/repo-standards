@@ -143,18 +143,14 @@ jobs:
               --diagrams "$ARCH_DIAGRAMS"
           fi
 
-      - name: Format auto-generated markdown
+      - name: Format all markdown files
         run: |
-          AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
-
           pip install mdformat mdformat-gfm mdformat-tables mdformat-frontmatter
 
-          echo "Formatting auto-generated markdown files..."
-          for file in "$AUTO_DOCS_DIR"/*.md; do
-            if [ -f "$file" ]; then
-              echo "Formatting: $file"
-              mdformat --wrap 120 "$file"
-            fi
+          echo "Formatting all markdown files..."
+          find . -name "*.md" -not -path "./.git/*" -not -path "./*_build/*" | while read -r file; do
+            echo "Formatting: $file"
+            mdformat --wrap 120 "$file"
           done
 
       - name: Run pre-commit on auto-generated files
@@ -170,7 +166,10 @@ jobs:
         id: check_changes
         run: |
           AUTO_DOCS_DIR="${{ steps.defaults.outputs.auto_docs_dir }}"
+
+          # Stage auto-generated docs and any markdown formatting changes
           git add "$AUTO_DOCS_DIR/"
+          git add "*.md" "**/*.md" 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "has_auto_changes=false" >> "$GITHUB_OUTPUT"

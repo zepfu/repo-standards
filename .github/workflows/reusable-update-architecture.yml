@@ -107,6 +107,13 @@ jobs:
               --diagrams "$DIAGRAMS"
           fi
 
+      - name: Format generated markdown
+        run: |
+          OUTPUT_PATH="${{ steps.defaults.outputs.output_path }}"
+          pip install mdformat mdformat-gfm mdformat-tables mdformat-frontmatter
+          echo "Formatting: $OUTPUT_PATH"
+          mdformat --wrap 120 "$OUTPUT_PATH"
+
       - name: Check if documentation changed
         id: check_changes
         run: |
