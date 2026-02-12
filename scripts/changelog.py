@@ -37,7 +37,7 @@ import argparse
 import re
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Changelog header
 CHANGELOG_HEADER = """# Changelog
@@ -198,8 +198,8 @@ def get_commits_for_changelog(
     if not output:
         return []
 
-    commits = []
-    current_commit = None
+    commits: List[Dict[str, Any]] = []
+    current_commit: Optional[Dict[str, Any]] = None
 
     for line in output.split("\n"):
         if "|" in line:
@@ -267,7 +267,7 @@ def generate_changelog(
 ) -> str:
     """Generate complete changelog content."""
     # Group commits by type
-    changes_by_type = {key: [] for key in CHANGE_TYPES.keys()}
+    changes_by_type: Dict[str, List[str]] = {key: [] for key in CHANGE_TYPES.keys()}
 
     for commit in commits:
         change_type = commit["change_type"]

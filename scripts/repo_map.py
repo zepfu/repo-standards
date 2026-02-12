@@ -29,7 +29,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 # Files that should be highlighted as important
 IMPORTANT_FILES = {
@@ -127,7 +127,7 @@ def extract_description(file_path: Path) -> Optional[str]:
                 desc = match.group(1).strip()
                 return desc[:100]
 
-    except Exception:
+    except Exception:  # nosec B110 - intentional: skip unreadable files
         pass
 
     return None
@@ -169,9 +169,9 @@ def get_file_category(file_path: Path) -> str:
     return "other"
 
 
-def scan_directory(root: Path, ignore_patterns: Set[str]) -> Dict:
+def scan_directory(root: Path, ignore_patterns: Set[str]) -> Dict[str, Any]:
     """Recursively scan directory and build structure."""
-    structure = {
+    structure: Dict[str, Any] = {
         "name": root.name or str(root),
         "type": "directory",
         "path": str(root),
@@ -205,7 +205,7 @@ def scan_directory(root: Path, ignore_patterns: Set[str]) -> Dict:
     return structure
 
 
-def format_tree(structure: Dict, prefix: str = "", is_last: bool = True) -> str:
+def format_tree(structure: Dict[str, Any], prefix: str = "", is_last: bool = True) -> str:
     """Format structure as text tree."""
     lines = []
 
@@ -241,7 +241,7 @@ def format_tree(structure: Dict, prefix: str = "", is_last: bool = True) -> str:
     return "\n".join(lines)
 
 
-def _build_directory_tree(struct: Dict, lines: List[str], prefix: str = ""):
+def _build_directory_tree(struct: Dict[str, Any], lines: List[str], prefix: str = ""):
     """Helper to build directory tree recursively."""
     # Files first
     files = struct.get("files", [])
@@ -265,7 +265,9 @@ def _build_directory_tree(struct: Dict, lines: List[str], prefix: str = ""):
         _build_directory_tree(child, lines, prefix + extension)
 
 
-def _collect_files_by_category(struct: Dict, category: str, collected: List):
+def _collect_files_by_category(
+    struct: Dict[str, Any], category: str, collected: List[Dict[str, Any]]
+):
     """Helper to collect files of a specific category."""
     for file_info in struct.get("files", []):
         if file_info["category"] == category:
@@ -275,7 +277,7 @@ def _collect_files_by_category(struct: Dict, category: str, collected: List):
         _collect_files_by_category(child, category, collected)
 
 
-def _collect_important_files(struct: Dict, collected: List):
+def _collect_important_files(struct: Dict[str, Any], collected: List[Dict[str, Any]]):
     """Helper to collect important files."""
     for file_info in struct.get("files", []):
         if file_info.get("important") and file_info["category"] != "entry_point":
@@ -284,12 +286,12 @@ def _collect_important_files(struct: Dict, collected: List):
         _collect_important_files(child, collected)
 
 
-def _add_key_files_section(lines: List[str], structure: Dict):
+def _add_key_files_section(lines: List[str], structure: Dict[str, Any]):
     """Add key files section to documentation."""
-    entry_points = []
+    entry_points: List[Dict[str, Any]] = []
     _collect_files_by_category(structure, "entry_point", entry_points)
 
-    important_files = []
+    important_files: List[Dict[str, Any]] = []
     _collect_important_files(structure, important_files)
 
     if not entry_points and not important_files:
@@ -315,10 +317,10 @@ def _add_key_files_section(lines: List[str], structure: Dict):
 
 
 def _add_category_section(
-    lines: List[str], structure: Dict, category: str, title: str, as_table: bool = False
+    lines: List[str], structure: Dict[str, Any], category: str, title: str, as_table: bool = False
 ):
     """Add a category section (config, docs, or scripts)."""
-    files = []
+    files: List[Dict[str, Any]] = []
     _collect_files_by_category(structure, category, files)
 
     if not files:
@@ -346,7 +348,7 @@ def _add_category_section(
     lines.append("")
 
 
-def format_markdown(structure: Dict, root_path: Path) -> str:
+def format_markdown(structure: Dict[str, Any], root_path: Path) -> str:
     """Format structure as comprehensive markdown documentation."""
     lines = ["# Repository Structure", "", "> Auto-generated repository map", ""]
 

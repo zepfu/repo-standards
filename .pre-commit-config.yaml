@@ -89,6 +89,16 @@ repos:
         args: ['--in-place']
 
   # ==========================================================================
+  # Python: Docstrings
+  # ==========================================================================
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        args: ['--config=pyproject.toml']
+        additional_dependencies: ['tomli']
+
+  # ==========================================================================
   # Python: Security
   # ==========================================================================
   - repo: https://github.com/PyCQA/bandit

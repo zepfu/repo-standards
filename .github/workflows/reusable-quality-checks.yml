@@ -337,6 +337,45 @@ jobs:
             echo "- [WARN] mypy: type issues detected" >> $GITHUB_STEP_SUMMARY
           fi
 
+  python-docstyle:
+    name: Python Docstring Style (pydocstyle)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || '3.13' }}
+
+      - name: Install pydocstyle
+        run: |
+          pip install 'pydocstyle[toml]'
+
+      - name: Run pydocstyle
+        run: |
+          echo "### Python Docstring Style (pydocstyle)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
+             ! compgen -G "**/*.py" > /dev/null 2>&1; then
+            echo "- [SKIP] No Python files found -- skipping docstyle check" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          if pydocstyle --config=pyproject.toml scripts/ 2>&1 | tee /tmp/pydocstyle.txt; then
+            echo "- [PASS] pydocstyle: all docstrings follow Google convention" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -30 /tmp/pydocstyle.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] pydocstyle: docstring format issues detected" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
   actionlint:
     name: GitHub Actions Lint
     runs-on: ubuntu-latest
@@ -386,7 +425,7 @@ jobs:
   summary:
     name: Quality Check Summary
     runs-on: ubuntu-latest
-    needs: [detect-unused-python, detect-unused-shell, markdown-lint, python-security, python-types, actionlint]
+    needs: [detect-unused-python, detect-unused-shell, markdown-lint, python-security, python-types, python-docstyle, actionlint]
     if: always()
 
     steps:

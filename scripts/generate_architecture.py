@@ -25,7 +25,7 @@ import ast
 import datetime
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import yaml
 
@@ -35,14 +35,14 @@ class CodeAnalyzer:
 
     def __init__(self, root_path: Path = Path(".")):
         self.root_path = root_path
-        self.modules = {}
-        self.imports_graph = defaultdict(set)
-        self.classes = {}
-        self.functions = {}
-        self.state_machines = []
-        self.api_endpoints = []
-        self.data_models = []
-        self.workflows = {}  # GitHub workflows
+        self.modules: Dict[str, Dict[str, Any]] = {}
+        self.imports_graph: Dict[str, Set[str]] = defaultdict(set)
+        self.classes: Dict[str, Dict[str, Any]] = {}
+        self.functions: Dict[str, Dict[str, Any]] = {}
+        self.state_machines: List[Dict[str, Any]] = []
+        self.api_endpoints: List[Dict[str, Any]] = []
+        self.data_models: List[Dict[str, Any]] = []
+        self.workflows: Dict[str, Dict[str, Any]] = {}  # GitHub workflows
         self.patterns = {
             "server": False,
             "api": False,
@@ -100,7 +100,7 @@ class CodeAnalyzer:
             rel_path = filepath.relative_to(self.root_path)
             module_name = str(rel_path).replace("/", ".").replace(".py", "")
 
-            module_info = {
+            module_info: Dict[str, Any] = {
                 "path": filepath,
                 "imports": set(),
                 "classes": [],
@@ -127,7 +127,7 @@ class CodeAnalyzer:
 
                 # Classes
                 elif isinstance(node, ast.ClassDef):
-                    class_info = {
+                    class_info: Dict[str, Any] = {
                         "name": node.name,
                         "bases": [self._get_name(b) for b in node.bases],
                         "methods": [],
@@ -181,7 +181,7 @@ class CodeAnalyzer:
 
                 # Functions
                 elif isinstance(node, ast.FunctionDef):
-                    func_info = {
+                    func_info: Dict[str, Any] = {
                         "name": node.name,
                         "is_async": isinstance(node, ast.AsyncFunctionDef),
                         "decorators": [self._get_name(d) for d in node.decorator_list],
@@ -225,7 +225,7 @@ class CodeAnalyzer:
         except Exception as e:
             print(f"Warning: Could not analyze {filepath}: {e}")
 
-    def _get_name(self, node) -> str:
+    def _get_name(self, node: ast.expr) -> str:
         """Extract name from AST node."""
         if isinstance(node, ast.Name):
             return node.id
@@ -235,11 +235,11 @@ class CodeAnalyzer:
             return self._get_name(node.func)
         return str(node)
 
-    def _extract_route_path(self, decorator) -> str:
+    def _extract_route_path(self, decorator: ast.expr) -> str:
         """Extract path from route decorator."""
         if isinstance(decorator, ast.Call) and decorator.args:
             arg = decorator.args[0]
-            if isinstance(arg, ast.Constant):
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
                 return arg.value
         return "/unknown"
 
@@ -267,7 +267,7 @@ class CodeAnalyzer:
 
                 workflow_name = yaml_file.stem
 
-                workflow_info = {
+                workflow_info: Dict[str, Any] = {
                     "name": workflow.get("name", workflow_name),
                     "file": yaml_file.name,
                     "triggers": self._extract_triggers(workflow.get("on", {})),
@@ -297,7 +297,7 @@ class CodeAnalyzer:
             except Exception as e:
                 print(f"Warning: Could not analyze workflow {yaml_file}: {e}")
 
-    def _extract_triggers(self, on_config) -> List[str]:
+    def _extract_triggers(self, on_config: Any) -> List[str]:
         """Extract trigger types from workflow 'on' config."""
         if isinstance(on_config, str):
             return [on_config]
@@ -815,7 +815,7 @@ class DiagramGenerator:
         return summary
 
 
-def generate_documentation(analyzer: CodeAnalyzer, args) -> str:
+def generate_documentation(analyzer: CodeAnalyzer, args: argparse.Namespace) -> str:
     """Generate complete architecture documentation."""
     generator = DiagramGenerator(analyzer)
 
