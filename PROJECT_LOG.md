@@ -137,3 +137,19 @@ Completed this session:
 1. Monitor mdformat-gfm for mdformat 1.0.0 compatibility
 1. Stream B2/B3: workflow usage examples and troubleshooting guide (lower priority, reference docs now comprehensive)
 1. Proceed to v1 release when operator is ready
+
+### 2026-02-13 06:30 [COMPLETE] CI fix and v1.0.1 patch release
+
+Root cause: actionlint passes `--norc` to shellcheck, so `.shellcheckrc` is never read. Additionally, shellcheck is not
+in local PATH (only in pre-commit venv), so actionlint only runs shellcheck checks in CI where it's pre-installed on the
+GitHub Actions runner. This caused SC2129 (sequential redirects) and SC2016 (single-quoted expressions) to fail in CI
+but pass locally.
+
+Fix: Added `-ignore` args for SC2129 and SC2016 directly in the actionlint pre-commit hook configuration. Added
+`.github/actionlint.yaml` as defense-in-depth. Added `workflow_dispatch` trigger to pre-commit workflow for manual
+testing.
+
+All CI workflows now passing. Tagged and released v1.0.1.
+
+Commits: 4828b35, 79a609d, ff9004e, a912de9, 01f1a03 Release:
+https://github.com/zepfu/repo-standards/releases/tag/v1.0.1

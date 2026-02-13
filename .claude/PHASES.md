@@ -115,7 +115,7 @@ changelog, architecture diagrams, and workflow registry.
 - [ ] Monitor and fix issues reported by consumer repos
 - [ ] Improve onboarding documentation for external adopters
 - [ ] Add language support as mature tooling becomes available (Go, Rust, JS/TS)
-- [ ] Community contribution guidelines (CONTRIBUTING.md)
+- [x] Community contribution guidelines (CONTRIBUTING.md)
 
 ______________________________________________________________________
 
@@ -132,11 +132,11 @@ ______________________________________________________________________
 
 ### Stream B: Documentation Improvements
 
-| Task                                               | Agent       | Status  |
-| -------------------------------------------------- | ----------- | ------- |
-| B1. External adopter onboarding guide              | TECH-WRITER | Pending |
-| B2. Workflow usage examples per consumer repo type | TECH-WRITER | Pending |
-| B3. Troubleshooting guide                          | TECH-WRITER | Pending |
+| Task                                               | Agent       | Status |
+| -------------------------------------------------- | ----------- | ------ |
+| B1. External adopter onboarding guide              | TECH-WRITER | Done   |
+| B2. Workflow usage examples per consumer repo type | TECH-WRITER | Done   |
+| B3. Troubleshooting guide                          | TECH-WRITER | Done   |
 
 ### Stream C: Expansion (Future)
 
@@ -177,14 +177,14 @@ All true:
 - [x] Documentation deployed to GitHub Pages and ReadTheDocs
 - [x] CODE_STANDARDS.md and MESSAGING_STANDARDS.md complete
 
-### Phase 4 → v1 Release
+### Phase 4 → v1 Release (PASSED — v1.0.0 released 2026-02-13, v1.0.1 patch same day)
 
-- [ ] All tool versions current
-- [ ] No open critical/high issues
-- [ ] External adopter documentation complete
-- [ ] CONTRIBUTING.md in place
-- [ ] Changelog generated for release
-- [ ] Operator approval
+- [x] All tool versions current (hadolint v2.14.0; mdformat 1.0.0 blocked by plugin compat)
+- [x] No open critical/high issues
+- [x] External adopter documentation complete (adopter-guide.rst)
+- [x] CONTRIBUTING.md in place
+- [x] Changelog generated for release
+- [x] Operator approval
 
 ______________________________________________________________________
 

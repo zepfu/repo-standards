@@ -12,6 +12,8 @@ to maintain consistent code quality across all projects.
 
    guides/getting-started
    guides/adopter-guide
+   guides/workflow-examples
+   guides/troubleshooting
    guides/quick-setup
 
 .. toctree::
