@@ -103,3 +103,37 @@ Pre-commit autoupdate results (13 of 15 up to date):
 - hadolint-py: v2.12.0 -> v2.14.0 available (minor bump — likely safe)
 - checkmake: v0.3.2 -> v0.3.0 reported (suspicious downgrade — needs investigation) Action: Deferred to next session.
   Create task for DEVOPS-ENGINEER to test mdformat 1.0 compatibility.
+
+### 2026-02-12 [COMPLETE] External adopter onboarding guide — Stream B1
+
+Commit: `52037d7` docs(docs): add external adopter onboarding guide Files: `docs/guides/adopter-guide.rst` (new, 372
+lines), `docs/index.rst` (added to toctree) Covers: new vs existing repo setup, customization patterns, workflow
+selection, monorepo tips, update process, troubleshooting, FAQ. Sphinx build verified clean.
+
+### 2026-02-12 [COMPLETE] Pre-commit hook version upgrades
+
+Commit: `68b93c5` chore(pre-commit): update hadolint-py v2.12.0 -> v2.14.0 Applied: hadolint-py v2.12.0 -> v2.14.0 (all
+hooks pass) Blocked: mdformat 0.7.22 -> 1.0.0 (mdformat-gfm plugin requires mdformat\<0.8.0 — incompatible) Resolved:
+checkmake v0.3.2 kept (upstream tagging issue — v0.3.1/v0.3.2 tagged on branch not merged to main, v0.3.0 is latest
+reachable from main HEAD)
+
+### 2026-02-12 [NOTE] Session 2 ended
+
+Completed this session:
+
+- Fixed sparse-checkout bug in sync-configs.sh
+- Completed all reference documentation (scripts 7/7, configs 13/13, workflows 10/10)
+- Created CONTRIBUTING.md (v1 gate item)
+- Created external adopter onboarding guide (Stream B1)
+- Updated getting-started.rst config list to all 13 files
+- Upgraded hadolint-py v2.12.0 -> v2.14.0
+- Investigated and resolved checkmake version anomaly (upstream tagging issue)
+- Tested mdformat 1.0.0 (blocked by plugin incompatibility) Commits pushed: 6 (Session 1 + Session 2 early work) Commits
+  pending push: 2 (adopter guide + hadolint upgrade) v1 gate status: 4 of 6 items now passing (no open issues,
+  CONTRIBUTING.md, external adopter docs, tool versions mostly current) Remaining for v1: changelog at release time,
+  operator approval, monitor mdformat-gfm for 1.0-compatible release Recommended next actions:
+
+1. Push pending commits to origin/main
+1. Monitor mdformat-gfm for mdformat 1.0.0 compatibility
+1. Stream B2/B3: workflow usage examples and troubleshooting guide (lower priority, reference docs now comprehensive)
+1. Proceed to v1 release when operator is ready
