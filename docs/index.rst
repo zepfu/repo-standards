@@ -11,6 +11,7 @@ to maintain consistent code quality across all projects.
    :caption: Getting Started
 
    guides/getting-started
+   guides/adopter-guide
    guides/quick-setup
 
 .. toctree::
