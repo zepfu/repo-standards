@@ -1,9 +1,7 @@
 # ShellCheck configuration
 # Disable specific checks globally
 # SC2250: Prefer ${var} over $var (style preference)
-# SC2129: Prefer { cmd1; cmd2; } >> file (style preference, noisy in workflow run blocks)
-# SC2016: Expressions don't expand in single quotes (intentional in config validation checks)
-disable=SC2250,SC2129,SC2016
+disable=SC2250
 
 # Enable optional checks
 enable=quote-safe-variables

@@ -1,0 +1,12 @@
+# actionlint configuration
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+#
+# Note: actionlint passes --norc to shellcheck, so .shellcheckrc is not read.
+# Use this file to suppress shellcheck rules that are noisy in workflow run blocks.
+ignore:
+  # SC2129: style — "Consider using { cmd1; cmd2; } >> file"
+  # Sequential redirects to $GITHUB_STEP_SUMMARY are idiomatic in Actions workflows.
+  - 'SC2129:'
+  # SC2016: info — "Expressions don't expand in single quotes"
+  # Intentional in config validation checks that grep for literal strings.
+  - 'SC2016:'
