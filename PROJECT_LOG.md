@@ -37,3 +37,69 @@ First Claude Code session on this repository. Explored full repo structure and p
   streams defined.
 - CONTRACTS.md: Two active contracts defined (C-001: Distributed Config File Set, C-002: Reusable Workflow Interface).
   Project is in maintenance mode. No open blockers. No injected tasks.
+
+### 2026-02-12 [NOTE] Session 1 ended
+
+Completed this session:
+
+- Explored full repo structure and identified project purpose
+- Populated all framework files (CLAUDE.md, SPEC.md, GUIDELINES.md, PHASES.md, CONTRACTS.md)
+- Initialized PROJECT_LOG.md, TASKS.md, CLAUDE_SUGGESTIONS.md
+- Fixed missing `.markdownlint.json` (referenced in 4 places, never existed) and added to sync-configs.sh Commits:
+- `4519b82` docs(ci): add Claude orchestration framework with project-specific config
+- `e459f1b` fix(configs): add missing .markdownlint.json and include in sync-configs In-flight: None Blocked: None
+  Suggestions written: None (first session, no implementation work to surface issues from) Contracts: C-001 and C-002
+  created (ACTIVE) GitHub sync: No issues created (no actionable items this session, onboarding only) Unsynced: 2
+  commits ahead of origin/main — push pending operator decision Recommended next actions:
+
+1. Push to origin/main when ready
+1. Complete `docs/reference/scripts.rst` (incomplete documentation)
+1. Clarify REUSABLE_WORKFLOW_REGISTRY.md naming in sync-configs.sh
+1. Begin Stream B work: external adopter onboarding guide (TECH-WRITER)
+
+### 2026-02-12 [DECISION] Session 2 priorities: fix sparse-checkout bug, CONTRIBUTING.md, complete reference docs, begin adopter guide
+
+Rationale: No injected tasks or open issues. Best use of discretionary time is advancing v1 release gate. Focus: Stream
+B (documentation) with a quick Stream A fix (sparse-checkout bug). Gate assessment: 2 of 6 v1 gate items currently
+passing (no open issues, changelog deferred to release time). Documentation is the primary blocker.
+
+### 2026-02-12 [DECISION] sync-configs.sh sparse-checkout bug must be fixed before push
+
+Bug: `.markdownlint.json` added to CONFIG_FILES array but not to sparse-checkout set in commit `e459f1b`. Impact:
+Consumer repos running sync-configs.sh will get "File not found" warning for .markdownlint.json. Action: Fix
+sparse-checkout set command, then recommend push of all commits to operator.
+
+### 2026-02-12 [NOTE] Session 2 started
+
+Previous session summary: Session 1 — onboarded project, populated all framework files, fixed missing
+.markdownlint.json, 2 commits unpushed. In-flight: None Blocked: None New tasks: None (TASKS.md empty, GitHub Issues
+empty) Suggestions processed: None pending PRODUCT-OWNER plan: (1) Fix sparse-checkout bug in sync-configs.sh, (2)
+recommend push to operator, (3) create CONTRIBUTING.md, (4) complete reference docs (scripts.rst, configs.rst,
+workflows.rst), (5) begin external adopter onboarding guide, (6) verify tool versions current
+
+### 2026-02-12 [COMPLETE] Fix sparse-checkout bug in sync-configs.sh
+
+Commit: `32c1d56` fix(scripts): add .markdownlint.json to sparse-checkout in sync-configs.sh Files:
+`scripts/sync-configs.sh`
+
+### 2026-02-12 [COMPLETE] Complete reference documentation — all scripts, configs, workflows now documented
+
+Commit: `9e10d18` docs(docs): complete reference documentation for all scripts, configs, and workflows Files:
+`docs/reference/scripts.rst` (+3 scripts), `docs/reference/configs.rst` (+7 configs), `docs/reference/workflows.rst` (+4
+workflows), `docs/guides/getting-started.rst` (updated config list to 13 files) Coverage: scripts 7/7, configs 13/13,
+workflows 10/10 Sphinx build verified clean.
+
+### 2026-02-12 [COMPLETE] Create CONTRIBUTING.md — v1 gate item
+
+Commit: `fe8ae96` docs(docs): add CONTRIBUTING.md for v1 release gate Files: `CONTRIBUTING.md` (new, 210 lines) Covers:
+setup, branching, commits, code standards, pre-commit hooks, make targets, breaking change policy, new workflow/config
+processes.
+
+### 2026-02-12 [NOTE] Tool version audit — Stream A maintenance check
+
+Pre-commit autoupdate results (13 of 15 up to date):
+
+- mdformat: 0.7.22 -> 1.0.0 available (MAJOR version — needs testing before applying)
+- hadolint-py: v2.12.0 -> v2.14.0 available (minor bump — likely safe)
+- checkmake: v0.3.2 -> v0.3.0 reported (suspicious downgrade — needs investigation) Action: Deferred to next session.
+  Create task for DEVOPS-ENGINEER to test mdformat 1.0 compatibility.
