@@ -23,13 +23,19 @@ Quick Setup
       curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash
 
    This adds:
-   - ``.gitattributes``
-   - ``.gitignore``
-   - ``.editorconfig``
-   - ``.flake8``
-   - ``.shellcheckrc``
-   - ``.pre-commit-config.yaml``
-   - ``pyproject.toml``
+   - ``.gitattributes`` - Line ending and diff rules
+   - ``.gitignore`` - Standard ignore patterns
+   - ``.editorconfig`` - Editor consistency settings
+   - ``.flake8`` - Python linting config
+   - ``.shellcheckrc`` - Shell linting config
+   - ``.pre-commit-config.yaml`` - Pre-commit hook definitions
+   - ``.readthedocs.yml`` - ReadTheDocs build config
+   - ``.markdownlint.json`` - Markdown linting config
+   - ``pyproject.toml`` - Python tool settings (Black, isort, pytest, mypy, bandit)
+   - ``Makefile`` - Standard development targets
+   - ``repo.mk.example`` - Template for custom targets
+   - ``.checkmake`` - Makefile linting config
+   - ``.checkmake-mk`` - Config for ``.mk`` include fragments
 
 2. **Install Pre-commit**
 
