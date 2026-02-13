@@ -24,6 +24,8 @@ on:
       - '**.yml'
       - '**.yaml'
 
+  workflow_dispatch: {}
+
 jobs:
   pre-commit:
     name: Pre-commit Checks
