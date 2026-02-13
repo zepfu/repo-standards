@@ -169,6 +169,7 @@ CONFIG_FILES=(
   ".shellcheckrc"
   ".pre-commit-config.yaml"
   ".readthedocs.yml"
+  ".markdownlint.json"
   "pyproject.toml"
   "Makefile"
   "repo.mk.example"
