@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-02-13
+
+### Fixed
+
+- Add `-ignore` args for SC2129 and SC2016 in actionlint pre-commit hook
+  ([a912de9](https://github.com/zepfu/repo-standards/commit/a912de9afe5f18c130b111150ae8ac665dd29a3d))
+- Add `.github/actionlint.yaml` config to suppress noisy shellcheck rules
+  ([ff9004e](https://github.com/zepfu/repo-standards/commit/ff9004e23097d5c68123c70354e301f89a933cb1))
+- Add `workflow_dispatch` trigger to pre-commit workflow
+  ([79a609d](https://github.com/zepfu/repo-standards/commit/79a609d1db83cbb9a09ec5fdb84bb153ed78324a))
+
 ## [1.0.0] - 2026-02-13
 
 ### Added
@@ -49,51 +60,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   ([f66940e](https://github.com/zepfu/repo-standards/commit/f66940ef6e9972780bf1758a6af7cc3a130d08f3))
 - Add external adopter onboarding guide
   ([8ebed97](https://github.com/zepfu/repo-standards/commit/8ebed9752e5b6dde42c4ce6bdcdb738348e16ebb))
-- Auto-update architecture documentation [skip ci]
-  ([be43bfd](https://github.com/zepfu/repo-standards/commit/be43bfda081345a4b4bdc28a2f18d231d8514a64))
-- Update PROJECT_LOG.md with session 2 activity
-  ([ba59c85](https://github.com/zepfu/repo-standards/commit/ba59c85febe0df3473d6695509d80e858a607cb3))
 - Add CONTRIBUTING.md for v1 release gate
   ([c30b0d1](https://github.com/zepfu/repo-standards/commit/c30b0d162765c6e4adc183658d57273c31e55705))
 - Complete reference documentation for all scripts, configs, and workflows
   ([c2569a4](https://github.com/zepfu/repo-standards/commit/c2569a4a8cc71377c04e7eadf492897a7d8feab7))
 - Add Claude orchestration framework with project-specific config
   ([1408125](https://github.com/zepfu/repo-standards/commit/1408125d6798129f5ba4d110c56130245cc17e24))
-- Auto-update architecture documentation [skip ci]
-  ([4ca473e](https://github.com/zepfu/repo-standards/commit/4ca473ea67af92b856a225a9c2d0e2e828de56f4))
-- Auto-update architecture documentation [skip ci]
-  ([b9a4e98](https://github.com/zepfu/repo-standards/commit/b9a4e98a32a1f9fba499d3b388b78af6b28f6a4c))
 - workflow registry ([83cda99](https://github.com/zepfu/repo-standards/commit/83cda99159b80f835e026e60ae0ad783f3c5e3e5))
 - docs updated ([7bdbb7f](https://github.com/zepfu/repo-standards/commit/7bdbb7f93d0049354a3e40a2191bdb222005bc0c))
-- Auto-update architecture documentation [skip ci]
-  ([6967c8b](https://github.com/zepfu/repo-standards/commit/6967c8b70a6054b040db60412ffcefdd52227368))
-- Auto-update architecture documentation [skip ci]
-  ([1a36228](https://github.com/zepfu/repo-standards/commit/1a36228c58ecabc6f683f1ed14baabd3e677776a))
 - workflow standardization
   ([385182f](https://github.com/zepfu/repo-standards/commit/385182f00aa4bab6ef4b74b3267f06f081ad3b07))
-- Auto-update architecture documentation
-  ([37a19e2](https://github.com/zepfu/repo-standards/commit/37a19e2b17ceba1ed02e6e4c97021caa30ea0e71))
 - workflow standardization
   ([83ad939](https://github.com/zepfu/repo-standards/commit/83ad93900bcdaad9c640143d89dc4ab82776271a))
-- Auto-update architecture documentation
-  ([16a4704](https://github.com/zepfu/repo-standards/commit/16a4704c701f02c581b762fdcba5e471c44b9f73))
 - workflow standardization
   ([27f9ef6](https://github.com/zepfu/repo-standards/commit/27f9ef6a17ca11ec5663342f7a91713720144810))
-- Auto-update documentation [skip ci]
-  ([bf2d744](https://github.com/zepfu/repo-standards/commit/bf2d744690433908d9802fc233cb7562eb7b1645))
 - workflow standardization
   ([4be9aa9](https://github.com/zepfu/repo-standards/commit/4be9aa997d3290e2891b692f612895c29343dff5))
-- Auto-update architecture documentation
-  ([4bde135](https://github.com/zepfu/repo-standards/commit/4bde135e6eda0c5837f60d56f6edec8ee2262471))
 - workflow standardization
   ([c7db8dc](https://github.com/zepfu/repo-standards/commit/c7db8dcef25b714a497d6a3618368eb1c2c1405d))
 - pre-commit workflow
   ([bf6d54f](https://github.com/zepfu/repo-standards/commit/bf6d54fda91ca29eedcc4e1860d15b840e3e717c))
 - workflow updates ([bee6523](https://github.com/zepfu/repo-standards/commit/bee65239af5a378da17c31936e16185f38198fcf))
-- Auto-update documentation [skip ci]
-  ([3d5b2ed](https://github.com/zepfu/repo-standards/commit/3d5b2ed7a3f23c0db8c00757669df8e605dc070e))
-- Auto-update documentation [skip ci]
-  ([100bf30](https://github.com/zepfu/repo-standards/commit/100bf30ae9ced4130a4d7cfde41568344b26f53e))
 - mermaid image generation
   ([b9878b4](https://github.com/zepfu/repo-standards/commit/b9878b4433a1fbf9ba526b9db3641e7c34ca970f))
 - workflow updates ([2bf2899](https://github.com/zepfu/repo-standards/commit/2bf2899958711edc5236e221946993ca504c928a))
@@ -102,8 +89,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - workflow updates ([78e833c](https://github.com/zepfu/repo-standards/commit/78e833ccb267efc599309ebc5087edefa652d9d5))
 - workflow updates ([981732d](https://github.com/zepfu/repo-standards/commit/981732db30ebd11a8e3c39b79125c1516503731d))
 - workflow updates ([37df72b](https://github.com/zepfu/repo-standards/commit/37df72b35f26d7bf00fca8020d482b8d6d3f2a5d))
-- more ignores ([f40b42c](https://github.com/zepfu/repo-standards/commit/f40b42c7c2aa4d44e098e87134ae3078218d62fb))
-- more ignores ([e36f0b9](https://github.com/zepfu/repo-standards/commit/e36f0b9c09273086e6962210ec7475614ed4d8fd))
 - ci updates ([19d8e20](https://github.com/zepfu/repo-standards/commit/19d8e20964f243fba8882741d75591da329cbe5c))
 - ci updates ([15c3877](https://github.com/zepfu/repo-standards/commit/15c3877ebbad9dbd415e34c3075a272c69c96da4))
 - refined ([474a09a](https://github.com/zepfu/repo-standards/commit/474a09a34674d2fc733408f09085c73ca52b2bf5))
@@ -111,6 +96,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Quote shell variables in all reusable workflow run blocks
+  ([7964c58](https://github.com/zepfu/repo-standards/commit/7964c58f165ac931bd1d4c6e5dd94a8b45fc279c))
 - Add .markdownlint.json to sparse-checkout in sync-configs.sh
   ([7798f8a](https://github.com/zepfu/repo-standards/commit/7798f8a1de48826626a2fd8003284af7e39e373f))
 - Add missing .markdownlint.json and include in sync-configs
