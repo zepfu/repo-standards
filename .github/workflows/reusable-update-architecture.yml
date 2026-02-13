@@ -62,9 +62,9 @@ jobs:
           [ -z "$DIAGRAMS" ] && DIAGRAMS="all"
           [ -z "$PYTHON_VERSION" ] && PYTHON_VERSION="3.13"
 
-          echo "output_path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
-          echo "diagrams=$DIAGRAMS" >> $GITHUB_OUTPUT
-          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+          echo "output_path=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"
+          echo "diagrams=$DIAGRAMS" >> "$GITHUB_OUTPUT"
+          echo "python_version=$PYTHON_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -111,9 +111,9 @@ jobs:
           OUTPUT_PATH="${{ steps.defaults.outputs.output_path }}"
 
           if git diff --quiet "$OUTPUT_PATH" 2>/dev/null; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Commit and push changes
@@ -130,16 +130,16 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Architecture Documentation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Architecture Documentation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ steps.check_changes.outputs.changed }}" = "true" ]; then
-            echo "- [PASS] Generated: \`${{ steps.defaults.outputs.output_path }}\`" >> $GITHUB_STEP_SUMMARY
-            echo "- Changes committed directly to \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Generated: \`${{ steps.defaults.outputs.output_path }}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Changes committed directly to \`${{ github.ref_name }}\`" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [SKIP] Architecture documentation is already up to date" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] Architecture documentation is already up to date" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Architecture generation complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Architecture generation complete**" >> "$GITHUB_STEP_SUMMARY"

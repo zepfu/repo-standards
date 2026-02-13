@@ -36,11 +36,11 @@ jobs:
       - name: Verify pre-commit config exists
         run: |
           if [ ! -f .pre-commit-config.yaml ]; then
-            echo "## Pre-commit Standards" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**[FAIL] .pre-commit-config.yaml not found**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Run: \`curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash\`" >> $GITHUB_STEP_SUMMARY
+            echo "## Pre-commit Standards" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**[FAIL] .pre-commit-config.yaml not found**" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run: \`curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash\`" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -55,13 +55,13 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Pre-commit Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Pre-commit Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ job.status }}" = "success" ]; then
-            echo "- [PASS] All pre-commit hooks passed" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] All pre-commit hooks passed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [FAIL] Pre-commit hooks found issues (see log output above)" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Pre-commit hooks found issues (see log output above)" >> "$GITHUB_STEP_SUMMARY"
           fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Pre-commit checks complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Pre-commit checks complete**" >> "$GITHUB_STEP_SUMMARY"

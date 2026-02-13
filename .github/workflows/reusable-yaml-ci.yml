@@ -46,10 +46,10 @@ jobs:
           YAMLS=( **/*.yml **/*.yaml )
 
           if [ ${#YAMLS[@]} -gt 0 ]; then
-            echo "has_yaml=true" >> $GITHUB_OUTPUT
+            echo "has_yaml=true" >> "$GITHUB_OUTPUT"
             echo "Found ${#YAMLS[@]} YAML file(s)"
           else
-            echo "has_yaml=false" >> $GITHUB_OUTPUT
+            echo "has_yaml=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Python
@@ -68,9 +68,9 @@ jobs:
         id: check_config
         run: |
           if [ -f ".yamllint" ] || [ -f ".yamllint.yml" ]; then
-            echo "has_config=true" >> $GITHUB_OUTPUT
+            echo "has_config=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_config=false" >> $GITHUB_OUTPUT
+            echo "has_config=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run yamllint
@@ -87,35 +87,35 @@ jobs:
             STRICT_FLAG="--strict"
           fi
 
-          echo "## YAML Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## YAML Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ steps.check_config.outputs.has_config }}" = "true" ]; then
-            echo "Using project yamllint config" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Using project yamllint config" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
 
-            if yamllint $STRICT_FLAG . 2>&1 | tee /tmp/yamllint.txt; then
-              echo "- [PASS] yamllint: all files passed" >> $GITHUB_STEP_SUMMARY
+            if yamllint ${STRICT_FLAG:+"$STRICT_FLAG"} . 2>&1 | tee /tmp/yamllint.txt; then
+              echo "- [PASS] yamllint: all files passed" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              cat /tmp/yamllint.txt >> $GITHUB_STEP_SUMMARY
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-              echo "- [FAIL] yamllint: issues found" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat /tmp/yamllint.txt >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "- [FAIL] yamllint: issues found" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           else
-            echo "Using workflow default config" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Using workflow default config" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
 
-            if yamllint -d "$CONFIG" $STRICT_FLAG . 2>&1 | tee /tmp/yamllint.txt; then
-              echo "- [PASS] yamllint: all files passed" >> $GITHUB_STEP_SUMMARY
+            if yamllint -d "$CONFIG" ${STRICT_FLAG:+"$STRICT_FLAG"} . 2>&1 | tee /tmp/yamllint.txt; then
+              echo "- [PASS] yamllint: all files passed" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              cat /tmp/yamllint.txt >> $GITHUB_STEP_SUMMARY
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-              echo "- [FAIL] yamllint: issues found" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              cat /tmp/yamllint.txt >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "- [FAIL] yamllint: issues found" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           fi
@@ -129,24 +129,24 @@ jobs:
           for file in **/*.yml **/*.yaml; do
             if [ -f "$file" ]; then
               if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
-                echo "- [FAIL] Syntax error: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] Syntax error: \`$file\`" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
               fi
             fi
           done
 
           if [ "$FAILED" = "true" ]; then
-            echo "- [FAIL] YAML syntax: errors found" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] YAML syntax: errors found" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "- [PASS] YAML syntax: all files valid" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] YAML syntax: all files valid" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Validate GitHub workflow files
         if: steps.check_yaml.outputs.has_yaml == 'true'
         run: |
           if [ ! -d ".github/workflows" ]; then
-            echo "- [SKIP] No .github/workflows directory found" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No .github/workflows directory found" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
@@ -158,43 +158,43 @@ jobs:
               ((WORKFLOW_COUNT++))
 
               if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>&1; then
-                echo "- [FAIL] Workflow syntax error: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] Workflow syntax error: \`$file\`" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
                 continue
               fi
 
               if ! grep -q "^name:" "$file"; then
-                echo "- [WARN] No 'name' field: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [WARN] No 'name' field: \`$file\`" >> "$GITHUB_STEP_SUMMARY"
               fi
 
               if ! grep -q "^on:" "$file" && ! grep -q "^'on':" "$file"; then
-                echo "- [FAIL] No 'on' trigger: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] No 'on' trigger: \`$file\`" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
               fi
 
               if ! grep -q "^jobs:" "$file"; then
-                echo "- [FAIL] No 'jobs' field: \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] No 'jobs' field: \`$file\`" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
               fi
             fi
           done
 
-          if [ $WORKFLOW_COUNT -eq 0 ]; then
-            echo "- [SKIP] No workflow files in .github/workflows/" >> $GITHUB_STEP_SUMMARY
+          if [ "$WORKFLOW_COUNT" -eq 0 ]; then
+            echo "- [SKIP] No workflow files in .github/workflows/" >> "$GITHUB_STEP_SUMMARY"
           elif [ "$FAILED" = "true" ]; then
-            echo "- [FAIL] Workflow validation: errors found" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Workflow validation: errors found" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "- [PASS] Workflow validation: all $WORKFLOW_COUNT files valid" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Workflow validation: all $WORKFLOW_COUNT files valid" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**YAML validation complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**YAML validation complete**" >> "$GITHUB_STEP_SUMMARY"
 
       - name: No YAML files found
         if: steps.check_yaml.outputs.has_yaml == 'false'
         run: |
-          echo "## YAML Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [SKIP] No YAML files found -- skipping validation" >> $GITHUB_STEP_SUMMARY
+          echo "## YAML Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [SKIP] No YAML files found -- skipping validation" >> "$GITHUB_STEP_SUMMARY"

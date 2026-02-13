@@ -36,8 +36,8 @@ jobs:
 
       - name: Check required config files exist
         run: |
-          echo "## Config Standards Validation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Config Standards Validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           REQUIRED_FILES=(
             ".gitattributes"
@@ -61,14 +61,14 @@ jobs:
           done
 
           if [ ${#MISSING_REQUIRED[@]} -ne 0 ]; then
-            echo "**[FAIL] Missing required config files:**" >> $GITHUB_STEP_SUMMARY
-            printf '  - \`%s\`\n' "${MISSING_REQUIRED[@]}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Run: \`curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash\`" >> $GITHUB_STEP_SUMMARY
+            echo "**[FAIL] Missing required config files:**" >> "$GITHUB_STEP_SUMMARY"
+            printf '  - \`%s\`\n' "${MISSING_REQUIRED[@]}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run: \`curl -fsSL https://raw.githubusercontent.com/zepfu/repo-standards/main/scripts/sync-configs.sh | bash\`" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
-          echo "- [PASS] All required config files present" >> $GITHUB_STEP_SUMMARY
+          echo "- [PASS] All required config files present" >> "$GITHUB_STEP_SUMMARY"
 
           # Check recommended files (warnings only)
           MISSING_RECOMMENDED=()
@@ -79,8 +79,8 @@ jobs:
           done
 
           if [ ${#MISSING_RECOMMENDED[@]} -ne 0 ]; then
-            echo "- [WARN] Recommended files missing (non-blocking):" >> $GITHUB_STEP_SUMMARY
-            printf '    - \`%s\`\n' "${MISSING_RECOMMENDED[@]}" >> $GITHUB_STEP_SUMMARY
+            echo "- [WARN] Recommended files missing (non-blocking):" >> "$GITHUB_STEP_SUMMARY"
+            printf '    - \`%s\`\n' "${MISSING_RECOMMENDED[@]}" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Validate .gitattributes content
@@ -88,17 +88,17 @@ jobs:
           FAILED=false
 
           if ! grep -q "text=auto" .gitattributes; then
-            echo "- [FAIL] .gitattributes: missing \`* text=auto\`" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] .gitattributes: missing \`* text=auto\`" >> "$GITHUB_STEP_SUMMARY"
             FAILED=true
           fi
 
           if ! grep -q "\.sh text eol=lf" .gitattributes; then
-            echo "- [FAIL] .gitattributes: must enforce LF for .sh files" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] .gitattributes: must enforce LF for .sh files" >> "$GITHUB_STEP_SUMMARY"
             FAILED=true
           fi
 
           if ! grep -q "\.py text eol=lf" .gitattributes; then
-            echo "- [FAIL] .gitattributes: must enforce LF for .py files" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] .gitattributes: must enforce LF for .py files" >> "$GITHUB_STEP_SUMMARY"
             FAILED=true
           fi
 
@@ -106,7 +106,7 @@ jobs:
             exit 1
           fi
 
-          echo "- [PASS] .gitattributes content is valid" >> $GITHUB_STEP_SUMMARY
+          echo "- [PASS] .gitattributes content is valid" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Validate .gitignore content
         run: |
@@ -125,12 +125,12 @@ jobs:
           done
 
           if [ ${#MISSING[@]} -ne 0 ]; then
-            echo "- [WARN] .gitignore: recommended patterns missing (non-blocking):" >> $GITHUB_STEP_SUMMARY
-            printf '    - \`%s\`\n' "${MISSING[@]}" >> $GITHUB_STEP_SUMMARY
+            echo "- [WARN] .gitignore: recommended patterns missing (non-blocking):" >> "$GITHUB_STEP_SUMMARY"
+            printf '    - \`%s\`\n' "${MISSING[@]}" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [PASS] .gitignore has all required patterns" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] .gitignore has all required patterns" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Config validation complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Config validation complete**" >> "$GITHUB_STEP_SUMMARY"

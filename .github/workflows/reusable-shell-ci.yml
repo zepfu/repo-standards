@@ -46,10 +46,10 @@ jobs:
           SCRIPTS=( **/*.sh )
 
           if [ ${#SCRIPTS[@]} -gt 0 ]; then
-            echo "has_scripts=true" >> $GITHUB_OUTPUT
+            echo "has_scripts=true" >> "$GITHUB_OUTPUT"
             echo "Found ${#SCRIPTS[@]} shell script(s)"
           else
-            echo "has_scripts=false" >> $GITHUB_OUTPUT
+            echo "has_scripts=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run ShellCheck
@@ -60,10 +60,10 @@ jobs:
 
           pip install shellcheck-py
 
-          echo "## Shell Script Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Severity level: \`$SEVERITY\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Shell Script Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Severity level: \`$SEVERITY\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           FAILED=false
 
@@ -72,29 +72,29 @@ jobs:
             if [ -f "$file" ]; then
               echo "Checking: $file"
               if shellcheck -S "$SEVERITY" -x "$file" 2>&1; then
-                echo "- [PASS] \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [PASS] \`$file\`" >> "$GITHUB_STEP_SUMMARY"
               else
-                echo "- [FAIL] \`$file\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] \`$file\`" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
               fi
             fi
           done
 
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$FAILED" = "true" ]; then
-            echo "**[FAIL] ShellCheck found issues**" >> $GITHUB_STEP_SUMMARY
+            echo "**[FAIL] ShellCheck found issues**" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "**[PASS] All shell scripts passed ShellCheck**" >> $GITHUB_STEP_SUMMARY
+            echo "**[PASS] All shell scripts passed ShellCheck**" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: No scripts found
         if: steps.check_scripts.outputs.has_scripts == 'false'
         run: |
-          echo "## Shell Script Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [SKIP] No shell scripts found -- skipping ShellCheck" >> $GITHUB_STEP_SUMMARY
+          echo "## Shell Script Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [SKIP] No shell scripts found -- skipping ShellCheck" >> "$GITHUB_STEP_SUMMARY"
 
   bash-syntax:
     name: Bash Syntax Validation
@@ -111,9 +111,9 @@ jobs:
           SCRIPTS=( **/*.sh )
 
           if [ ${#SCRIPTS[@]} -gt 0 ]; then
-            echo "has_scripts=true" >> $GITHUB_OUTPUT
+            echo "has_scripts=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_scripts=false" >> $GITHUB_OUTPUT
+            echo "has_scripts=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Validate Bash syntax
@@ -132,17 +132,17 @@ jobs:
           done
 
           if [ "$FAILED" = "true" ]; then
-            echo "- [FAIL] Bash syntax: errors found" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Bash syntax: errors found" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "- [PASS] Bash syntax: all scripts valid" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Bash syntax: all scripts valid" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Shell script checks complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Shell script checks complete**" >> "$GITHUB_STEP_SUMMARY"
 
       - name: No scripts found
         if: steps.check_scripts.outputs.has_scripts == 'false'
         run: |
-          echo "- [SKIP] No shell scripts found -- skipping syntax validation" >> $GITHUB_STEP_SUMMARY
+          echo "- [SKIP] No shell scripts found -- skipping syntax validation" >> "$GITHUB_STEP_SUMMARY"

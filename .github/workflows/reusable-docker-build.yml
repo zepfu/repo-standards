@@ -48,11 +48,11 @@ jobs:
           PUSH="${{ inputs.push }}"
           [ -z "$PUSH" ] && PUSH="false"
 
-          echo "## Docker Build" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Platform(s): \`$PLATFORMS\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Push: \`$PUSH\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Docker Build" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Platform(s): \`$PLATFORMS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Push: \`$PUSH\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build image
         uses: docker/build-push-action@v6
@@ -71,7 +71,7 @@ jobs:
 
       - name: Summary
         run: |
-          echo "- [PASS] Docker image built successfully" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Docker build complete**" >> $GITHUB_STEP_SUMMARY
+          echo "- [PASS] Docker image built successfully" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Docker build complete**" >> "$GITHUB_STEP_SUMMARY"

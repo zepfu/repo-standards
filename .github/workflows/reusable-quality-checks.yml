@@ -50,83 +50,83 @@ jobs:
       - name: Check for dead code (Vulture)
         id: vulture
         run: |
-          echo "## Advanced Quality Checks" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Dead Code Analysis (Vulture)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Advanced Quality Checks" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Dead Code Analysis (Vulture)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if vulture scripts/ --min-confidence 80 2>&1 | tee /tmp/vulture.txt; then
-            echo "- [PASS] Vulture: no dead code detected" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [PASS] Vulture: no dead code detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/vulture.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [WARN] Vulture: potentially unused code detected" >> $GITHUB_STEP_SUMMARY
-            echo "found=true" >> $GITHUB_OUTPUT
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/vulture.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [WARN] Vulture: potentially unused code detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check for unused imports (Autoflake)
         id: autoflake
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Unused Imports (Autoflake)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Unused Imports (Autoflake)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found in scripts/" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [SKIP] No Python files found in scripts/" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if autoflake --check --remove-all-unused-imports --recursive scripts/ 2>&1 | tee /tmp/autoflake.txt; then
-            echo "- [PASS] Autoflake: no unused imports" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [PASS] Autoflake: no unused imports" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/autoflake.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [WARN] Autoflake: unused imports detected" >> $GITHUB_STEP_SUMMARY
-            echo "found=true" >> $GITHUB_OUTPUT
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/autoflake.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [WARN] Autoflake: unused imports detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check for commented code (Eradicate)
         id: eradicate
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Commented-Out Code (Eradicate)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Commented-Out Code (Eradicate)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found in scripts/" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [SKIP] No Python files found in scripts/" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if eradicate --check scripts/ 2>&1 | tee /tmp/eradicate.txt; then
-            echo "- [PASS] Eradicate: no commented-out code" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [PASS] Eradicate: no commented-out code" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/eradicate.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [WARN] Eradicate: commented-out code detected" >> $GITHUB_STEP_SUMMARY
-            echo "found=true" >> $GITHUB_OUTPUT
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/eradicate.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [WARN] Eradicate: commented-out code detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check for unreachable code (PyLint)
         id: pylint
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Unreachable Code (PyLint)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Unreachable Code (PyLint)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found in scripts/" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [SKIP] No Python files found in scripts/" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -135,15 +135,15 @@ jobs:
                  scripts/*.py 2>&1 | tee /tmp/pylint.txt || true
 
           if grep -E "unreachable|pointless" /tmp/pylint.txt > /dev/null 2>&1; then
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/pylint.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [WARN] PyLint: unreachable code detected" >> $GITHUB_STEP_SUMMARY
-            echo "found=true" >> $GITHUB_OUTPUT
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/pylint.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [WARN] PyLint: unreachable code detected" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=true" >> "$GITHUB_OUTPUT"
           else
-            echo "- [PASS] PyLint: no unreachable code" >> $GITHUB_STEP_SUMMARY
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "- [PASS] PyLint: no unreachable code" >> "$GITHUB_STEP_SUMMARY"
+            echo "found=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Fail if requested and issues found
@@ -154,8 +154,8 @@ jobs:
            steps.eradicate.outputs.found == 'true' ||
            steps.pylint.outputs.found == 'true')
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**[FAIL] Unused code detected and fail-on-unused is enabled**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**[FAIL] Unused code detected and fail-on-unused is enabled**" >> "$GITHUB_STEP_SUMMARY"
           exit 1
 
   detect-unused-shell:
@@ -168,14 +168,14 @@ jobs:
 
       - name: Find unused shell functions
         run: |
-          echo "### Unused Shell Functions (Advisory)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Note: this check uses static analysis and may produce false positives" >> $GITHUB_STEP_SUMMARY
-          echo "for functions called via variables, sourced files, or indirect invocation." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Unused Shell Functions (Advisory)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Note: this check uses static analysis and may produce false positives" >> "$GITHUB_STEP_SUMMARY"
+          echo "for functions called via variables, sourced files, or indirect invocation." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.sh" > /dev/null 2>&1; then
-            echo "- [SKIP] No shell scripts found -- skipping analysis" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No shell scripts found -- skipping analysis" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
@@ -193,14 +193,14 @@ jobs:
 
               # Check if function is called anywhere
               if ! grep -rq "\b$func\b" scripts/ --include="*.sh" 2>/dev/null; then
-                echo "- [WARN] Potentially unused: \`$func\` in \`$(basename "$script")\`" >> $GITHUB_STEP_SUMMARY
+                echo "- [WARN] Potentially unused: \`$func\` in \`$(basename "$script")\`" >> "$GITHUB_STEP_SUMMARY"
                 found_unused=true
               fi
             done
           done
 
           if [ "$found_unused" = false ]; then
-            echo "- [PASS] No obviously unused shell functions detected" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] No obviously unused shell functions detected" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   markdown-lint:
@@ -218,9 +218,9 @@ jobs:
           MD_FILES=( **/*.md )
 
           if [ ${#MD_FILES[@]} -gt 0 ]; then
-            echo "has_markdown=true" >> $GITHUB_OUTPUT
+            echo "has_markdown=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_markdown=false" >> $GITHUB_OUTPUT
+            echo "has_markdown=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Python
@@ -237,28 +237,28 @@ jobs:
       - name: Run mdformat check
         if: steps.check_md.outputs.has_markdown == 'true'
         run: |
-          echo "### Markdown Formatting (mdformat)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Markdown Formatting (mdformat)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if mdformat --check --wrap 120 . 2>&1 | tee /tmp/mdformat.txt; then
-            echo "- [PASS] mdformat: all Markdown files properly formatted" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] mdformat: all Markdown files properly formatted" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/mdformat.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [FAIL] mdformat: formatting issues found" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Run \`mdformat --wrap 120 .\` to fix" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/mdformat.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [FAIL] mdformat: formatting issues found" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run \`mdformat --wrap 120 .\` to fix" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
       - name: No Markdown files found
         if: steps.check_md.outputs.has_markdown == 'false'
         run: |
-          echo "### Markdown Formatting" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [SKIP] No Markdown files found -- skipping formatting check" >> $GITHUB_STEP_SUMMARY
+          echo "### Markdown Formatting" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [SKIP] No Markdown files found -- skipping formatting check" >> "$GITHUB_STEP_SUMMARY"
 
   python-security:
     name: Python Security (Bandit)
@@ -279,23 +279,23 @@ jobs:
 
       - name: Run Bandit security scan
         run: |
-          echo "### Python Security (Bandit)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Security (Bandit)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
              ! compgen -G "**/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found -- skipping security scan" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No Python files found -- skipping security scan" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
           if bandit -c pyproject.toml -r . -f txt 2>&1 | tee /tmp/bandit.txt; then
-            echo "- [PASS] Bandit: no security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Bandit: no security issues detected" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -20 /tmp/bandit.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [FAIL] Bandit: security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -20 /tmp/bandit.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [FAIL] Bandit: security issues detected" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -318,23 +318,23 @@ jobs:
 
       - name: Run mypy
         run: |
-          echo "### Python Type Checking (mypy)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Type Checking (mypy)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
              ! compgen -G "**/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found -- skipping type check" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No Python files found -- skipping type check" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
           if mypy --ignore-missing-imports scripts/ 2>&1 | tee /tmp/mypy.txt; then
-            echo "- [PASS] mypy: no type errors detected" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] mypy: no type errors detected" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -20 /tmp/mypy.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [WARN] mypy: type issues detected" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -20 /tmp/mypy.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [WARN] mypy: type issues detected" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   python-docstyle:
@@ -356,23 +356,23 @@ jobs:
 
       - name: Run pydocstyle
         run: |
-          echo "### Python Docstring Style (pydocstyle)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Docstring Style (pydocstyle)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ! compgen -G "scripts/*.py" > /dev/null 2>&1 && \
              ! compgen -G "**/*.py" > /dev/null 2>&1; then
-            echo "- [SKIP] No Python files found -- skipping docstyle check" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No Python files found -- skipping docstyle check" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
           if pydocstyle --config=pyproject.toml scripts/ 2>&1 | tee /tmp/pydocstyle.txt; then
-            echo "- [PASS] pydocstyle: all docstrings follow Google convention" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] pydocstyle: all docstrings follow Google convention" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -30 /tmp/pydocstyle.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [FAIL] pydocstyle: docstring format issues detected" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -30 /tmp/pydocstyle.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [FAIL] pydocstyle: docstring format issues detected" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -388,9 +388,9 @@ jobs:
         id: check_workflows
         run: |
           if compgen -G ".github/workflows/*.yml" > /dev/null 2>&1; then
-            echo "has_workflows=true" >> $GITHUB_OUTPUT
+            echo "has_workflows=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_workflows=false" >> $GITHUB_OUTPUT
+            echo "has_workflows=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install actionlint
@@ -401,26 +401,26 @@ jobs:
       - name: Run actionlint
         if: steps.check_workflows.outputs.has_workflows == 'true'
         run: |
-          echo "### GitHub Actions Lint" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Actions Lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if ./actionlint -color 2>&1 | tee /tmp/actionlint.txt; then
-            echo "- [PASS] actionlint: all workflow files valid" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] actionlint: all workflow files valid" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/actionlint.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [FAIL] actionlint: workflow issues detected" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat /tmp/actionlint.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [FAIL] actionlint: workflow issues detected" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
       - name: No workflow files found
         if: steps.check_workflows.outputs.has_workflows == 'false'
         run: |
-          echo "### GitHub Actions Lint" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [SKIP] No workflow files found -- skipping actionlint" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Actions Lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [SKIP] No workflow files found -- skipping actionlint" >> "$GITHUB_STEP_SUMMARY"
 
   summary:
     name: Quality Check Summary
@@ -431,6 +431,6 @@ jobs:
     steps:
       - name: Summary
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Advanced quality checks complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Advanced quality checks complete**" >> "$GITHUB_STEP_SUMMARY"

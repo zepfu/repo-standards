@@ -75,11 +75,11 @@ jobs:
           [ -z "$GEN_ARCH" ] && GEN_ARCH="true"
           [ -z "$ARCH_DIAGRAMS" ] && ARCH_DIAGRAMS="all"
 
-          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
-          echo "docs_dir=$DOCS_DIR" >> $GITHUB_OUTPUT
-          echo "auto_docs_dir=$AUTO_DOCS_DIR" >> $GITHUB_OUTPUT
-          echo "generate_arch=$GEN_ARCH" >> $GITHUB_OUTPUT
-          echo "arch_diagrams=$ARCH_DIAGRAMS" >> $GITHUB_OUTPUT
+          echo "python_version=$PYTHON_VERSION" >> "$GITHUB_OUTPUT"
+          echo "docs_dir=$DOCS_DIR" >> "$GITHUB_OUTPUT"
+          echo "auto_docs_dir=$AUTO_DOCS_DIR" >> "$GITHUB_OUTPUT"
+          echo "generate_arch=$GEN_ARCH" >> "$GITHUB_OUTPUT"
+          echo "arch_diagrams=$ARCH_DIAGRAMS" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -234,39 +234,39 @@ jobs:
         run: |
           GEN_ARCH="${{ steps.defaults.outputs.generate_arch }}"
 
-          echo "## Documentation Build" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Documentation Build" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ steps.check_changes.outputs.has_auto_changes }}" = "true" ]; then
-            echo "- [PASS] Auto-documentation updated and committed" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Auto-documentation updated and committed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [SKIP] No auto-documentation changes" >> $GITHUB_STEP_SUMMARY
+            echo "- [SKIP] No auto-documentation changes" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- CHANGELOG.md -- git history" >> $GITHUB_STEP_SUMMARY
-          echo "- REPO_MAP.md -- repository structure" >> $GITHUB_STEP_SUMMARY
-          echo "- WORKFLOW_REGISTRY.md -- workflow registry and tool coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Generated Files" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- CHANGELOG.md -- git history" >> "$GITHUB_STEP_SUMMARY"
+          echo "- REPO_MAP.md -- repository structure" >> "$GITHUB_STEP_SUMMARY"
+          echo "- WORKFLOW_REGISTRY.md -- workflow registry and tool coverage" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$GEN_ARCH" = "true" ]; then
-            echo "- ARCHITECTURE_AUTO.md -- architecture diagrams" >> $GITHUB_STEP_SUMMARY
+            echo "- ARCHITECTURE_AUTO.md -- architecture diagrams" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             REPO="${GITHUB_REPOSITORY}"
             OWNER="${REPO%/*}"
             REPO_NAME="${REPO#*/}"
 
-            echo "- [PASS] Sphinx docs built and deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-            echo "- View at: https://${OWNER}.github.io/${REPO_NAME}/" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Sphinx docs built and deployed to GitHub Pages" >> "$GITHUB_STEP_SUMMARY"
+            echo "- View at: https://${OWNER}.github.io/${REPO_NAME}/" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [PASS] Sphinx docs built successfully (not deployed -- not on main)" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Sphinx docs built successfully (not deployed -- not on main)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Documentation build complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Documentation build complete**" >> "$GITHUB_STEP_SUMMARY"

@@ -35,16 +35,16 @@ jobs:
         id: check_makefile
         run: |
           if [ -f "Makefile" ]; then
-            echo "has_makefile=true" >> $GITHUB_OUTPUT
+            echo "has_makefile=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_makefile=false" >> $GITHUB_OUTPUT
+            echo "has_makefile=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Validate Makefile syntax
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
-          echo "## Makefile Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Makefile Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           # Get first available target
           TARGETS=$(make -qp 2>/dev/null \
@@ -53,9 +53,9 @@ jobs:
           [ -z "$TARGETS" ] && TARGETS="help"
 
           if make -n "$TARGETS" >/dev/null 2>&1; then
-            echo "- [PASS] Makefile syntax is valid" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Makefile syntax is valid" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [FAIL] Makefile syntax errors detected" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Makefile syntax errors detected" >> "$GITHUB_STEP_SUMMARY"
             make -n "$TARGETS" 2>&1 || true
             exit 1
           fi
@@ -64,7 +64,7 @@ jobs:
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
           go install github.com/checkmake/checkmake/cmd/checkmake@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
 
       - name: Run checkmake
         if: steps.check_makefile.outputs.has_makefile == 'true'
@@ -76,13 +76,13 @@ jobs:
 
           # Check Makefile
           if checkmake Makefile 2>&1; then
-            echo "- [PASS] checkmake: Makefile has no issues" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] checkmake: Makefile has no issues" >> "$GITHUB_STEP_SUMMARY"
           else
             if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-              echo "- [FAIL] checkmake: Makefile has issues" >> $GITHUB_STEP_SUMMARY
+              echo "- [FAIL] checkmake: Makefile has issues" >> "$GITHUB_STEP_SUMMARY"
               FAILED=true
             else
-              echo "- [WARN] checkmake: Makefile has issues (non-blocking)" >> $GITHUB_STEP_SUMMARY
+              echo "- [WARN] checkmake: Makefile has issues (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
             fi
           fi
 
@@ -92,13 +92,13 @@ jobs:
           if [ -n "$MK_FILES" ]; then
             while IFS= read -r mk_file; do
               if checkmake "$mk_file" 2>&1; then
-                echo "- [PASS] checkmake: \`$mk_file\` has no issues" >> $GITHUB_STEP_SUMMARY
+                echo "- [PASS] checkmake: \`$mk_file\` has no issues" >> "$GITHUB_STEP_SUMMARY"
               else
                 if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-                  echo "- [FAIL] checkmake: \`$mk_file\` has issues" >> $GITHUB_STEP_SUMMARY
+                  echo "- [FAIL] checkmake: \`$mk_file\` has issues" >> "$GITHUB_STEP_SUMMARY"
                   FAILED=true
                 else
-                  echo "- [WARN] checkmake: \`$mk_file\` has issues (non-blocking)" >> $GITHUB_STEP_SUMMARY
+                  echo "- [WARN] checkmake: \`$mk_file\` has issues (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
                 fi
               fi
             done <<< "$MK_FILES"
@@ -112,9 +112,9 @@ jobs:
         if: steps.check_makefile.outputs.has_makefile == 'true'
         run: |
           if grep -q "^\.PHONY:" Makefile; then
-            echo "- [PASS] Makefile has .PHONY declarations" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Makefile has .PHONY declarations" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [WARN] Makefile has no .PHONY declarations (non-blocking)" >> $GITHUB_STEP_SUMMARY
+            echo "- [WARN] Makefile has no .PHONY declarations (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
@@ -122,9 +122,9 @@ jobs:
           if [ -n "$MK_FILES" ]; then
             while IFS= read -r mk_file; do
               if grep -q "^\.PHONY:" "$mk_file"; then
-                echo "- [PASS] \`$mk_file\` has .PHONY declarations" >> $GITHUB_STEP_SUMMARY
+                echo "- [PASS] \`$mk_file\` has .PHONY declarations" >> "$GITHUB_STEP_SUMMARY"
               else
-                echo "- [WARN] \`$mk_file\` has no .PHONY declarations (non-blocking)" >> $GITHUB_STEP_SUMMARY
+                echo "- [WARN] \`$mk_file\` has no .PHONY declarations (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
               fi
             done <<< "$MK_FILES"
           fi
@@ -135,10 +135,10 @@ jobs:
           FAILED=false
 
           if grep -Pn '^ {8}[a-zA-Z@-]' Makefile >/dev/null 2>&1; then
-            echo "- [FAIL] Makefile: recipes may be using spaces instead of tabs" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Makefile: recipes may be using spaces instead of tabs" >> "$GITHUB_STEP_SUMMARY"
             FAILED=true
           else
-            echo "- [PASS] Makefile: recipe indentation is correct" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Makefile: recipe indentation is correct" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           MK_FILES=$(find . -name "*.mk" -type f -not -path "*/\.*" 2>/dev/null || true)
@@ -146,27 +146,27 @@ jobs:
           if [ -n "$MK_FILES" ]; then
             while IFS= read -r mk_file; do
               if grep -Pn '^ {8}[a-zA-Z@-]' "$mk_file" >/dev/null 2>&1; then
-                echo "- [FAIL] \`$mk_file\`: recipes may be using spaces instead of tabs" >> $GITHUB_STEP_SUMMARY
+                echo "- [FAIL] \`$mk_file\`: recipes may be using spaces instead of tabs" >> "$GITHUB_STEP_SUMMARY"
                 FAILED=true
               else
-                echo "- [PASS] \`$mk_file\`: recipe indentation is correct" >> $GITHUB_STEP_SUMMARY
+                echo "- [PASS] \`$mk_file\`: recipe indentation is correct" >> "$GITHUB_STEP_SUMMARY"
               fi
             done <<< "$MK_FILES"
           fi
 
           if [ "$FAILED" = "true" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Makefiles require tabs for recipe indentation, not spaces" >> $GITHUB_STEP_SUMMARY
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Makefiles require tabs for recipe indentation, not spaces" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Makefile validation complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Makefile validation complete**" >> "$GITHUB_STEP_SUMMARY"
 
       - name: No Makefile found
         if: steps.check_makefile.outputs.has_makefile == 'false'
         run: |
-          echo "## Makefile Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [SKIP] No Makefile found -- skipping validation" >> $GITHUB_STEP_SUMMARY
+          echo "## Makefile Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [SKIP] No Makefile found -- skipping validation" >> "$GITHUB_STEP_SUMMARY"

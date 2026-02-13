@@ -32,11 +32,11 @@ jobs:
           [ -z "$PROVIDED" ] && PROVIDED="3.13"
 
           if [[ "$PROVIDED" < "$REQUIRED" ]]; then
-            echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**[FAIL] Python version must be $REQUIRED+ (organization standard)**" >> $GITHUB_STEP_SUMMARY
-            echo "- Provided: \`$PROVIDED\`" >> $GITHUB_STEP_SUMMARY
-            echo "- See: https://github.com/zepfu/repo-standards#python-standards" >> $GITHUB_STEP_SUMMARY
+            echo "## Python Standards" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**[FAIL] Python version must be $REQUIRED+ (organization standard)**" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Provided: \`$PROVIDED\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- See: https://github.com/zepfu/repo-standards#python-standards" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -53,12 +53,12 @@ jobs:
         id: check_files
         run: |
           if compgen -G "**/*.py" > /dev/null 2>&1; then
-            echo "has_python=true" >> $GITHUB_OUTPUT
+            echo "has_python=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_python=false" >> $GITHUB_OUTPUT
-            echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [SKIP] No Python files found -- skipping linting" >> $GITHUB_STEP_SUMMARY
+            echo "has_python=false" >> "$GITHUB_OUTPUT"
+            echo "## Python Standards" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- [SKIP] No Python files found -- skipping linting" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Set up Python
@@ -76,15 +76,15 @@ jobs:
       - name: Run Black (check only)
         if: steps.check_files.outputs.has_python == 'true'
         run: |
-          echo "## Python Standards" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Python Standards" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           if black --check --line-length=100 . 2>&1; then
-            echo "- [PASS] Black: formatting check passed" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Black: formatting check passed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [FAIL] Black: formatting issues found" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Run \`black --line-length=100 .\` to fix" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Black: formatting issues found" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run \`black --line-length=100 .\` to fix" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -92,11 +92,11 @@ jobs:
         if: steps.check_files.outputs.has_python == 'true'
         run: |
           if isort --check --profile=black --line-length=100 . 2>&1; then
-            echo "- [PASS] isort: import ordering check passed" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] isort: import ordering check passed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [FAIL] isort: import ordering issues found" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Run \`isort --profile=black --line-length=100 .\` to fix" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] isort: import ordering issues found" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run \`isort --profile=black --line-length=100 .\` to fix" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -104,15 +104,15 @@ jobs:
         if: steps.check_files.outputs.has_python == 'true'
         run: |
           if flake8 . --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=20 2>&1; then
-            echo "- [PASS] Flake8: linting check passed" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Flake8: linting check passed" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- [FAIL] Flake8: linting issues found" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Flake8: linting issues found" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "**Python linting complete**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Python linting complete**" >> "$GITHUB_STEP_SUMMARY"
 
   python-syntax:
     name: Python Syntax Validation
@@ -127,9 +127,9 @@ jobs:
         id: check_files
         run: |
           if compgen -G "**/*.py" > /dev/null 2>&1; then
-            echo "has_python=true" >> $GITHUB_OUTPUT
+            echo "has_python=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_python=false" >> $GITHUB_OUTPUT
+            echo "has_python=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Python
@@ -154,8 +154,8 @@ jobs:
           done
 
           if [ "$FAILED" = "true" ]; then
-            echo "- [FAIL] Python syntax: compilation errors found" >> $GITHUB_STEP_SUMMARY
+            echo "- [FAIL] Python syntax: compilation errors found" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
-            echo "- [PASS] Python syntax: all files compile" >> $GITHUB_STEP_SUMMARY
+            echo "- [PASS] Python syntax: all files compile" >> "$GITHUB_STEP_SUMMARY"
           fi
