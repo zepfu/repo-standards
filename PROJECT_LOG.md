@@ -153,3 +153,31 @@ All CI workflows now passing. Tagged and released v1.0.1.
 
 Commits: 4828b35, 79a609d, ff9004e, a912de9, 01f1a03 Release:
 https://github.com/zepfu/repo-standards/releases/tag/v1.0.1
+
+### 2026-02-13 07:06 [COMPLETE] Stream B documentation — workflow examples and troubleshooting
+
+- B2: Created `docs/guides/workflow-examples.rst` — CI configs for 6 project types (starter, Python app, Python library,
+  shell/DevOps, Docker service, full suite) plus input reference table
+- B3: Created `docs/guides/troubleshooting.rst` — 12 common issues covering pre-commit hooks, sync-configs, CI
+  workflows, Python CI, Docker builds, and plugin compatibility
+- Updated PHASES.md: all Stream B items marked Done, v1 gate marked PASSED
+- Added both guides to Sphinx toctree
+
+Commit: 16d9d83
+
+### 2026-02-13 07:10 [NOTE] Session ended
+
+Duration: ~2 hours (continued from compacted session) Completed this session:
+
+- CI fix: actionlint/shellcheck SC2129+SC2016 suppression via -ignore args
+- v1.0.1 patch release tagged and published
+- B2: Workflow usage examples guide (workflow-examples.rst)
+- B3: Troubleshooting guide (troubleshooting.rst)
+- PHASES.md: all gate checkboxes ticked, Stream B marked Done In-flight: none Blocked: none Decisions made:
+- Operator deferred Stream C (language expansion) — no current demand Suggestions: none written, approved, rejected, or
+  pending Contracts: N/A (no cross-agent contracts in this project) GitHub sync:
+- No open issues. No issues created, closed, or updated this session. Recommended next actions:
+
+1. Routine maintenance: periodically run `pre-commit autoupdate` and test upgrades
+1. Monitor mdformat-gfm for mdformat 1.0.0 compatibility
+1. Stream C (Go/JS/Rust standards) when demand arises from consumer repos
