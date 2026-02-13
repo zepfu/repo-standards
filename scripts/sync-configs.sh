@@ -145,6 +145,7 @@ git sparse-checkout set \
   repo.mk.example \
   .checkmake \
   .checkmake-mk \
+  .markdownlint.json \
   docs/auto/WORKFLOW_REGISTRY.md \
   2>&1 | grep -v "^$" || true
 
