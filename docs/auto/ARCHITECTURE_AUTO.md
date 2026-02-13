@@ -1,6 +1,6 @@
 # Architecture (Auto-Generated)
 
-**Generated:** 2026-02-12 04:24:10 **Project:** /home/runner/work/repo-standards/repo-standards
+**Generated:** 2026-02-13 03:38:17 **Project:** /home/runner/work/repo-standards/repo-standards
 
 ## Overview
 
@@ -27,9 +27,7 @@ Analyzed **5** Python modules containing:
 ```mermaid
 flowchart TD
     Start([Start]) --> Init[Initialize]
-    Init --> rungitcommand[run_git_command]
-    Init --> main[main]
-    main --> End([End])
+    Init --> End([End])
 ```
 
 ## State Diagram
@@ -49,13 +47,13 @@ stateDiagram-v2
 
 ```mermaid
 architecture-beta
-    group scripts(cloud)[Scripts]
-        service scripts_changelog(server)[changelog] in scripts
-        service scripts_generate_architecture(server)[generate_architecture] in scripts
-        service scripts_generate_workflow_registry(server)[generate_workflow_registry] in scripts
-    end
     group docs(cloud)[Docs]
         service docs_conf(server)[conf] in docs
+    end
+    group scripts(cloud)[Scripts]
+        service scripts_generate_workflow_registry(server)[generate_workflow_registry] in scripts
+        service scripts_repo_map(server)[repo_map] in scripts
+        service scripts_generate_architecture(server)[generate_architecture] in scripts
     end
 ```
 
@@ -67,20 +65,6 @@ architecture-beta
 
 ```mermaid
 classDiagram
-    class scripts_generate_architecture_CodeAnalyzer {
-        +__init__(root_path)
-        +analyze()
-        +_should_ignore(path)
-        +_analyze_file(filepath)
-        +_get_name(node)
-    }
-    class scripts_generate_architecture_DiagramGenerator {
-        +__init__(analyzer)
-        +generate_flowchart()
-        +generate_state_diagram()
-        +generate_sequence_diagram()
-        +generate_architecture_diagram()
-    }
     class scripts_generate_workflow_registry_WorkflowParser {
         +KNOWN_TOOLS
         +BASH_CHECK_PATTERNS
@@ -97,6 +81,20 @@ classDiagram
         +_precommit_vs_ci()
         +_workflow_registry()
     }
+    class scripts_generate_architecture_CodeAnalyzer {
+        +__init__(root_path)
+        +analyze()
+        +_should_ignore(path)
+        +_analyze_file(filepath)
+        +_get_name(node)
+    }
+    class scripts_generate_architecture_DiagramGenerator {
+        +__init__(analyzer)
+        +generate_flowchart()
+        +generate_state_diagram()
+        +generate_sequence_diagram()
+        +generate_architecture_diagram()
+    }
 ```
 
 ## Journey Diagram
@@ -111,10 +109,10 @@ mindmap
     docs
       conf
     scripts
-      changelog
-      generate_architecture
       generate_workflow_registry
       repo_map
+      generate_architecture
+      changelog
 ```
 
 ## Workflow Pipeline Diagram
@@ -123,24 +121,24 @@ mindmap
 flowchart TD
 
     Push -->|Doc Changes| Docs[Build Docs]
+    Docs --> reusable_update_docs[Update Documentation (Reusable]
     Docs --> reusable_docker_build[Docker Build Standards]
-    Docs --> reusable_update_architecture[Update Architecture Documentat]
 ```
 
 ## Workflow Triggers Diagram
 
 ```mermaid
 graph TD
-    reusable_makefile_ci[Makefile Standards Enforcement]
+    reusable_python_ci[Python Standards Enforcement]
     reusable_config_validation[Config Standards Validation]
+    reusable_update_docs[Update Documentation (Reusable)]
+    reusable_pre_commit[Pre-commit Standards Enforcement]
+    reusable_shell_ci[Shell Script Standards Enforcement]
+    reusable_makefile_ci[Makefile Standards Enforcement]
+    reusable_quality_checks[Advanced Quality Checks]
     reusable_yaml_ci[YAML Standards Enforcement]
     reusable_docker_build[Docker Build Standards]
-    reusable_python_ci[Python Standards Enforcement]
     reusable_update_architecture[Update Architecture Documentation]
-    reusable_shell_ci[Shell Script Standards Enforcement]
-    reusable_pre_commit[Pre-commit Standards Enforcement]
-    reusable_update_docs[Update Documentation (Reusable)]
-    reusable_quality_checks[Advanced Quality Checks]
 ```
 
 ## Workflow Jobs Diagram
