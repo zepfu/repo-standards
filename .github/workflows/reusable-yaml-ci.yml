@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check for YAML files
         id: check_yaml
@@ -54,7 +54,7 @@ jobs:
 
       - name: Set up Python
         if: steps.check_yaml.outputs.has_yaml == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
